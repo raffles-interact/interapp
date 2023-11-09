@@ -1,9 +1,9 @@
-FROM node:21-alpine
+FROM oven/bun:1.0.11
 WORKDIR /app
 
 COPY . .
 
-RUN npm ci
+RUN bun install
 
 EXPOSE 3000
-CMD ["npm", "run", "dev"]
+CMD ["bun", "run", "dev"]
