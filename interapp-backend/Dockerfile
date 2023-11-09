@@ -9,8 +9,6 @@ RUN bun install
 
 COPY . . 
 
-# initialise database
-RUN bun run db/init.ts 
 
 EXPOSE 3000
 CMD ["bun", "--watch", "api/routes/index.ts"]
