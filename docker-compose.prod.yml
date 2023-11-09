@@ -4,12 +4,12 @@ services:
   postgres:
     container_name: interapp-postgres
     image: postgres:alpine
-    restart: on-failure
+    restart: always
     ports:
       - 5432:5432
     command: postgres 
     env_file:
-      - ./interapp-backend/.env
+      - ./interapp-backend/.env.production
     networks:
       - interapp-network
     healthcheck:
@@ -20,21 +20,12 @@ services:
 
   backend:
     container_name: interapp-backend
-    restart: on-failure
+    restart: always
     build: 
       context: ./interapp-backend
-      dockerfile: Dockerfile
-    develop:
-      watch:
-        - path: ./interapp-backend/api
-          action: sync
-          target: /app/api
+      dockerfile: prod.Dockerfile
     env_file:
-      - ./interapp-backend/.env
-    environment:
-      - POSTGRES_HOST=interapp-postgres
-      - POSTGRES_PORT=5432
-      - API_PORT=8000
+      - ./interapp-backend/.env.production
     ports:
       - 8000:8000
     networks:
@@ -47,9 +38,7 @@ services:
     container_name: interapp-frontend
     build: 
       context: ./interapp-frontend
-      dockerfile: Dockerfile
-    volumes:
-      - ./interapp-frontend/src:/app/src
+      dockerfile: prod.Dockerfile
     ports:
       - 3000:3000
     networks:

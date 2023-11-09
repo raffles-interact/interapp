@@ -15,7 +15,7 @@ const nextConfig = {
       {
         source: '/api/:path*',
         destination:
-          process.env.NODE_ENV === 'development' ? 'http://backend:8000/api/:path*' : '/api/',
+          `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api/:path*`,
       },
     ];
   },
