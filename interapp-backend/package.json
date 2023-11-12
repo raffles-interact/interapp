@@ -4,9 +4,10 @@
   "type": "module",
   "scripts": {
     "typeorm": "typeorm-ts-node-esm",
-    "typeorm:generate": "sh scripts/typeorm_generate.sh",
-    "typeorm:run": "typeorm-ts-node-esm migration:run -- -d db/data-source.ts",
-    "typeorm:revert": "typeorm-ts-node-esm migration:revert -- -d db/data-source.ts"
+    "typeorm:generate": "sh ./scripts/typeorm_generate.sh",
+    "typeorm:run": "typeorm-ts-node-esm migration:run -d db/data-source.ts",
+    "typeorm:revert": "typeorm-ts-node-esm migration:revert -d db/data-source.ts",
+    "typeorm:drop": "typeorm-ts-node-esm schema:drop -d db/data-source.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",

@@ -1,8 +1,7 @@
 import { DataSource } from 'typeorm';
 import { DataSourceOptions } from 'typeorm';
-import { HelloWorld } from './entities/hello_world';
 
-const options: DataSourceOptions = {
+export const AppDataSourceOptions: DataSourceOptions = {
   type: 'postgres',
   host: process.env.POSTGRES_HOST,
   port: Number(process.env.POSTGRES_PORT),
@@ -11,16 +10,15 @@ const options: DataSourceOptions = {
   database: process.env.POSTGRES_DB,
   synchronize: process.env.NODE_ENV === 'development',
   logging: true,
-  entities: [HelloWorld],
+  entities: [`${__dirname}/entities/*.ts`],
   subscribers: [],
-  migrations: [],
+  migrations: [`${__dirname}/migrations/*.ts`],
 };
-
-export const AppDataSource = new DataSource(options);
 
 // for migrations only
 // override host to localhost to avoid docker networking issues in CLI
-export default new DataSource({
-  ...options,
+const migrationDataSource = new DataSource({
+  ...AppDataSourceOptions,
   host: 'localhost',
 });
+export default migrationDataSource;
