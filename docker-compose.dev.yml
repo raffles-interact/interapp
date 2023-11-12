@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   postgres:
@@ -7,21 +7,21 @@ services:
     restart: on-failure
     ports:
       - 5432:5432
-    command: postgres 
+    command: postgres
     env_file:
       - ./interapp-backend/.env.development
     networks:
       - interapp-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
+      interval: 3s
       timeout: 5s
       retries: 5
 
   backend:
     container_name: interapp-backend
     restart: on-failure
-    build: 
+    build:
       context: ./interapp-backend
       dockerfile: dev.Dockerfile
     develop:
@@ -41,10 +41,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    
+
   frontend:
     container_name: interapp-frontend
-    build: 
+    build:
       context: ./interapp-frontend
       dockerfile: dev.Dockerfile
     volumes:

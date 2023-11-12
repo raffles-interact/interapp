@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 
 services:
   postgres:
@@ -7,7 +7,7 @@ services:
     restart: always
     ports:
       - 5432:5432
-    command: postgres 
+    command: postgres
     env_file:
       - ./interapp-backend/.env.production
     networks:
@@ -21,7 +21,7 @@ services:
   backend:
     container_name: interapp-backend
     restart: always
-    build: 
+    build:
       context: ./interapp-backend
       dockerfile: prod.Dockerfile
     env_file:
@@ -33,10 +33,10 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-    
+
   frontend:
     container_name: interapp-frontend
-    build: 
+    build:
       context: ./interapp-frontend
       dockerfile: prod.Dockerfile
     ports:
