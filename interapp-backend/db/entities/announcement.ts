@@ -18,6 +18,6 @@ export class Announcement {
   @Column()
   user_id: number;
 
-  @ManyToOne(() => User, (user) => user.user_id)
+  @ManyToOne(() => User)
   user: Relation<User>;
 }

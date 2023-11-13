@@ -25,9 +25,9 @@ export class Service {
   @Column({ type: 'bytea', nullable: true })
   promotional_image: Buffer;
 
-  @OneToMany(() => UserService, (user_service) => user_service.service_id)
+  @OneToMany(() => UserService, (user_service) => user_service.service)
   user_service: Relation<UserService[]>;
 
-  @OneToMany(() => ServiceSession, (service_session) => service_session.service_id)
+  @OneToMany(() => ServiceSession, (service_session) => service_session.service)
   service_sessions: Relation<ServiceSession[]>;
 }

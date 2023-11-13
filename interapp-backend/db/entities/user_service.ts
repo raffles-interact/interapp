@@ -10,9 +10,9 @@ export class UserService {
   @PrimaryColumn()
   service_id: number;
 
-  @ManyToOne(() => User, (user) => user.user_id)
+  @ManyToOne(() => User, (user) => user.user_service)
   user: Relation<User>;
 
-  @ManyToOne(() => Service, (service) => service.service_id)
-  services: Relation<Service>;
+  @ManyToOne(() => Service, (service) => service.user_service)
+  service: Relation<Service>;
 }

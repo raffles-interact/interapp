@@ -10,10 +10,10 @@ export class AnnouncementCompletion {
   @PrimaryColumn()
   user_id: number;
 
-  @ManyToOne(() => Announcement, (announcement) => announcement.announcement_id)
+  @ManyToOne(() => Announcement)
   announcement: Relation<Announcement>;
 
-  @ManyToOne(() => User, (user) => user.user_id)
+  @ManyToOne(() => User)
   user: Relation<User>;
 
   @Column()

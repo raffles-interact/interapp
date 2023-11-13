@@ -17,12 +17,12 @@ export class User {
   @Column()
   service_hours: number;
 
-  @OneToMany(() => UserPermission, (user_permission) => user_permission.user_id)
+  @OneToMany(() => UserPermission, (user_permission) => user_permission.user)
   user_permissions: Relation<UserPermission[]>;
 
-  @OneToMany(() => UserService, (user_service) => user_service.user_id)
+  @OneToMany(() => UserService, (user_service) => user_service.user)
   user_service: Relation<UserService[]>;
 
-  @OneToMany(() => ServiceSessionUser, (service_session_user) => service_session_user.user_id)
+  @OneToMany(() => ServiceSessionUser, (service_session_user) => service_session_user.user)
   service_session_users: Relation<ServiceSessionUser[]>;
 }

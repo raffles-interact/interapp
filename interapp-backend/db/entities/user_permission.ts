@@ -9,6 +9,6 @@ export class UserPermission {
   @PrimaryColumn()
   permission_id: number;
 
-  @ManyToOne(() => User, (user) => user.user_id)
+  @ManyToOne(() => User, (user) => user.user_permissions)
   user: Relation<User>;
 }
