@@ -20,19 +20,19 @@ Go to ``localhost:3000`` for frontend and ``localhost:3000/api`` for api routes
 
 ## Setting up (testing/non-technical)
 
-If you're just testing the UI/frontend, just have ``docker`` installed in your terminal and have Docker desktop running. You can install docker [here](https://docs.docker.com/engine/install/).
+1. If you're just testing the UI/frontend, just have ``docker`` installed in your terminal and have Docker desktop running. You can install docker [here](https://docs.docker.com/engine/install/).
 
-Download the ZIP file (Scroll to the green button 'Code' > 'Local' tab > Download ZIP) and unzip it in your directory of choice.
+2. Download the ZIP file (Scroll to the green button 'Code' > 'Local' tab > Download ZIP) and unzip it in your directory of choice.
 
-Right click the folder which you unzipped and copy its path (may differ based on operating system). Open a new terminal (command prompt on windows/terminal on Mac), and type ``cd <path-to-the-directory-which-you-copied>``.
+3. Right click the folder which you unzipped and copy its path (the location where the folder is stored at). Open a new terminal (command prompt on windows/terminal on Mac), and type ``cd <path-to-the-directory-which-you-copied>``.
 
-Verify docker is installed with ``docker -v`` and ensure that you have docker desktop open (important!).
+4. Verify docker is installed with ``docker -v`` (If the terminal says ``docker`` is not recognised, try reopening another terminal, failing which, restart your computer) and ensure that you have docker desktop open (important!).
 
-Run ``docker compose build --no-cache && docker compose up -d``.
+5. Run ``docker compose -f docker-compose.dev.yml up --build -d``.
 
-Verify the containers are running by going to docker desktop and ensuring all container icons are GREEN.
+6. Verify the containers are running by going to docker desktop and ensuring all container icons are **green**.
 
-Go to ``localhost:3000`` on your browser.
+7. Go to ``localhost:3000`` on your browser, and verify that you can see the site.
 
 
 ## thanks
