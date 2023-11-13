@@ -26,12 +26,12 @@ export class ServiceSession {
   @Column()
   ad_hoc_enabled: boolean;
 
-  @ManyToOne(() => Service, (service) => service.service_id)
-  services: Relation<Service>;
+  @ManyToOne(() => Service, (service) => service.service_sessions)
+  service: Relation<Service>;
 
   @OneToMany(
     () => ServiceSessionUser,
-    (service_session_user) => service_session_user.service_session_id,
+    (service_session_user) => service_session_user.service_session,
   )
   service_session_users: Relation<ServiceSessionUser[]>;
 }

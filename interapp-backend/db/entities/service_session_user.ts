@@ -13,9 +13,9 @@ export class ServiceSessionUser {
   @Column()
   ad_hoc: boolean;
 
-  @ManyToOne(() => ServiceSession, (service_session) => service_session.service_session_id)
-  service_sessions: Relation<ServiceSession>;
+  @ManyToOne(() => ServiceSession, (service_session) => service_session.service_session_users)
+  service_session: Relation<ServiceSession>;
 
-  @ManyToOne(() => User, (user) => user.user_id)
+  @ManyToOne(() => User, (user) => user.service_session_users)
   user: Relation<User>;
 }
