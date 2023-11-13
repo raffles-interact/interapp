@@ -1,5 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, type Relation } from 'typeorm';
-import { Users } from './users';
+import { User } from './user';
 
 @Entity()
 export class Announcement {
@@ -15,6 +15,9 @@ export class Announcement {
   @Column({ type: 'bytea', nullable: true })
   attachment: Buffer;
 
-  @ManyToOne(() => Users, (user) => user.user_id)
-  user_id: Relation<Users>;
+  @Column()
+  user_id: number;
+
+  @ManyToOne(() => User, (user) => user.user_id)
+  user: Relation<User>;
 }

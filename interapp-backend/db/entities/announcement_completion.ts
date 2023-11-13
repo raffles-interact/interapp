@@ -1,6 +1,6 @@
 import { Entity, Column, PrimaryColumn, ManyToOne, type Relation } from 'typeorm';
 import { Announcement } from './announcement';
-import { Users } from './users';
+import { User } from './user';
 
 @Entity()
 export class AnnouncementCompletion {
@@ -13,8 +13,8 @@ export class AnnouncementCompletion {
   @ManyToOne(() => Announcement, (announcement) => announcement.announcement_id)
   announcement: Relation<Announcement>;
 
-  @ManyToOne(() => Users, (user) => user.user_id)
-  user: Relation<Users>;
+  @ManyToOne(() => User, (user) => user.user_id)
+  user: Relation<User>;
 
   @Column()
   completed: boolean;
