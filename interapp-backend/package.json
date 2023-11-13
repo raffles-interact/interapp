@@ -7,7 +7,9 @@
     "typeorm:generate": "sh ./scripts/typeorm_generate.sh",
     "typeorm:run": "typeorm-ts-node-esm migration:run -d db/data-source.ts",
     "typeorm:revert": "typeorm-ts-node-esm migration:revert -d db/data-source.ts",
-    "typeorm:drop": "typeorm-ts-node-esm schema:drop -d db/data-source.ts"
+    "typeorm:show": "typeorm-ts-node-esm migration:show -d db/data-source.ts",
+    "typeorm:drop": "typeorm-ts-node-esm schema:drop -d db/data-source.ts",
+    "typeorm:sync": "typeorm-ts-node-esm schema:sync -d db/data-source.ts"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
