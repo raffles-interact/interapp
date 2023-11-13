@@ -1,9 +1,9 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany, type Relation } from 'typeorm';
-import { UserServices } from './user_services';
-import { ServiceSessions } from './service_sessions';
+import { UserService } from './user_service';
+import { ServiceSession } from './service_session';
 
 @Entity()
-export class Services {
+export class Service {
   @PrimaryGeneratedColumn()
   service_id: number;
 
@@ -25,9 +25,9 @@ export class Services {
   @Column({ type: 'bytea', nullable: true })
   promotional_image: Buffer;
 
-  @OneToMany(() => UserServices, (user_services) => user_services.service_id)
-  user_services: Relation<UserServices[]>;
+  @OneToMany(() => UserService, (user_service) => user_service.service_id)
+  user_service: Relation<UserService[]>;
 
-  @OneToMany(() => ServiceSessions, (service_sessions) => service_sessions.service_id)
-  service_sessions: Relation<ServiceSessions[]>;
+  @OneToMany(() => ServiceSession, (service_session) => service_session.service_id)
+  service_sessions: Relation<ServiceSession[]>;
 }

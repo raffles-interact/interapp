@@ -1,14 +1,14 @@
 import { Entity, ManyToOne, PrimaryColumn, type Relation } from 'typeorm';
-import { Users } from './users';
+import { User } from './user';
 
 @Entity()
-export class UserPermissions {
+export class UserPermission {
   @PrimaryColumn()
   user_id: number;
 
   @PrimaryColumn()
   permission_id: number;
 
-  @ManyToOne(() => Users, (users) => users.user_id)
-  users: Relation<Users>;
+  @ManyToOne(() => User, (user) => user.user_id)
+  user: Relation<User>;
 }
