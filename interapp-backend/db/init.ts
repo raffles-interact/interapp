@@ -1,7 +1,6 @@
 import { AppDataSource } from '@db/data-source';
 
-AppDataSource
-  .initialize()
+AppDataSource.initialize()
   .then(() => {
     console.log('Database initialized');
     process.exit(0);

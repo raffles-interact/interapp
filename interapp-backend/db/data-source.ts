@@ -22,5 +22,5 @@ export const AppDataSource = new DataSource(options);
 // override host to localhost to avoid docker networking issues in CLI
 export default new DataSource({
   ...options,
-  host: 'localhost'
+  host: 'localhost',
 });
