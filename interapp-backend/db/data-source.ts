@@ -9,10 +9,13 @@ export const AppDataSourceOptions: DataSourceOptions = {
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
   synchronize: process.env.NODE_ENV === 'development',
-  logging: true,
+  logging: process.env.NODE_ENV === 'development' ? 'all' : ['schema', 'error', 'warn'],
+  logger: 'advanced-console',
+  maxQueryExecutionTime: 1000,
   entities: [`${__dirname}/entities/*.ts`],
   subscribers: [],
   migrations: [`${__dirname}/migrations/*.ts`],
+  migrationsRun: true,
 };
 
 // for migrations only
