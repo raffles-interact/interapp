@@ -1,4 +1,4 @@
-import appDataSource from '@service/index';
+import appDataSource from '@utils/init_datasource';
 import { HelloWorld } from '@db/entities/hello_world';
 
 export async function hello() {
