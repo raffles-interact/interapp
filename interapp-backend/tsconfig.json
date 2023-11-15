@@ -24,7 +24,8 @@
     "paths": {
       "@db/*": ["./db/*"],
       "@routes/*": ["./api/routes/*"],
-      "@service/*": ["./api/service/*"]
+      "@models/*": ["./api/models/*"],
+      "@utils/*": ["./api/utils/*"]
     }
   }
 }
