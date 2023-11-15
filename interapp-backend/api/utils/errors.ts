@@ -5,11 +5,11 @@ export interface AppError extends Error {
 }
 
 export class HTTPError extends Error implements Partial<AppError> {
-  name: string;
-  message: string;
-  data?: Record<string, any>;
-  status: HTTPErrorCode;
-  headers?: Record<string, string>;
+  public readonly name: string;
+  public readonly message: string;
+  public readonly data?: Record<string, any>;
+  public readonly status: HTTPErrorCode;
+  public readonly headers?: Record<string, string>;
 
   constructor(
     name: string,
@@ -28,11 +28,11 @@ export class HTTPError extends Error implements Partial<AppError> {
 }
 
 export class DatabaseError extends Error implements Partial<AppError> {
-  name: string;
-  message: string;
-  data?: Record<string, any>;
-  query: string;
-  parameters?: any[];
+  public readonly name: string;
+  public readonly message: string;
+  public readonly data?: Record<string, any>;
+  public readonly query: string;
+  public readonly parameters?: any[];
 
   constructor(
     name: string,
