@@ -7,6 +7,8 @@ import { HTTPError } from '@utils/errors';
 const app = express();
 const PORT = Number(process.env.API_PORT);
 
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use('/api/hello', helloRouter);
 
 app.use((err: HTTPError, req: Request, res: Response, next: NextFunction) => {
