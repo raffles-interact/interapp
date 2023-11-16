@@ -1,18 +1,21 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, type Relation } from 'typeorm';
+import { Entity, Column, PrimaryColumn, OneToMany, type Relation } from 'typeorm';
 import { UserPermission } from './user_permission';
 import { UserService } from './user_service';
 import { ServiceSessionUser } from './service_session_user';
 
 @Entity()
 export class User {
-  @PrimaryGeneratedColumn()
+  @PrimaryColumn()
   user_id: number;
 
   @Column()
-  name: string;
+  username: string;
 
   @Column()
   email: string;
+
+  @Column()
+  password_hash: string;
 
   @Column()
   service_hours: number;
