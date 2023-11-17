@@ -14,9 +14,25 @@ services:
       - interapp-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 3s
-      timeout: 5s
-      retries: 5
+      interval: 2s
+      timeout: 2s
+      retries: 7
+  
+  redis:
+    container_name: interapp-redis
+    image: redis:alpine
+    restart: on-failure
+    env_file:
+      - ./interapp-backend/.env.development
+    ports:
+      - 6379:6379
+    networks:
+      - interapp-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 2s
+      timeout: 2s
+      retries: 7
 
   backend:
     container_name: interapp-backend
@@ -40,6 +56,8 @@ services:
       - interapp-network
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   frontend:
