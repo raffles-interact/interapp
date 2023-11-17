@@ -18,6 +18,22 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    container_name: interapp-redis
+    image: redis:alpine
+    restart: always
+    env_file:
+      - ./interapp-backend/.env.production
+    ports:
+      - 6379:6379
+    networks:
+      - interapp-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 2s
+      timeout: 2s
+      retries: 7
+
   backend:
     container_name: interapp-backend
     restart: always
@@ -32,6 +48,8 @@ services:
       - interapp-network
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
 
   frontend:

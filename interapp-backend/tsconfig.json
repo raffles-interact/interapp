@@ -25,7 +25,8 @@
       "@db/*": ["./db/*"],
       "@routes/*": ["./api/routes/*"],
       "@models/*": ["./api/models/*"],
-      "@utils/*": ["./api/utils/*"]
+      "@utils/*": ["./api/utils/*"],
+      "@email_handler/*": ["./api/email_handler/*"]
     }
   }
 }

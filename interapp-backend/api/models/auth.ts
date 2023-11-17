@@ -2,6 +2,9 @@ import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { SignJWT, jwtVerify, JWTPayload } from 'jose';
+import { randomBytes } from 'crypto';
+import redisClient from '@utils/init_redis';
+import transporter from '@email_handler/index';
 
 export interface UserJWT extends JWTPayload {
   userId: number;
@@ -168,5 +171,72 @@ export class AuthModel {
       }
     }
     await appDataSource.manager.update(User, { username: username }, user);
+  }
+  public static async resetPassword(token: string) {
+    // check if the user exists in redis
+    const username = await redisClient.get(`resetpw:${token}`);
+    if (!username) {
+      throw new HTTPError(
+        'Invalid token',
+        'The token you provided is invalid',
+        HTTPErrorCode.UNAUTHORIZED_ERROR,
+      );
+    }
+
+    // generate a random password
+    const newPassword = randomBytes(8).toString('hex');
+
+    // hash the password
+    const newPasswordHash = await Bun.password.hash(newPassword);
+
+    // update the user's password
+    await appDataSource.manager.update(
+      User,
+      { username: username },
+      { password_hash: newPasswordHash },
+    );
+
+    // delete the token
+    await redisClient.del(`resetpw:${token}`);
+
+    return newPassword;
+  }
+  public static async sendResetPasswordEmail(username: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user.email'])
+      .from(User, 'user')
+      .where('user.username = :username', { username: username })
+      .getOne();
+
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    const token = randomBytes(16).toString('hex');
+    await redisClient.set(`resetpw:${token}`, username, {
+      EX: 60 * 60 * 1, // 1 hour expiration
+    });
+
+    const email = {
+      from: {
+        name: 'Interapp',
+        address: process.env.EMAIL_USER as string,
+      },
+      to: [user.email],
+      subject: 'Reset Password from Interapp',
+      template: 'reset_password',
+      context: {
+        token: token,
+        username: username,
+        url: 'localhost:3000', //TODO
+      },
+    };
+
+    await transporter.sendMail(email);
   }
 }

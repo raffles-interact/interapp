@@ -33,13 +33,13 @@ authRouter.post(
       req.body.email,
       req.body.password,
     );
-    res.send(token);
+    res.status(200).send(token);
   },
 );
 
 authRouter.post('/signin', validateRequiredFields(['username', 'password']), async (req, res) => {
   const token = await AuthModel.signIn(req.body.username, req.body.password);
-  res.send(token);
+  res.status(200).send(token);
 });
 
 authRouter.patch(
@@ -53,8 +53,22 @@ authRouter.patch(
       req.body.oldPassword,
       req.body.newPassword,
     );
-    res.send(token);
+    res.status(200).send(token);
   },
 );
+
+authRouter.post(
+  '/sendresetpasswordemail',
+  validateRequiredFields(['username']),
+  async (req, res) => {
+    await AuthModel.sendResetPasswordEmail(req.body.username);
+    res.status(204).send();
+  },
+);
+
+authRouter.patch('/resetpassword', validateRequiredFields(['resetToken']), async (req, res) => {
+  const newPw = await AuthModel.resetPassword(req.body.resetToken);
+  res.status(200).send(newPw);
+});
 
 export default authRouter;
