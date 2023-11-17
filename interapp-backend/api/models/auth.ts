@@ -92,8 +92,7 @@ export class AuthModel {
       );
     }
 
-    if (!await Bun.password.verify(password, user.password_hash)) {
-      
+    if (!(await Bun.password.verify(password, user.password_hash))) {
       throw new HTTPError(
         'Invalid password',
         'The password you entered is incorrect',
@@ -148,8 +147,7 @@ export class AuthModel {
       );
     }
 
-
-    if (!await Bun.password.verify(oldPassword, user.password_hash)) {
+    if (!(await Bun.password.verify(oldPassword, user.password_hash))) {
       throw new HTTPError(
         'Invalid password',
         'The old password you entered is incorrect',
