@@ -1,8 +1,8 @@
 import express from 'express';
 import helloRouter from './hello';
+import authRouter from './auth';
 import 'express-async-errors';
-import { Request, Response, NextFunction } from 'express';
-import { HTTPError } from '@utils/errors';
+import { handleError } from './middleware';
 
 const app = express();
 const PORT = Number(process.env.API_PORT);
@@ -10,17 +10,8 @@ const PORT = Number(process.env.API_PORT);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use('/api/hello', helloRouter);
+app.use('/api/auth', authRouter);
 
-app.use((err: HTTPError, req: Request, res: Response, next: NextFunction) => {
-  res.status(err.status);
-  res.header(err.headers);
-  res.json({
-    name: err.name,
-    message: err.message,
-    data: err.data,
-  });
-
-  next(err);
-});
+app.use(handleError);
 
 app.listen(PORT, () => console.log('Server running on port 8000!'));

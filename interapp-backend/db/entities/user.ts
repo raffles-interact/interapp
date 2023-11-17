@@ -8,7 +8,7 @@ export class User {
   @PrimaryColumn()
   user_id: number;
 
-  @Column()
+  @Column({ unique: true })
   username: string;
 
   @Column()
@@ -16,9 +16,6 @@ export class User {
 
   @Column()
   password_hash: string;
-
-  @Column({ type: 'bytea' })
-  password_salt: string;
 
   @Column()
   service_hours: number;
