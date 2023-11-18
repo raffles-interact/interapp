@@ -1,9 +1,8 @@
 import { Transporter, createTransport } from 'nodemailer';
 import hbs from 'nodemailer-express-handlebars';
 
-
 let transporter: Transporter;
-try{
+try {
   transporter = createTransport({
     service: 'gmail',
     host: 'smtp.gmail.com',
@@ -18,7 +17,6 @@ try{
   console.error(err);
   process.exit(1);
 }
-
 
 const handlebarsOptions: hbs.NodemailerExpressHandlebarsOptions = {
   viewEngine: {

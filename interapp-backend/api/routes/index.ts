@@ -14,7 +14,7 @@ app.use('/api/auth', authRouter);
 
 app.use(handleError);
 
-try{
+try {
   app.listen(PORT, () => console.log('Server running on port 8000!'));
 } catch (err) {
   console.error(err);

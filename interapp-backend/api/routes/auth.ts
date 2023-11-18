@@ -48,12 +48,8 @@ authRouter.patch(
   verifyJWT,
   async (req, res) => {
     const jwt = req.body.user.payload;
-    const token = await AuthModel.changePassword(
-      jwt.username,
-      req.body.oldPassword,
-      req.body.newPassword,
-    );
-    res.status(200).send(token);
+    await AuthModel.changePassword(jwt.username, req.body.oldPassword, req.body.newPassword);
+    res.status(204).send();
   },
 );
 
@@ -71,4 +67,13 @@ authRouter.patch('/resetpassword', validateRequiredFields(['resetToken']), async
   res.status(200).send(newPw);
 });
 
+authRouter.post('/sendverifyemail', validateRequiredFields(['username']), async (req, res) => {
+  await AuthModel.sendVerifyEmail(req.body.username);
+  res.status(204).send();
+});
+
+authRouter.patch('/verifyemail', validateRequiredFields(['verifyToken']), async (req, res) => {
+  const newPw = await AuthModel.verifyEmail(req.body.verifyToken);
+  res.status(200).send(newPw);
+});
 export default authRouter;

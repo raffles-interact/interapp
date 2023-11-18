@@ -18,6 +18,9 @@ export class User {
   password_hash: string;
 
   @Column()
+  verified: boolean;
+
+  @Column()
   service_hours: number;
 
   @OneToMany(() => UserPermission, (user_permission) => user_permission.user)

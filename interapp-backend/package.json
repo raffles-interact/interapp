@@ -3,6 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
+    "prettier": "prettier --write . '!./pgdata'",
     "typeorm": "typeorm-ts-node-esm",
     "typeorm:generate": "sh ./scripts/typeorm_generate.sh",
     "typeorm:run": "typeorm-ts-node-esm migration:run -d db/data-source.ts",
@@ -30,6 +31,7 @@
     "nodemailer-express-handlebars": "^6.1.0",
     "pg": "^8.11.3",
     "redis": "^4.6.10",
+    "swagger-ui-express": "^5.0.0",
     "typeorm": "^0.3.17"
   }
 }

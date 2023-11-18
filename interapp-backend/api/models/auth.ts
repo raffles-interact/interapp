@@ -10,6 +10,7 @@ export interface UserJWT extends JWTPayload {
   userId: number;
   username: string;
   email: string;
+  verified: boolean;
   service_hours: number;
   permissions: number[];
   services: number[];
@@ -24,6 +25,7 @@ export class AuthModel {
     user.username = username;
     user.email = email;
     user.service_hours = 0;
+    user.verified = false;
 
     try {
       user.password_hash = await Bun.password.hash(password);
@@ -62,6 +64,7 @@ export class AuthModel {
       userId: userId,
       username: username,
       email: email,
+      verified: false,
       service_hours: 0,
       permissions: [0],
       services: [],
@@ -107,6 +110,7 @@ export class AuthModel {
       userId: user.user_id,
       username: username,
       email: user.email,
+      verified: user.verified,
       service_hours: user.service_hours,
       permissions: user.user_permissions.map((permission) => permission.permission_id),
       services: user.user_service.map((service) => service.service_id),
@@ -217,7 +221,7 @@ export class AuthModel {
       );
     }
 
-    const token = randomBytes(16).toString('hex');
+    const token = randomBytes(128).toString('hex'); // minimum 128 bytes for security
     await redisClient.set(`resetpw:${token}`, username, {
       EX: 60 * 60 * 1, // 1 hour expiration
     });
@@ -230,6 +234,61 @@ export class AuthModel {
       to: [user.email],
       subject: 'Reset Password from Interapp',
       template: 'reset_password',
+      context: {
+        token: token,
+        username: username,
+        url: 'localhost:3000', //TODO
+      },
+    };
+
+    await transporter.sendMail(email);
+  }
+  public static async verifyEmail(token: string) {
+    // check if the user exists in redis
+    const username = await redisClient.get(`verify:${token}`);
+    if (!username) {
+      throw new HTTPError(
+        'Invalid token',
+        'The token you provided is invalid',
+        HTTPErrorCode.UNAUTHORIZED_ERROR,
+      );
+    }
+
+    // update the user's verified status
+    await appDataSource.manager.update(User, { username: username }, { verified: true });
+
+    // delete the token
+    await redisClient.del(`verify:${token}`);
+  }
+  public static async sendVerifyEmail(username: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user.email'])
+      .from(User, 'user')
+      .where('user.username = :username', { username: username })
+      .getOne();
+
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    const token = randomBytes(128).toString('hex'); // minimum 128 bytes for security
+    await redisClient.set(`verify:${token}`, username, {
+      EX: 60 * 60 * 1, // 1 hour expiration
+    });
+
+    const email = {
+      from: {
+        name: 'Interapp',
+        address: process.env.EMAIL_USER as string,
+      },
+      to: [user.email],
+      subject: 'Verify Email from Interapp',
+      template: 'verify_email',
       context: {
         token: token,
         username: username,
