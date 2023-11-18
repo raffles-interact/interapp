@@ -6,10 +6,10 @@ import { ServiceSessionUser } from './service_session_user';
 @Entity()
 export class User {
   @PrimaryColumn()
-  user_id: number;
+  username: string;
 
   @Column({ unique: true })
-  username: string;
+  user_id: number;
 
   @Column()
   email: string;

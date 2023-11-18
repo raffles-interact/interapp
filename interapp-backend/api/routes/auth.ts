@@ -33,17 +33,21 @@ authRouter.post(
       req.body.email,
       req.body.password,
     );
-    res.status(200).send(token);
+    res.status(200).send({
+      jwt: token,
+    });
   },
 );
 
 authRouter.post('/signin', validateRequiredFields(['username', 'password']), async (req, res) => {
   const token = await AuthModel.signIn(req.body.username, req.body.password);
-  res.status(200).send(token);
+  res.status(200).send({
+    jwt: token,
+  });
 });
 
 authRouter.patch(
-  '/changepassword',
+  '/password/change',
   validateRequiredFields(['oldPassword', 'newPassword']),
   verifyJWT,
   async (req, res) => {
@@ -53,27 +57,32 @@ authRouter.patch(
   },
 );
 
+authRouter.post('/password/reset_email', validateRequiredFields(['username']), async (req, res) => {
+  await AuthModel.sendResetPasswordEmail(req.body.username);
+  res.status(204).send();
+});
+
+authRouter.patch('/password/reset', validateRequiredFields(['token']), async (req, res) => {
+  const newPw = await AuthModel.resetPassword(req.body.token);
+  res.status(200).send({
+    tempPassword: newPw,
+  });
+});
+
 authRouter.post(
-  '/sendresetpasswordemail',
+  '/verify_email',
   validateRequiredFields(['username']),
+  verifyJWT,
   async (req, res) => {
-    await AuthModel.sendResetPasswordEmail(req.body.username);
+    await AuthModel.sendVerifyEmail(req.body.username);
     res.status(204).send();
   },
 );
 
-authRouter.patch('/resetpassword', validateRequiredFields(['resetToken']), async (req, res) => {
-  const newPw = await AuthModel.resetPassword(req.body.resetToken);
-  res.status(200).send(newPw);
-});
-
-authRouter.post('/sendverifyemail', validateRequiredFields(['username']), async (req, res) => {
-  await AuthModel.sendVerifyEmail(req.body.username);
-  res.status(204).send();
-});
-
-authRouter.patch('/verifyemail', validateRequiredFields(['verifyToken']), async (req, res) => {
-  const newPw = await AuthModel.verifyEmail(req.body.verifyToken);
-  res.status(200).send(newPw);
+authRouter.patch('/verify', validateRequiredFields(['token']), verifyJWT, async (req, res) => {
+  const token = await AuthModel.verifyEmail(req.body.token);
+  res.status(200).send({
+    jwt: token,
+  });
 });
 export default authRouter;

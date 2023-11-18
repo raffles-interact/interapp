@@ -6,18 +6,25 @@ import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import transporter from '@email_handler/index';
 
-export interface UserJWT extends JWTPayload {
+export interface UserJWT {
   userId: number;
   username: string;
-  email: string;
   verified: boolean;
-  service_hours: number;
   permissions: number[];
-  services: number[];
 }
 
 export class AuthModel {
   private static readonly secretKey = new TextEncoder().encode(process.env.JWT_SECRET as string);
+  private static async signJWT(jwtBody: UserJWT) {
+    const jwt: UserJWT & JWTPayload = { ...jwtBody }; // copy the object and cast it to JWTPayload
+    return await new SignJWT(jwt)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setIssuer(process.env.JWT_ISSUER as string)
+      .setAudience(process.env.JWT_AUDIENCE as string)
+      .setExpirationTime(process.env.JWT_EXPIRATION_TIME as string)
+      .sign(this.secretKey);
+  }
   public static async signUp(userId: number, username: string, email: string, password: string) {
     // init a new user
     const user = new User();
@@ -46,7 +53,7 @@ export class AuthModel {
     } catch (err) {
       throw new HTTPError(
         'User already exists',
-        `The user with id ${userId} already exists in the database`,
+        `The user with username ${username} already exists in the database`,
         HTTPErrorCode.CONFLICT_ERROR,
       );
     }
@@ -63,30 +70,20 @@ export class AuthModel {
     const JWTBody: UserJWT = {
       userId: userId,
       username: username,
-      email: email,
       verified: false,
-      service_hours: 0,
       permissions: [0],
-      services: [],
     };
 
     // sign a JWT token and return it
-    const token = await new SignJWT(JWTBody)
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setIssuer(process.env.JWT_ISSUER as string)
-      .setAudience(process.env.JWT_AUDIENCE as string)
-      .setExpirationTime(process.env.JWT_EXPIRATION_TIME as string)
-      .sign(this.secretKey);
+    const token = await this.signJWT(JWTBody);
     return token;
   }
   public static async signIn(username: string, password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
-      .select('user')
+      .select(['user.user_id', 'user.verified', 'user.password_hash'])
       .from(User, 'user')
       .leftJoinAndSelect('user.user_permissions', 'user_permissions')
-      .leftJoinAndSelect('user.user_service', 'user_service')
       .where('user.username = :username', { username: username })
       .getOne();
 
@@ -97,7 +94,6 @@ export class AuthModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-
     if (!(await Bun.password.verify(password, user.password_hash))) {
       throw new HTTPError(
         'Invalid password',
@@ -109,21 +105,12 @@ export class AuthModel {
     const JWTBody: UserJWT = {
       userId: user.user_id,
       username: username,
-      email: user.email,
       verified: user.verified,
-      service_hours: user.service_hours,
       permissions: user.user_permissions.map((permission) => permission.permission_id),
-      services: user.user_service.map((service) => service.service_id),
     };
 
     // sign a JWT token and return it
-    const token = await new SignJWT(JWTBody)
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setIssuer(process.env.JWT_ISSUER as string)
-      .setAudience(process.env.JWT_AUDIENCE as string)
-      .setExpirationTime(process.env.JWT_EXPIRATION_TIME as string)
-      .sign(this.secretKey);
+    const token = await this.signJWT(JWTBody);
     return token;
   }
   public static async verify(token: string) {
@@ -254,11 +241,37 @@ export class AuthModel {
       );
     }
 
+    // delete the token
+    await redisClient.del(`verify:${token}`);
+
     // update the user's verified status
     await appDataSource.manager.update(User, { username: username }, { verified: true });
 
-    // delete the token
-    await redisClient.del(`verify:${token}`);
+    // get new JWT body
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user.user_id'])
+      .from(User, 'user')
+      .leftJoinAndSelect('user.user_permissions', 'user_permissions')
+      .where('user.username = :username', { username: username })
+      .getOne();
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    const JWTBody: UserJWT = {
+      userId: user.user_id,
+      username: username,
+      verified: true,
+      permissions: user.user_permissions.map((permission) => permission.permission_id),
+    };
+
+    const jwt = await this.signJWT(JWTBody);
+    return jwt;
   }
   public static async sendVerifyEmail(username: string) {
     const user = await appDataSource.manager
