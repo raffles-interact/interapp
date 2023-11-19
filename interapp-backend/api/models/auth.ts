@@ -80,8 +80,9 @@ export class AuthModel {
   public static async signIn(username: string, password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
-      .select(['user.user_id', 'user.password_hash'])
+      .select(['user.user_id', 'user.password_hash', 'user.username', 'user.email', 'user.verified', 'user.service_hours'])
       .from(User, 'user')
+      .leftJoinAndSelect('user.user_permissions', 'user_permissions')
       .where('user.username = :username', { username: username })
       .getOne();
 
@@ -111,7 +112,16 @@ export class AuthModel {
 
     await appDataSource.manager.update(User, { username: username }, { refresh_token: refresh });
 
-    return { token: token, refresh: refresh };
+    const parsedUser = {
+      userId: user.user_id,
+      username: user.username,
+      email: user.email,
+      verified: user.verified,
+      serviceHours: user.service_hours,
+      permissions: user.user_permissions.map((perm) => perm.permission_id),
+    }
+
+    return { token: token, refresh: refresh, user: parsedUser };
   }
   public static async signOut(username: string, accessToken: string) {
     await appDataSource.manager.update(User, { username: username }, { refresh_token: null });

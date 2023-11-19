@@ -1,7 +1,20 @@
+'use client';
 import Image from 'next/image';
 import styles from './page.module.css';
+import { useContext, useEffect } from 'react';
+import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 
 export default function Home() {
+  const { login } = useContext(AuthContext);
+  useEffect(() => {
+    login({
+      username: 'sebfasw',
+      password: 'a',
+    }).then(() => {
+
+    });
+  }, []
+  );
   return (
     <main className={styles.main}>
       <div className={styles.description}>

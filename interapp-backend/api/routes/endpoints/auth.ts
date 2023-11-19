@@ -33,13 +33,14 @@ authRouter.post(
 );
 
 authRouter.post('/signin', validateRequiredFields(['username', 'password']), async (req, res) => {
-  const { token, refresh } = await AuthModel.signIn(req.body.username, req.body.password);
+  const { token, refresh, user } = await AuthModel.signIn(req.body.username, req.body.password);
   res.cookie('refresh', refresh, {
     httpOnly: true,
     path: '/api/auth/refresh',
   });
   res.status(200).send({
-    jwt: token,
+    accessToken: token,
+    user: user,
   });
 });
 
