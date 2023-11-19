@@ -1,8 +1,11 @@
 import express from 'express';
-import helloRouter from './hello';
-import authRouter from './auth';
+import helloRouter from './endpoints/hello';
+import authRouter from './endpoints/auth';
+import userRouter from './endpoints/user';
+
 import 'express-async-errors';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import { handleError } from './middleware';
 import { serve, setup } from 'swagger-ui-express';
 import swagger_docs from './swagger_docs.json' assert { type: 'json' };
@@ -13,10 +16,12 @@ const PORT = Number(process.env.API_PORT);
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cors());
+app.use(cookieParser());
 
 app.use('/api/docs', serve, setup(swagger_docs));
 app.use('/api/hello', helloRouter);
 app.use('/api/auth', authRouter);
+app.use('/api/user', userRouter);
 
 app.use(handleError);
 

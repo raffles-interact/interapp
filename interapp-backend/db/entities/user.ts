@@ -20,6 +20,9 @@ export class User {
   @Column()
   verified: boolean;
 
+  @Column({ unique: true, nullable: true })
+  refresh_token: string | null;
+
   @Column()
   service_hours: number;
 

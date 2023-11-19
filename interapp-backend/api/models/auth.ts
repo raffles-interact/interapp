@@ -1,29 +1,37 @@
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
-import { SignJWT, jwtVerify, JWTPayload } from 'jose';
-import { randomBytes } from 'crypto';
+import { SignJWT, jwtVerify, JWTPayload, JWTVerifyResult } from 'jose';
+
 import redisClient from '@utils/init_redis';
-import transporter from '@email_handler/index';
 
 export interface UserJWT {
   userId: number;
   username: string;
-  verified: boolean;
-  permissions: number[];
 }
 
+type JWTtype = 'access' | 'refresh';
+
 export class AuthModel {
-  private static readonly secretKey = new TextEncoder().encode(process.env.JWT_SECRET as string);
-  private static async signJWT(jwtBody: UserJWT) {
+  private static readonly accessSecret = new TextEncoder().encode(
+    process.env.JWT_ACCESS_SECRET as string,
+  );
+  private static readonly refreshSecret = new TextEncoder().encode(
+    process.env.JWT_REFRESH_SECRET as string,
+  );
+  private static async signJWT(jwtBody: UserJWT, type: JWTtype = 'access') {
     const jwt: UserJWT & JWTPayload = { ...jwtBody }; // copy the object and cast it to JWTPayload
     return await new SignJWT(jwt)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setIssuer(process.env.JWT_ISSUER as string)
       .setAudience(process.env.JWT_AUDIENCE as string)
-      .setExpirationTime(process.env.JWT_EXPIRATION_TIME as string)
-      .sign(this.secretKey);
+      .setExpirationTime(
+        type === 'access'
+          ? (process.env.JWT_ACCESS_EXPIRATION as string)
+          : (process.env.JWT_REFRESH_EXPIRATION as string),
+      )
+      .sign(type === 'access' ? this.accessSecret : this.refreshSecret);
   }
   public static async signUp(userId: number, username: string, email: string, password: string) {
     // init a new user
@@ -67,23 +75,13 @@ export class AuthModel {
 
     await appDataSource.manager.save(userPermission);
 
-    const JWTBody: UserJWT = {
-      userId: userId,
-      username: username,
-      verified: false,
-      permissions: [0],
-    };
-
-    // sign a JWT token and return it
-    const token = await this.signJWT(JWTBody);
-    return token;
+    return;
   }
   public static async signIn(username: string, password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
-      .select(['user.user_id', 'user.verified', 'user.password_hash'])
+      .select(['user.user_id', 'user.password_hash'])
       .from(User, 'user')
-      .leftJoinAndSelect('user.user_permissions', 'user_permissions')
       .where('user.username = :username', { username: username })
       .getOne();
 
@@ -105,17 +103,92 @@ export class AuthModel {
     const JWTBody: UserJWT = {
       userId: user.user_id,
       username: username,
-      verified: user.verified,
-      permissions: user.user_permissions.map((permission) => permission.permission_id),
     };
 
     // sign a JWT token and return it
-    const token = await this.signJWT(JWTBody);
-    return token;
+    const token = await this.signJWT(JWTBody, 'access');
+    const refresh = await this.signJWT(JWTBody, 'refresh');
+
+    await appDataSource.manager.update(User, { username: username }, { refresh_token: refresh });
+
+    return { token: token, refresh: refresh };
   }
-  public static async verify(token: string) {
+  public static async signOut(username: string, accessToken: string) {
+    await appDataSource.manager.update(User, { username: username }, { refresh_token: null });
+    await redisClient.set(`blacklist:${accessToken}`, 'true', { EX: 60 * 60 * 24 });
+  }
+  public static async getNewAccessToken(refreshToken: string) {
+    if (!refreshToken) {
+      throw new HTTPError(
+        'Invalid refresh token',
+        'The refresh token you provided is invalid',
+        HTTPErrorCode.UNAUTHORIZED_ERROR,
+      );
+    }
+
+    const result = await this.verify(refreshToken);
+    const username = result.payload.username;
+
+    if (!username) {
+      throw new HTTPError(
+        'Invalid refresh token',
+        'The refresh token you provided is invalid',
+        HTTPErrorCode.UNAUTHORIZED_ERROR,
+      );
+    }
+
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user.refresh_token'])
+      .from(User, 'user')
+      .where('user.username = :username', { username: username })
+      .getOne();
+
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    if (user.refresh_token !== refreshToken) {
+      throw new HTTPError(
+        'Invalid refresh token',
+        'The refresh token you provided is invalid',
+        HTTPErrorCode.UNAUTHORIZED_ERROR,
+      );
+    }
+
+    // passed all checks, sign a new access token and return it
+    const JWTBody: UserJWT = {
+      userId: result.payload.userId,
+      username: username,
+    };
+
+    const token = await this.signJWT(JWTBody, 'access');
+    const refresh = await this.signJWT(JWTBody, 'refresh');
+
+    await appDataSource.manager.update(User, { username: username }, { refresh_token: refresh });
+
+    return { token: token, refresh: refresh };
+  }
+
+  public static async verify(token: string, type: JWTtype = 'access') {
     try {
-      const payload = await jwtVerify(token, this.secretKey);
+      // check if the token is blacklisted
+      const blacklisted = await redisClient.get(`blacklist:${token}`);
+      if (blacklisted) {
+        throw new HTTPError(
+          'Invalid JWT',
+          'The JWT you provided is invalid',
+          HTTPErrorCode.UNAUTHORIZED_ERROR,
+        );
+      }
+      const payload: JWTVerifyResult<JWTPayload & UserJWT> = await jwtVerify(
+        token,
+        type === 'access' ? this.accessSecret : this.refreshSecret,
+      );
       return payload;
     } catch (err) {
       throw new HTTPError(
@@ -124,191 +197,5 @@ export class AuthModel {
         HTTPErrorCode.UNAUTHORIZED_ERROR,
       );
     }
-  }
-  public static async changePassword(username: string, oldPassword: string, newPassword: string) {
-    const user = await appDataSource.manager
-      .createQueryBuilder()
-      .select(['user.username', 'user.password_hash'])
-      .from(User, 'user')
-      .where('user.username = :username', { username: username })
-      .getOne();
-
-    if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
-    }
-
-    if (!(await Bun.password.verify(oldPassword, user.password_hash))) {
-      throw new HTTPError(
-        'Invalid password',
-        'The old password you entered is incorrect',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
-    }
-
-    try {
-      user.password_hash = await Bun.password.hash(newPassword);
-    } catch (err) {
-      // err should be of type Error always
-      if (err instanceof Error) {
-        throw new HTTPError(
-          'Password hashing error',
-          err.message || 'An error occurred while hashing the password',
-          HTTPErrorCode.INTERNAL_SERVER_ERROR,
-        );
-      }
-    }
-    await appDataSource.manager.update(User, { username: username }, user);
-  }
-  public static async resetPassword(token: string) {
-    // check if the user exists in redis
-    const username = await redisClient.get(`resetpw:${token}`);
-    if (!username) {
-      throw new HTTPError(
-        'Invalid token',
-        'The token you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
-    }
-
-    // generate a random password
-    const newPassword = randomBytes(8).toString('hex');
-
-    // hash the password
-    const newPasswordHash = await Bun.password.hash(newPassword);
-
-    // update the user's password
-    await appDataSource.manager.update(
-      User,
-      { username: username },
-      { password_hash: newPasswordHash },
-    );
-
-    // delete the token
-    await redisClient.del(`resetpw:${token}`);
-
-    return newPassword;
-  }
-  public static async sendResetPasswordEmail(username: string) {
-    const user = await appDataSource.manager
-      .createQueryBuilder()
-      .select(['user.email'])
-      .from(User, 'user')
-      .where('user.username = :username', { username: username })
-      .getOne();
-
-    if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
-    }
-
-    const token = randomBytes(128).toString('hex'); // minimum 128 bytes for security
-    await redisClient.set(`resetpw:${token}`, username, {
-      EX: 60 * 60 * 1, // 1 hour expiration
-    });
-
-    const email = {
-      from: {
-        name: 'Interapp',
-        address: process.env.EMAIL_USER as string,
-      },
-      to: [user.email],
-      subject: 'Reset Password from Interapp',
-      template: 'reset_password',
-      context: {
-        token: token,
-        username: username,
-        url: 'localhost:3000', //TODO
-      },
-    };
-
-    await transporter.sendMail(email);
-  }
-  public static async verifyEmail(token: string) {
-    // check if the user exists in redis
-    const username = await redisClient.get(`verify:${token}`);
-    if (!username) {
-      throw new HTTPError(
-        'Invalid token',
-        'The token you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
-    }
-
-    // delete the token
-    await redisClient.del(`verify:${token}`);
-
-    // update the user's verified status
-    await appDataSource.manager.update(User, { username: username }, { verified: true });
-
-    // get new JWT body
-    const user = await appDataSource.manager
-      .createQueryBuilder()
-      .select(['user.user_id'])
-      .from(User, 'user')
-      .leftJoinAndSelect('user.user_permissions', 'user_permissions')
-      .where('user.username = :username', { username: username })
-      .getOne();
-    if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
-    }
-
-    const JWTBody: UserJWT = {
-      userId: user.user_id,
-      username: username,
-      verified: true,
-      permissions: user.user_permissions.map((permission) => permission.permission_id),
-    };
-
-    const jwt = await this.signJWT(JWTBody);
-    return jwt;
-  }
-  public static async sendVerifyEmail(username: string) {
-    const user = await appDataSource.manager
-      .createQueryBuilder()
-      .select(['user.email'])
-      .from(User, 'user')
-      .where('user.username = :username', { username: username })
-      .getOne();
-
-    if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
-    }
-
-    const token = randomBytes(128).toString('hex'); // minimum 128 bytes for security
-    await redisClient.set(`verify:${token}`, username, {
-      EX: 60 * 60 * 1, // 1 hour expiration
-    });
-
-    const email = {
-      from: {
-        name: 'Interapp',
-        address: process.env.EMAIL_USER as string,
-      },
-      to: [user.email],
-      subject: 'Verify Email from Interapp',
-      template: 'verify_email',
-      context: {
-        token: token,
-        username: username,
-        url: 'localhost:3000', //TODO
-      },
-    };
-
-    await transporter.sendMail(email);
   }
 }
