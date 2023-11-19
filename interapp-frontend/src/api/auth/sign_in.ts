@@ -1,4 +1,4 @@
-import { LogInDetails, UserWithJWT } from "@/providers/AuthProvider/types";
+import { LogInDetails, UserWithJWT } from '@/providers/AuthProvider/types';
 
 export async function signIn(det: LogInDetails): Promise<UserWithJWT> {
   const response = await fetch('/api/auth/signin', {

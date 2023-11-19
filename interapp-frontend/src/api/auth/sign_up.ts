@@ -1,4 +1,4 @@
-import { AccountDetails } from "@/providers/AuthProvider/types";
+import { AccountDetails } from '@/providers/AuthProvider/types';
 
 export async function signUp(accountDetails: AccountDetails): Promise<void> {
   const response = await fetch('/api/auth/signup', {

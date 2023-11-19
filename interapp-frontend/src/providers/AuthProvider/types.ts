@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 
 export interface AuthContextType {
@@ -15,13 +14,10 @@ export interface LogInDetails {
   password: string;
 }
 
-export interface AccountDetails extends LogInDetails  {
+export interface AccountDetails extends LogInDetails {
   email: string;
   userId: number;
 }
-
-
-
 
 export interface User {
   username: string;

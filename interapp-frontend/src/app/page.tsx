@@ -10,11 +10,8 @@ export default function Home() {
     login({
       username: 'sebfasw',
       password: 'a',
-    }).then(() => {
-
-    });
-  }, []
-  );
+    }).then(() => {});
+  }, []);
   return (
     <main className={styles.main}>
       <div className={styles.description}>

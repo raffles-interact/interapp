@@ -11,9 +11,8 @@ export const AuthContext = createContext<AuthContextType>({
   registerUserAccount: async () => {},
 });
 
-
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-  const [user, setUser] = useState<User|null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -24,20 +23,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
     refreshAccessToken().then((accessToken) => {
       localStorage.setItem('accessToken', accessToken);
-    })
+    });
     setLoading(false);
   }, []);
 
-  
-
   const login = useCallback(async (details: LogInDetails) => {
-    const {accessToken, user} = await signIn(details);
-    
+    const { accessToken, user } = await signIn(details);
+
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
-    
-    
   }, []);
 
   const logout = useCallback(() => {
@@ -51,12 +46,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   }, []);
 
-  const registerUserAccount = useCallback(
-    async (accountDetails: AccountDetails): Promise<void> => {
-      await signUp(accountDetails);
-    },
-    [],
-  );
+  const registerUserAccount = useCallback(async (accountDetails: AccountDetails): Promise<void> => {
+    await signUp(accountDetails);
+  }, []);
 
   const providerValue = useMemo(
     () => ({
@@ -69,11 +61,5 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }),
     [user, loading, login, logout, updateUser, registerUserAccount],
   );
-  return (
-    <AuthContext.Provider value={providerValue}>
-      {children}
-    </AuthContext.Provider>
-  );
-
-
-}
+  return <AuthContext.Provider value={providerValue}>{children}</AuthContext.Provider>;
+};
