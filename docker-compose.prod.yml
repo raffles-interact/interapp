@@ -10,6 +10,8 @@ services:
     command: postgres
     env_file:
       - ./interapp-backend/.env.production
+    volumes:
+      - ./interapp-backend/pgdata:/var/lib/postgresql/data
     networks:
       - interapp-network
     healthcheck:
@@ -17,6 +19,7 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+      start_period: 60s
 
   redis:
     container_name: interapp-redis

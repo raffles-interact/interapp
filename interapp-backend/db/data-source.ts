@@ -8,7 +8,7 @@ export const AppDataSourceOptions: DataSourceOptions = {
   username: process.env.POSTGRES_USER,
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
-  synchronize: process.env.NODE_ENV === 'development',
+  synchronize: false,
   logging: process.env.NODE_ENV === 'development' ? 'all' : ['schema', 'error', 'warn'],
   logger: 'advanced-console',
   maxQueryExecutionTime: 1000,

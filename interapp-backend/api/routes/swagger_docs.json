@@ -1,0 +1,325 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Interapp API",
+    "description": "This is the spec for all routes defined in the `api/routes/*` directory. All routes should be prefixed with `/api/*`.",
+    "contact": {
+      "email": "sebastian.ong@hotmail.com"
+    },
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/api",
+      "description": "dev"
+    }
+  ],
+  "tags": [
+    {
+      "name": "auth",
+      "description": "Authentication with JWT"
+    }
+  ],
+  "paths": {
+    "/auth/signup": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Sign a user up for the application",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "userId": {
+                    "type": "integer"
+                  },
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "joe",
+                "userId": 123,
+                "email": "joejoejoe@gmail.com",
+                "password": "MyNewPassword"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JWTresponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing body/bad userId type/invalid email"
+          }
+        }
+      }
+    },
+    "/auth/signin": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Logs user into the app",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "joe",
+                "password": "pass123"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JWTresponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        }
+      }
+    },
+    "/auth/password/change": {
+      "patch": {
+        "tags": ["auth"],
+        "summary": "Change password to a new password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "oldPassword": {
+                    "type": "string"
+                  },
+                  "newPassword": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "oldPassword": "jeofjeoifjwero",
+                "newPassword": "pass123"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/password/reset_email": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Send a reset email to the specified user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "joe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        }
+      }
+    },
+    "/auth/password/reset": {
+      "patch": {
+        "tags": ["auth"],
+        "summary": "Reset passsword to random value given access token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/tokenInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "tempPassword": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "tempPassword": "5b009b035c2b24e1"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        }
+      }
+    },
+    "/auth/verify_email": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Send a verify email to the specified user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "joe"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/password/verify": {
+      "patch": {
+        "tags": ["auth"],
+        "summary": "Verify a user given access token",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/tokenInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "JWTresponse": {
+        "type": "object",
+        "properties": {
+          "jwt": {
+            "type": "string",
+            "example": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoic2ViZmFzdyIsInZlcmlmaWVkIjpmYWxzZSwicGVybWlzc2lvbnMiOlswXSwiaWF0IjoxNzAwMzEzNjQ1LCJpc3MiOiJpbnRlcmFwcCIsImF1ZCI6ImludGVyYWN0X2NsdWIiLCJleHAiOjE3MDA0MDAwNDV9.vJg4hmBY_slUmGjHK4H_8UITIX9417_BRXznt_6p4rk"
+          }
+        }
+      },
+      "tokenInput": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "example": "61ccbddcf94bbfc4b45fd6caa0bb36a7be96a93ec19ce7714616818dca4e129e82d6e36c2772a5a04165efa01bbbc64d5e7244cc138d6fb7884d730e27956c704810e099da33cb02287f7f27bd53fcb03dcf2fbe41f31faf40a9ac1c812418415be39e121f39b85b9ddcd5969e95d050fc9673c61ef66c9bd370953b02d7eb3d"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

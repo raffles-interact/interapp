@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
-import { AuthModel, UserJWT } from '@models/auth';
+import { AuthModel } from '@models/auth';
+import { UserModel } from '@models/user';
 
 export function validateRequiredFields(requiredFields: string[]) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -26,23 +27,28 @@ export async function verifyJWT(req: Request, res: Response, next: NextFunction)
       HTTPErrorCode.FORBIDDEN_ERROR,
     );
   }
-  req.body.user = await AuthModel.verify(token);
+  const { userId, username } = (await AuthModel.verify(token, 'access')).payload;
+  req.headers.userId = String(userId);
+  req.headers.username = username;
   next();
 }
 
+// must be used after verifyJWT to get the userId and username
 export function verifyRequiredRole(role: number) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    if (!req.body.user) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const username = req.headers.username;
+
+    if (!username || typeof username !== 'string') {
       throw new HTTPError(
-        'Missing request.body.user',
-        'You must set req.body.user to the JWT payload',
-        HTTPErrorCode.FORBIDDEN_ERROR,
+        'Missing username',
+        'Must call verifyJWT before calling verifyRequiredRole',
+        HTTPErrorCode.INTERNAL_SERVER_ERROR,
       );
     }
 
-    const jwt = req.body.user.payload as UserJWT;
+    const perms = await UserModel.checkRoles(username);
 
-    if (!jwt.permissions.includes(role)) {
+    if (!perms.includes(role)) {
       throw new HTTPError(
         'Insufficient permissions',
         'You do not have sufficient permissions to access this resource. Required role: ' +

@@ -6,16 +6,22 @@ import { ServiceSessionUser } from './service_session_user';
 @Entity()
 export class User {
   @PrimaryColumn()
-  user_id: number;
+  username: string;
 
   @Column({ unique: true })
-  username: string;
+  user_id: number;
 
   @Column()
   email: string;
 
   @Column()
   password_hash: string;
+
+  @Column()
+  verified: boolean;
+
+  @Column({ unique: true, nullable: true })
+  refresh_token: string | null;
 
   @Column()
   service_hours: number;
