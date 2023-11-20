@@ -1,4 +1,5 @@
 import { ReactNode } from 'react';
+import { Permissions } from '@/app/route_permissions';
 
 export interface AuthContextType {
   user: User | null;
@@ -23,7 +24,7 @@ export interface User {
   username: string;
   userId: number;
   email: string;
-  permissions: number[];
+  permissions: Permissions[];
   verified: boolean;
   serviceHours: number;
 }

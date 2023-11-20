@@ -1,6 +1,8 @@
 import { createContext, useEffect, useMemo, useState, useCallback } from 'react';
 import { AuthProviderProps, LogInDetails, AccountDetails, User, AuthContextType } from './types';
 import axiosClient from '@api/api_client';
+import { useRouter, usePathname } from 'next/navigation';
+import { RoutePermissions, noLoginRequiredRoutes, Permissions } from '@/app/route_permissions';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -14,6 +16,29 @@ export const AuthContext = createContext<AuthContextType>({
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const user = localStorage.getItem('user');
+
+    if (!user) {
+      if (!noLoginRequiredRoutes.includes(pathname)) {
+        router.push('/auth/login');
+      }
+      return;
+    }
+
+    const currentUser: User = JSON.parse(user);
+    const userPermissions = currentUser.permissions;
+
+    for (const permission of userPermissions) {
+      if (RoutePermissions[permission].includes(pathname)) {
+        return;
+      }
+    }
+    return router.push('/');
+  }, []);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
