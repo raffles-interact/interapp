@@ -33,7 +33,10 @@ authRouter.post(
 );
 
 authRouter.post('/signin', validateRequiredFields(['username', 'password']), async (req, res) => {
-  const { token, refresh, user } = await AuthModel.signIn(req.body.username, req.body.password);
+  const { token, refresh, user, expire } = await AuthModel.signIn(
+    req.body.username,
+    req.body.password,
+  );
   res.cookie('refresh', refresh, {
     httpOnly: true,
     path: '/api/auth/refresh',
@@ -41,18 +44,20 @@ authRouter.post('/signin', validateRequiredFields(['username', 'password']), asy
   res.status(200).send({
     accessToken: token,
     user: user,
+    expire: expire,
   });
 });
 
 authRouter.post('/refresh', async (req, res) => {
   const refreshToken = req.cookies.refresh;
-  const { token, refresh } = await AuthModel.getNewAccessToken(refreshToken);
+  const { token, refresh, expire } = await AuthModel.getNewAccessToken(refreshToken);
   res.cookie('refresh', refresh, {
     httpOnly: true,
     path: '/api/auth/refresh',
   });
   res.status(200).send({
-    jwt: token,
+    accessToken: token,
+    expire: expire,
   });
 });
 

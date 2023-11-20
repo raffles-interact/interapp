@@ -6,12 +6,7 @@ import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 
 export default function Home() {
   const { login } = useContext(AuthContext);
-  useEffect(() => {
-    login({
-      username: 'sebfasw',
-      password: 'a',
-    }).then(() => {});
-  }, []);
+  useEffect(() => {}, []);
   return (
     <main className={styles.main}>
       <div className={styles.description}>

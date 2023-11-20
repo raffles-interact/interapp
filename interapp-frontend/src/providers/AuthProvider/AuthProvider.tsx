@@ -1,6 +1,6 @@
 import { createContext, useEffect, useMemo, useState, useCallback } from 'react';
 import { AuthProviderProps, LogInDetails, AccountDetails, User, AuthContextType } from './types';
-import { signIn, signUp, refreshAccessToken } from '@api/auth';
+import axiosClient from '@api/api_client';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -18,27 +18,38 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     const user = localStorage.getItem('user');
-    if (accessToken && user) {
+    if (user && accessToken) {
       setUser(JSON.parse(user));
     }
-    refreshAccessToken().then((accessToken) => {
-      localStorage.setItem('accessToken', accessToken);
-    });
+    const expired = Number(localStorage.getItem('accessTokenExpire')) < Date.now();
+
+    if (expired && accessToken) {
+      axiosClient
+        .refreshAccessToken()
+        .then((res) => {
+          localStorage.setItem('accessToken', res.accessToken);
+        })
+        .catch(logout);
+    }
+
     setLoading(false);
   }, []);
 
   const login = useCallback(async (details: LogInDetails) => {
-    const { accessToken, user } = await signIn(details);
+    const { accessToken, user, expire } = await axiosClient.signIn(details);
 
+    localStorage.setItem('accessTokenExpire', expire.toString());
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await axiosClient.signOut();
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
+    localStorage.removeItem('accessTokenExpire');
   }, []);
 
   const updateUser = useCallback((updatedUser: User) => {
@@ -47,7 +58,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const registerUserAccount = useCallback(async (accountDetails: AccountDetails): Promise<void> => {
-    await signUp(accountDetails);
+    await axiosClient.signUp(accountDetails);
   }, []);
 
   const providerValue = useMemo(

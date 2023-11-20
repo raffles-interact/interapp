@@ -35,4 +35,5 @@ export interface AuthProviderProps {
 export interface UserWithJWT {
   user: User;
   accessToken: string;
+  expire: number;
 }

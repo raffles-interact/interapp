@@ -21,17 +21,22 @@ export class AuthModel {
   );
   private static async signJWT(jwtBody: UserJWT, type: JWTtype = 'access') {
     const jwt: UserJWT & JWTPayload = { ...jwtBody }; // copy the object and cast it to JWTPayload
-    return await new SignJWT(jwt)
+
+    const expireTime =
+      Date.now() +
+      (type === 'access'
+        ? Number(process.env.JWT_ACCESS_EXPIRATION as string)
+        : Number(process.env.JWT_REFRESH_EXPIRATION as string));
+
+    const token = await new SignJWT(jwt)
       .setProtectedHeader({ alg: 'HS256' })
       .setIssuedAt()
       .setIssuer(process.env.JWT_ISSUER as string)
       .setAudience(process.env.JWT_AUDIENCE as string)
-      .setExpirationTime(
-        type === 'access'
-          ? (process.env.JWT_ACCESS_EXPIRATION as string)
-          : (process.env.JWT_REFRESH_EXPIRATION as string),
-      )
+      .setExpirationTime(expireTime)
       .sign(type === 'access' ? this.accessSecret : this.refreshSecret);
+
+    return { token, expire: expireTime };
   }
   public static async signUp(userId: number, username: string, email: string, password: string) {
     // init a new user
@@ -80,7 +85,14 @@ export class AuthModel {
   public static async signIn(username: string, password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
-      .select(['user.user_id', 'user.password_hash', 'user.username', 'user.email', 'user.verified', 'user.service_hours'])
+      .select([
+        'user.user_id',
+        'user.password_hash',
+        'user.username',
+        'user.email',
+        'user.verified',
+        'user.service_hours',
+      ])
       .from(User, 'user')
       .leftJoinAndSelect('user.user_permissions', 'user_permissions')
       .where('user.username = :username', { username: username })
@@ -107,8 +119,8 @@ export class AuthModel {
     };
 
     // sign a JWT token and return it
-    const token = await this.signJWT(JWTBody, 'access');
-    const refresh = await this.signJWT(JWTBody, 'refresh');
+    const { token, expire } = await this.signJWT(JWTBody, 'access');
+    const refresh = (await this.signJWT(JWTBody, 'refresh')).token;
 
     await appDataSource.manager.update(User, { username: username }, { refresh_token: refresh });
 
@@ -119,9 +131,9 @@ export class AuthModel {
       verified: user.verified,
       serviceHours: user.service_hours,
       permissions: user.user_permissions.map((perm) => perm.permission_id),
-    }
+    };
 
-    return { token: token, refresh: refresh, user: parsedUser };
+    return { token: token, refresh: refresh, expire: expire, user: parsedUser };
   }
   public static async signOut(username: string, accessToken: string) {
     await appDataSource.manager.update(User, { username: username }, { refresh_token: null });
@@ -136,7 +148,7 @@ export class AuthModel {
       );
     }
 
-    const result = await this.verify(refreshToken);
+    const result = await this.verify(refreshToken, 'refresh');
     const username = result.payload.username;
 
     if (!username) {
@@ -176,12 +188,12 @@ export class AuthModel {
       username: username,
     };
 
-    const token = await this.signJWT(JWTBody, 'access');
-    const refresh = await this.signJWT(JWTBody, 'refresh');
+    const { token, expire } = await this.signJWT(JWTBody, 'access');
+    const refresh = (await this.signJWT(JWTBody, 'refresh')).token;
 
     await appDataSource.manager.update(User, { username: username }, { refresh_token: refresh });
 
-    return { token: token, refresh: refresh };
+    return { token: token, refresh: refresh, expire: expire };
   }
 
   public static async verify(token: string, type: JWTtype = 'access') {
