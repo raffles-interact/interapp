@@ -20,17 +20,16 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const pathname = usePathname();
 
   useEffect(() => {
-    const user = localStorage.getItem('user');
+    if (loading) return; // we dont know if user is logged in or not yet
 
     if (!user) {
       if (!noLoginRequiredRoutes.includes(pathname)) {
         router.push('/auth/login');
       }
       return;
-    }
+    } // user is not logged in
 
-    const currentUser: User = JSON.parse(user);
-    const userPermissions = currentUser.permissions;
+    const userPermissions = user.permissions;
 
     for (const permission of userPermissions) {
       if (RoutePermissions[permission].includes(pathname)) {
@@ -38,7 +37,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       }
     }
     return router.push('/');
-  }, []);
+  }, [user, loading]);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
