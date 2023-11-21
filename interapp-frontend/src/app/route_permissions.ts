@@ -8,7 +8,7 @@ export enum Permissions {
   ADMIN = 6,
 }
 
-export const noLoginRequiredRoutes = ['/', '/login', '/signup', '/forgot-password'];
+export const noLoginRequiredRoutes = ['/', '/auth/login', '/auth/signup', '/forgot-password'];
 
 export const RoutePermissions = {
   [Permissions.VISTOR]: ['/'],
