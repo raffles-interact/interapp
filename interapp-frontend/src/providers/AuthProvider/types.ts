@@ -4,10 +4,10 @@ import { Permissions } from '@/app/route_permissions';
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (loginDetails: LogInDetails) => Promise<void>;
-  logout: () => void;
-  updateUser: (updatedUser: User) => void;
-  registerUserAccount: (accountDetails: AccountDetails) => Promise<void>;
+  login: (loginDetails: LogInDetails) => Promise<number>;
+  logout: () => Promise<number>;
+  updateUser: (updatedUser: User) => void; // update user in context
+  registerUserAccount: (accountDetails: AccountDetails) => Promise<number>;
 }
 
 export interface LogInDetails {

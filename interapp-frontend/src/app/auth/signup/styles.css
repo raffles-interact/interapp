@@ -1,0 +1,56 @@
+.signup-page {
+  margin: 7%;
+}
+
+.signup-headers {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2%;
+  padding: 0 3rem;
+  gap: 2rem;
+}
+.signup-headers-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.signup-logo {
+  width: min(20%, 7rem);
+  position: relative;
+  aspect-ratio: 1/1;
+}
+
+.signup-form-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0 3rem;
+  padding: 2%;
+  gap: 1rem;
+}
+.signup-form-already-member {
+  align-self: center;
+}
+
+@media screen and (max-width: 48em) {
+  .signup-page {
+    margin: 3%;
+  }
+  .signup-headers {
+    flex-direction: column;
+    margin: 0;
+    padding: 0 1rem;
+  }
+  .signup-headers-text {
+    margin-bottom: 2%;
+  }
+  .signup-logo {
+    margin-bottom: 2%;
+  }
+  .signup-form-container {
+    margin: 0;
+  }
+}

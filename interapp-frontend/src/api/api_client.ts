@@ -8,52 +8,31 @@ export class APIClient {
       baseURL: baseUrl,
       timeout: 10000,
       withCredentials: true,
+      validateStatus: (status) => status < 500,
     });
-    this.instance.interceptors.request.use(
-      (req) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log(req);
-        }
-        const token = localStorage.getItem('accessToken');
-        if (token) {
-          req.headers['Authorization'] = `Bearer ${token}`;
-        }
-        req.headers['Content-Type'] = 'application/json';
-        return req;
-      },
-      (err) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.error(err);
-        }
-        return Promise.reject(err);
-      },
-    );
-    this.instance.interceptors.response.use(
-      (res) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.log(res);
-        }
-        return res;
-      },
-      (err) => {
-        if (process.env.NODE_ENV === 'development') {
-          console.error(err);
-        }
-        return Promise.reject(err);
-      },
-    );
+    this.instance.interceptors.request.use((req) => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        req.headers['Authorization'] = `Bearer ${token}`;
+      }
+      req.headers['Content-Type'] = 'application/json';
+      return req;
+    });
   }
-  public signUp = async (accountDetails: AccountDetails): Promise<void> => {
+  public signUp = async (accountDetails: AccountDetails) => {
     // returns 204 No Content
-    await this.instance.post('/api/auth/signup', JSON.stringify(accountDetails));
+    const res = await this.instance.post('/api/auth/signup', JSON.stringify(accountDetails));
+    return res.status;
   };
   public signIn = async (details: LogInDetails) => {
     const response = await this.instance.post('/api/auth/signin', JSON.stringify(details));
-    return response.data as UserWithJWT;
+    return { data: response.data as UserWithJWT, status: response.status };
   };
-  public signOut = async (): Promise<void> => {
+  public signOut = async () => {
     // returns 204 No Content
-    await this.instance.delete('/api/auth/signout');
+    const res = await this.instance.delete('/api/auth/signout');
+
+    return res.status;
   };
   public refreshAccessToken = async () => {
     const response = await this.instance.post('/api/auth/refresh');
