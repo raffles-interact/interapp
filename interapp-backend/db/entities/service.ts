@@ -23,7 +23,7 @@ export class Service {
   website: string;
 
   @Column({ type: 'bytea', nullable: true })
-  promotional_image: Buffer;
+  promotional_image: string;
 
   @OneToMany(() => UserService, (user_service) => user_service.service)
   user_service: Relation<UserService[]>;

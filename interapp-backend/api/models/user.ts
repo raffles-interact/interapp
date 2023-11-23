@@ -199,10 +199,10 @@ export class UserModel {
 
     await transporter.sendMail(email);
   }
-  public static async checkRoles(username: string) {
+  public static async checkPermissions(username: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
-      .select(['user.user_id'])
+      .select(['user.user_id', 'user_permissions.permission_id'])
       .from(User, 'user')
       .leftJoinAndSelect('user.user_permissions', 'user_permissions')
       .where('user.username = :username', { username: username })
@@ -214,8 +214,32 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
+
     const perms = user.user_permissions.map((perm) => perm.permission_id);
 
     return perms;
+  }
+  public static async updatePermissions(username: string, permissions: number[]) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .leftJoinAndSelect('user.user_permissions', 'user_permissions')
+      .where('user.username = :username', { username: username })
+      .getOne();
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    // delete all permissions
+    await appDataSource.manager.delete(UserPermission, { username });
+    // add new permissions
+    await appDataSource.manager.insert(
+      UserPermission,
+      permissions.map((perm) => ({ username, permission_id: perm, user })),
+    );
   }
 }

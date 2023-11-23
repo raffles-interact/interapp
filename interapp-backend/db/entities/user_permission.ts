@@ -4,7 +4,7 @@ import { User } from './user';
 @Entity()
 export class UserPermission {
   @PrimaryColumn()
-  user_id: number;
+  username: string;
 
   @PrimaryColumn()
   permission_id: number;

@@ -39,7 +39,7 @@ services:
 
   backend:
     container_name: interapp-backend
-    restart: always
+    restart: on-failure
     build:
       context: ./interapp-backend
       dockerfile: dev.Dockerfile

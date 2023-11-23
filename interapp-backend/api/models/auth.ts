@@ -73,9 +73,8 @@ export class AuthModel {
 
     // init a new permission entry for the user, will insert/update regardless if this entry already exists
     const userPermission = new UserPermission();
-
     userPermission.user = user;
-    userPermission.user_id = userId;
+    userPermission.username = username;
     userPermission.permission_id = 0;
 
     await appDataSource.manager.save(userPermission);
@@ -200,6 +199,7 @@ export class AuthModel {
     try {
       // check if the token is blacklisted
       const blacklisted = await redisClient.get(`blacklist:${token}`);
+
       if (blacklisted) {
         throw new HTTPError(
           'Invalid JWT',
