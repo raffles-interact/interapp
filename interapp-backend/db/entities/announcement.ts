@@ -16,7 +16,7 @@ export class Announcement {
   attachment: Buffer;
 
   @Column()
-  user_id: number;
+  username: string;
 
   @ManyToOne(() => User)
   user: Relation<User>;

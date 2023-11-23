@@ -14,7 +14,7 @@ export class ServiceSessionUser {
   service_session_id: number;
 
   @PrimaryColumn()
-  user_id: number;
+  username: string;
 
   @Column()
   ad_hoc: boolean;

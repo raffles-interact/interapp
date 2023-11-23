@@ -3,16 +3,20 @@ import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { AuthModel } from '@models/auth';
 import { UserModel } from '@models/user';
 
-export function validateRequiredFields(requiredFields: string[]) {
+export function validateRequiredFields(requiredFields: string[], optionalFields: string[] = []) {
   return (req: Request, res: Response, next: NextFunction) => {
-    const missing = requiredFields.filter((field) => !req.body[field]);
+    const content = req.method === 'GET' ? req.query : req.body;
+    const missing = requiredFields.filter((field) => !content[field]);
+
     if (missing.length > 0) {
       throw new HTTPError(
         'Missing fields',
-        `You are missing these field(s): ${missing.join(', ')}`,
+        `You are missing these field(s): ${missing.join(', ')}. ` +
+          (optionalFields.length > 0 ? 'Optional field(s): ' + optionalFields.join(', ') : ''),
         HTTPErrorCode.BAD_REQUEST_ERROR,
       );
     }
+
     next();
   };
 }
@@ -28,6 +32,8 @@ export async function verifyJWT(req: Request, res: Response, next: NextFunction)
     );
   }
   const { userId, username } = (await AuthModel.verify(token, 'access')).payload;
+  console.log(userId, username);
+
   req.headers.userId = String(userId);
   req.headers.username = username;
   next();
@@ -46,7 +52,7 @@ export function verifyRequiredRole(role: number) {
       );
     }
 
-    const perms = await UserModel.checkRoles(username);
+    const perms = await UserModel.checkPermissions(username);
 
     if (!perms.includes(role)) {
       throw new HTTPError(

@@ -5,7 +5,7 @@ import { Service } from './service';
 @Entity()
 export class UserService {
   @PrimaryColumn()
-  user_id: number;
+  username: string;
 
   @PrimaryColumn()
   service_id: number;

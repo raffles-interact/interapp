@@ -1,7 +1,8 @@
 import { Router } from 'express';
-import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { validateRequiredFields, verifyJWT } from '../middleware';
 import { UserModel } from '@models/user';
+import { HTTPError, HTTPErrorCode } from '@utils/errors';
+import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
@@ -46,5 +47,33 @@ userRouter.patch('/verify', validateRequiredFields(['token']), verifyJWT, async 
   await UserModel.verifyEmail(req.body.token);
   res.status(204).send();
 });
+
+userRouter.patch(
+  '/permissions/update',
+  validateRequiredFields(['username', 'permissions']),
+  verifyJWT,
+  async (req, res) => {
+    if (
+      !Array.isArray(req.body.permissions) ||
+      !req.body.permissions.every((x: any) => x in Permissions) ||
+      req.body.permissions.length === 0
+    ) {
+      throw new HTTPError(
+        'Invalid field type',
+        'Permissions must be an array of permission IDs',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    if (!req.body.permissions.includes(Permissions.VISTOR)) {
+      throw new HTTPError(
+        'Invalid field type',
+        'Permissions must include the visitor permission',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    await UserModel.updatePermissions(req.body.username, req.body.permissions);
+    res.status(204).send();
+  },
+);
 
 export default userRouter;

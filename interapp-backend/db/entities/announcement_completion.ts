@@ -8,7 +8,7 @@ export class AnnouncementCompletion {
   announcement_id: number;
 
   @PrimaryColumn()
-  user_id: number;
+  username: string;
 
   @ManyToOne(() => Announcement)
   announcement: Relation<Announcement>;
