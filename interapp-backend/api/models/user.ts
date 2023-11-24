@@ -242,4 +242,13 @@ export class UserModel {
       permissions.map((perm) => ({ username, permission_id: perm, user })),
     );
   }
+  public static async getAllServicesByUser(username: string) {
+    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+  }
+  public static async addServiceUser(service_id: number, username: string) {
+    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+  }
+  public static async removeServiceUser(service_id: number, username: string) {
+    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+  }
 }

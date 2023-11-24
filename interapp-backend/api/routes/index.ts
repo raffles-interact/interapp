@@ -21,14 +21,13 @@ app.use(cookieParser());
 
 process.env.NODE_ENV === 'development' && app.use('/api/docs', serve, setup(swagger_docs));
 
-
 app.use('/api/hello', helloRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/service', serviceRouter);
 
-app.use(generateRateLimit(1000 * 60 * 60, 500)); // 500 requests per hour
 app.use(handleError);
+app.use(generateRateLimit(1000 * 60 * 60, 500)); // 500 requests per hour
 
 try {
   app.listen(PORT, () => console.log('Server running on port 8000!'));
