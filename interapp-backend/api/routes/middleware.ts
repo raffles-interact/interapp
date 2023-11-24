@@ -3,8 +3,7 @@ import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { AuthModel } from '@models/auth';
 import { UserModel } from '@models/user';
 
-
-import {rateLimit} from 'express-rate-limit';
+import { rateLimit } from 'express-rate-limit';
 
 export function validateRequiredFields(requiredFields: string[], optionalFields: string[] = []) {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -81,13 +80,16 @@ export function handleError(err: HTTPError, req: Request, res: Response, next: N
   next(err);
 }
 
-
 export function generateRateLimit(ms: number, max: number) {
   return rateLimit({
     windowMs: ms,
     max,
     standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-	  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
     message: 'Too many requests from this IP, please try again later',
+    validate: {
+      ip: process.env.NODE_ENV === 'production', // only validate IP in production
+      xForwardedForHeader: false, // don't validate x-forwarded-for header
+    },
   });
 }

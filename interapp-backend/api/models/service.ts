@@ -11,7 +11,21 @@ export class ServiceModel {
     newService.contact_number = service.contact_number;
     newService.website = service.website;
     newService.promotional_image = service.promotional_image;
-    await appDataSource.manager.save(newService);
+
+    newService.day_of_week = service.day_of_week;
+    newService.start_time = service.start_time;
+    newService.end_time = service.end_time;
+
+    try {
+      await appDataSource.manager.insert(Service, newService);
+    } catch (e) {
+      throw new HTTPError(
+        'Service already exists',
+        `Service with name ${service.name} already exists`,
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+
     return newService.service_id;
   }
   public static async getService(service_id: number) {
@@ -31,7 +45,11 @@ export class ServiceModel {
     return service;
   }
   public static async updateService(service: Service) {
-    await appDataSource.manager.save(Service, service);
+    try {
+      await appDataSource.manager.update(Service, { service_id: service.service_id }, service);
+    } catch (e) {
+      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
+    }
     return service;
   }
   public static async deleteService(service_id: number) {
@@ -45,28 +63,50 @@ export class ServiceModel {
       .getMany();
     return services;
   }
-  public static async getAllServicesByUser(username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
-  }
-  public static async addServiceUser(service_id: number, username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
-  }
-
   public static async createServiceSession(
     service_session: Omit<ServiceSession, 'service_session_id'>,
   ) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+    const session = new ServiceSession();
+    session.service_id = service_session.service_id;
+    session.start_time = service_session.start_time;
+    session.end_time = service_session.end_time;
+    session.ad_hoc_enabled = service_session.ad_hoc_enabled;
+    session.service = await this.getService(service_session.service_id);
   }
+  public static async getServiceSession(service_session_id: number) {
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where('service_session_id = :id', { id: service_session_id })
+      .getOne();
+    if (!res) {
+      throw new HTTPError(
+        'Service session not found',
+        `Service session with service_session_id ${service_session_id} does not exist`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return res;
+  }
+  public static async updateServiceSession(service_session: ServiceSession) {
+    await appDataSource.manager.save(ServiceSession, service_session);
+    return service_session;
+  }
+  public static async deleteServiceSession(service_session_id: number) {
+    await appDataSource.manager.delete(ServiceSession, { service_session_id });
+  }
+
   public static async createServiceSessionUser(service_session_id: number, username: string) {
     throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
   }
-  public static async getServiceSession(service_session_id: number) {
+  public static async getServiceSessionUser(service_session_id: number, username: string) {
     throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
   }
-  public static async updateServiceSession(service_session: ServiceSession) {
+  public static async updateServiceSessionUser(service_session_id: number, username: string) {
     throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
   }
-  public static async deleteServiceSession(service_session_id: number) {
+  public static async deleteServiceSessionUser(service_session_id: number, username: string) {
     throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
   }
 }

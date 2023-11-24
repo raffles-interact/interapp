@@ -2,12 +2,22 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, type Relation } from
 import { UserService } from './user_service';
 import { ServiceSession } from './service_session';
 
+export enum DayOfWeek {
+  SUNDAY = 0,
+  MONDAY = 1,
+  TUESDAY = 2,
+  WEDNESDAY = 3,
+  THURSDAY = 4,
+  FRIDAY = 5,
+  SATURDAY = 6,
+}
+
 @Entity()
 export class Service {
   @PrimaryGeneratedColumn()
   service_id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
 
   @Column({ nullable: true })
@@ -24,6 +34,15 @@ export class Service {
 
   @Column({ type: 'bytea', nullable: true })
   promotional_image: string;
+
+  @Column({ type: 'smallint' })
+  day_of_week: DayOfWeek;
+
+  @Column({ type: 'time without time zone' })
+  start_time: string;
+
+  @Column({ type: 'time without time zone' })
+  end_time: string;
 
   @OneToMany(() => UserService, (user_service) => user_service.service)
   user_service: Relation<UserService[]>;
