@@ -4,7 +4,7 @@ name: Build Docker Compose
 on:
   push:
     branches:
-      - main
+      - '**'
 
 jobs:
   build:
