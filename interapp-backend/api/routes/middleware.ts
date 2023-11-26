@@ -60,7 +60,9 @@ export function verifyRequiredRole(role: number) {
       throw new HTTPError(
         'Insufficient permissions',
         'You do not have sufficient permissions to access this resource. Required role: ' +
-          role.toString(),
+          role.toString() +
+          '. Your roles: ' +
+          perms.join(', '),
         HTTPErrorCode.FORBIDDEN_ERROR,
       );
     }
