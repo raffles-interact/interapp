@@ -30,7 +30,7 @@ export class User {
   user_permissions: Relation<UserPermission[]>;
 
   @OneToMany(() => UserService, (user_service) => user_service.user)
-  user_service: Relation<UserService[]>;
+  user_services: Relation<UserService[]>;
 
   @OneToMany(() => ServiceSessionUser, (service_session_user) => service_session_user.user)
   service_session_users: Relation<ServiceSessionUser[]>;

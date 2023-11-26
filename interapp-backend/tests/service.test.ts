@@ -90,6 +90,22 @@ describe('change account details', async () => {
     expect(await res2.json()).toMatchObject({
       serviceId: 2,
     });
+
+    const res3 = await fetch(`${API_URL}/service`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'test service3',
+        contact_email: 'fksalfjasklf@fkjkdsjglk',
+        day_of_week: 2,
+        start_time: '09:00',
+        end_time: '10:00',
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res3.status).toBe(200);
+    expect(await res3.json()).toMatchObject({
+      serviceId: 3,
+    });
   });
 
   test('update service', async () => {
@@ -159,11 +175,99 @@ describe('change account details', async () => {
     const res = await fetch(`${API_URL}/service`, {
       method: 'DELETE',
       body: JSON.stringify({
-        serviceId: 1,
+        serviceId: 3,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(204);
+  });
+
+  test('add service to user', async () => {
+    const res = await fetch(`${API_URL}/user/userservices`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'testuser',
+        service_id: 2,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+
+    const res2 = await fetch(`${API_URL}/user/userservices`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'testuser',
+        service_id: 1,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(204);
+
+    const res3 = await fetch(`${API_URL}/user/userservices`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'notfound',
+        service_id: 1,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res3.status).toBe(404);
+  });
+
+  test('get all services by user', async () => {
+    const res = await fetch(`${API_URL}/user/userservices?username=testuser`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject([
+      {
+        service_id: 2,
+        name: 'test service2',
+        description: 'test description2',
+        contact_email: 'fksalfjasklf@fkjkdsjglk',
+        day_of_week: 2,
+        start_time: '09:00:00',
+        end_time: '10:00:00',
+        contact_number: null,
+        website: null,
+        promotional_image: null,
+      },
+      {
+        service_id: 1,
+        name: 'new name',
+        description: 'new description',
+        contact_email: 'asjlfkjfl@jkljfl.com',
+        day_of_week: 1,
+        start_time: '09:00:00',
+        end_time: '10:00:00',
+        contact_number: null,
+        website: null,
+        promotional_image: null,
+      },
+    ]);
+  });
+
+  test('delete service from user', async () => {
+    const res = await fetch(`${API_URL}/user/userservices`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        username: 'testuser',
+        service_id: 2,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+
+    const res2 = await fetch(`${API_URL}/user/userservices`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        username: 'testuser',
+        service_id: 423421421,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(204);
   });
 
   afterAll(async () => {

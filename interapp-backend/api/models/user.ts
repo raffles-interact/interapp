@@ -1,5 +1,5 @@
 import appDataSource from '@utils/init_datasource';
-import { User, UserPermission, UserService } from '@db/entities';
+import { User, UserPermission, UserService, Service } from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
@@ -243,12 +243,70 @@ export class UserModel {
     );
   }
   public static async getAllServicesByUser(username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+    const user_services = await appDataSource
+      .createQueryBuilder()
+      .select(['user_service.service_id'])
+      .from(UserService, 'user_service')
+      .where('user_service.username = :username', { username })
+      .getMany();
+    if (!user_services) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} has no services`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    const services = user_services.map((service) => service.service_id);
+    if (!services) {
+      throw new HTTPError(
+        'Service not found',
+        `The user with username ${username} has no services`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return await appDataSource.manager
+      .createQueryBuilder()
+      .select(['service'])
+      .from(Service, 'service')
+      .where('service.service_id IN (:...services)', { services })
+      .getMany();
   }
   public static async addServiceUser(service_id: number, username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!user)
+      throw new HTTPError(
+        'User not found',
+        `User with username ${user} was not found`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    const service = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['service'])
+      .from(Service, 'service')
+      .where('service.service_id = :service_id', { service_id })
+      .getOne();
+    if (!service)
+      throw new HTTPError(
+        'Service not found',
+        `Service with id ${service_id} was not found`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    try {
+      await appDataSource.manager.insert(UserService, { service_id, username, user, service });
+    } catch (e) {
+      throw new HTTPError(
+        'Already exists',
+        'User already has been added to this service',
+        HTTPErrorCode.CONFLICT_ERROR,
+      );
+    }
   }
   public static async removeServiceUser(service_id: number, username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+    await appDataSource.manager.delete(UserService, { service_id, username });
   }
 }
