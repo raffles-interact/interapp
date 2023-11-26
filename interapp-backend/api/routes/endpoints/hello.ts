@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import { hello } from '@models/hello';
-import { verifyJWT, verifyRequiredRole } from '../middleware';
-import { UserModel } from '@models/user';
 
 const helloRouter = Router();
 

@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateRequiredFields, verifyJWT } from '../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredRole } from '../middleware';
 import { UserModel } from '@models/user';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
@@ -52,6 +52,7 @@ userRouter.patch(
   '/permissions/update',
   validateRequiredFields(['username', 'permissions']),
   verifyJWT,
+  verifyRequiredRole(Permissions.ADMIN),
   async (req, res) => {
     if (
       !Array.isArray(req.body.permissions) ||

@@ -90,7 +90,15 @@ export class ServiceModel {
     return res;
   }
   public static async updateServiceSession(service_session: ServiceSession) {
-    await appDataSource.manager.save(ServiceSession, service_session);
+    try {
+      await appDataSource.manager.update(
+        ServiceSession,
+        { service_session_id: service_session.service_session_id },
+        service_session,
+      );
+    } catch (e) {
+      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
+    }
     return service_session;
   }
   public static async deleteServiceSession(service_session_id: number) {
