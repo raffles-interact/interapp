@@ -77,4 +77,28 @@ userRouter.patch(
   },
 );
 
+userRouter.get('/userservices', validateRequiredFields(['username']), async (req, res) => {
+  console.log(req.params.username);
+
+  const services = await UserModel.getAllServicesByUser(req.query.username as string);
+  res.status(200).send(services);
+});
+
+userRouter.post(
+  '/userservices',
+  validateRequiredFields(['username', 'service_id']),
+  async (req, res) => {
+    await UserModel.addServiceUser(req.body.service_id, req.body.username);
+    res.status(204).send();
+  },
+);
+
+userRouter.delete(
+  '/userservices',
+  validateRequiredFields(['username', 'service_id']),
+  async (req, res) => {
+    await UserModel.removeServiceUser(req.body.service_id, req.body.username);
+    res.status(204).send();
+  },
+);
 export default userRouter;

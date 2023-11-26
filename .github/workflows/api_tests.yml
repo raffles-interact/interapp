@@ -1,5 +1,5 @@
 
-name: Build Docker Compose
+name: API Tests
 
 on:
   push:

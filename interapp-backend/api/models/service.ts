@@ -22,7 +22,7 @@ export class ServiceModel {
       throw new HTTPError(
         'Service already exists',
         `Service with name ${service.name} already exists`,
-        HTTPErrorCode.BAD_REQUEST_ERROR,
+        HTTPErrorCode.CONFLICT_ERROR,
       );
     }
 
