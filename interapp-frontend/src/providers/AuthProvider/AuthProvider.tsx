@@ -3,14 +3,15 @@ import { AuthProviderProps, LogInDetails, AccountDetails, User, AuthContextType 
 import axiosClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
 import { RoutePermissions, noLoginRequiredRoutes, Permissions } from '@/app/route_permissions';
+import { notifications } from '@mantine/notifications';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  login: async () => {},
-  logout: () => {},
+  login: async () => 0,
+  logout: async () => 0,
   updateUser: () => {},
-  registerUserAccount: async () => {},
+  registerUserAccount: async () => 0,
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -24,10 +25,22 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (!user) {
       if (!noLoginRequiredRoutes.includes(pathname)) {
-        router.push('/auth/login');
+        notifications.show({
+          title: 'Error',
+          message: 'You must be logged in to access this page',
+          color: 'red',
+        });
+        router.replace('/auth/login');
       }
       return;
-    } // user is not logged in
+    } else if (pathname === '/auth/login' || pathname === '/auth/signup') {
+      notifications.show({
+        title: 'Error',
+        message: 'You are already logged in. Redirecting to home page.',
+        color: 'red',
+      });
+      return router.replace('/');
+    }
 
     const userPermissions = user.permissions;
 
@@ -36,7 +49,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         return;
       }
     }
-    return router.push('/');
+    notifications.show({
+      title: 'Error',
+      message: 'You do not have permission to access this page',
+      color: 'red',
+    });
+    return router.replace('/');
   }, [user, loading]);
 
   useEffect(() => {
@@ -60,20 +78,27 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const login = useCallback(async (details: LogInDetails) => {
-    const { accessToken, user, expire } = await axiosClient.signIn(details);
+    const { data, status } = await axiosClient.signIn(details);
+    const { accessToken, expire, user } = data;
+
+    if (status !== 200) return status;
 
     localStorage.setItem('accessTokenExpire', expire.toString());
     localStorage.setItem('accessToken', accessToken);
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
+    router.refresh(); // invalidate browser cache
+    return status;
   }, []);
 
   const logout = useCallback(async () => {
-    await axiosClient.signOut();
+    const status = await axiosClient.signOut();
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('accessToken');
     localStorage.removeItem('accessTokenExpire');
+    router.refresh(); // invalidate browser cache
+    return status;
   }, []);
 
   const updateUser = useCallback((updatedUser: User) => {
@@ -81,8 +106,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
   }, []);
 
-  const registerUserAccount = useCallback(async (accountDetails: AccountDetails): Promise<void> => {
-    await axiosClient.signUp(accountDetails);
+  const registerUserAccount = useCallback(async (accountDetails: AccountDetails) => {
+    const status = await axiosClient.signUp(accountDetails);
+    return status;
   }, []);
 
   const providerValue = useMemo(

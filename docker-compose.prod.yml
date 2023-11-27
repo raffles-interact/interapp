@@ -62,6 +62,8 @@ services:
       dockerfile: prod.Dockerfile
     ports:
       - 3000:3000
+    env_file:
+      - ./interapp-frontend/.env.production
     networks:
       - interapp-network
     depends_on:
