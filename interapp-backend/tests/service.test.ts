@@ -19,6 +19,26 @@ describe('change account details', async () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
+    await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: 2,
+        username: 'testuser2',
+        email: 'test@example.com',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: 999,
+        username: 'serviceic',
+        email: 'tes234141@example.com',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
     const res = await fetch(`${API_URL}/auth/signin`, {
       method: 'POST',
       body: JSON.stringify({
@@ -61,7 +81,7 @@ describe('change account details', async () => {
     }
   });
 
-  test('create service', async () => {
+  test('create valid service', async () => {
     const res = await fetch(`${API_URL}/service`, {
       method: 'POST',
       body: JSON.stringify({
@@ -71,29 +91,33 @@ describe('change account details', async () => {
         day_of_week: 1,
         start_time: '09:00',
         end_time: '10:00',
+        service_ic_username: 'serviceic',
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({
-      serviceId: 1,
+      service_id: 1,
     });
+  });
 
+  test('create multiple services', async () => {
     const res2 = await fetch(`${API_URL}/service`, {
       method: 'POST',
       body: JSON.stringify({
-        name: 'test service2',
+        name: 'test service 2',
         description: 'test description2',
         contact_email: 'fksalfjasklf@fkjkdsjglk',
         day_of_week: 2,
         start_time: '09:00',
         end_time: '10:00',
+        service_ic_username: 'testuser',
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res2.status).toBe(200);
     expect(await res2.json()).toMatchObject({
-      serviceId: 2,
+      service_id: 2,
     });
 
     const res3 = await fetch(`${API_URL}/service`, {
@@ -104,20 +128,39 @@ describe('change account details', async () => {
         day_of_week: 2,
         start_time: '09:00',
         end_time: '10:00',
+        service_ic_username: 'testuser2',
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res3.status).toBe(200);
     expect(await res3.json()).toMatchObject({
-      serviceId: 3,
+      service_id: 3,
     });
   });
 
-  test('update service', async () => {
+  test('create invalid service', async () => {
+    // create with no valid service_ic
+    const invalidres = await fetch(`${API_URL}/service`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'test service',
+        description: 'test description',
+        contact_email: 'asjlfkjfl@jkljfl.com',
+        day_of_week: 1,
+        start_time: '09:00',
+        end_time: '10:00',
+        service_ic_username: 1234,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(invalidres.status).toBe(404);
+  });
+
+  test('update service name and description', async () => {
     const res = await fetch(`${API_URL}/service`, {
       method: 'PATCH',
       body: JSON.stringify({
-        serviceId: 1,
+        service_id: 1,
         name: 'new name',
         description: 'new description',
       }),
@@ -135,11 +178,38 @@ describe('change account details', async () => {
       contact_number: null,
       website: null,
       promotional_image: null,
+      service_ic_username: 'serviceic',
     });
   });
 
-  test('get service', async () => {
-    const res = await fetch(`${API_URL}/service?serviceId=1`, {
+  test("update service's service ic", async () => {
+    // update service_ic
+    const res2 = await fetch(`${API_URL}/service`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_id: 1,
+        service_ic_username: 'serviceic',
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(200);
+    expect(await res2.json()).toMatchObject({
+      service_id: 1,
+      name: 'new name',
+      description: 'new description',
+      contact_email: 'asjlfkjfl@jkljfl.com',
+      day_of_week: 1,
+      start_time: '09:00:00',
+      end_time: '10:00:00',
+      contact_number: null,
+      website: null,
+      promotional_image: null,
+      service_ic_username: 'serviceic',
+    });
+  });
+
+  test('get services', async () => {
+    const res = await fetch(`${API_URL}/service?service_id=1`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -155,16 +225,17 @@ describe('change account details', async () => {
       contact_number: null,
       website: null,
       promotional_image: null,
+      service_ic_username: 'serviceic',
     });
 
-    const res2 = await fetch(`${API_URL}/service?serviceId=2`, {
+    const res2 = await fetch(`${API_URL}/service?service_id=2`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(res2.status).toBe(200);
     expect(await res2.json()).toMatchObject({
       service_id: 2,
-      name: 'test service2',
+      name: 'test service 2',
       description: 'test description2',
       contact_email: 'fksalfjasklf@fkjkdsjglk',
       day_of_week: 2,
@@ -173,6 +244,7 @@ describe('change account details', async () => {
       contact_number: null,
       website: null,
       promotional_image: null,
+      service_ic_username: 'testuser',
     });
   });
 
@@ -180,7 +252,7 @@ describe('change account details', async () => {
     const res = await fetch(`${API_URL}/service`, {
       method: 'DELETE',
       body: JSON.stringify({
-        serviceId: 3,
+        service_id: 3,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -228,7 +300,7 @@ describe('change account details', async () => {
     expect(await res.json()).toMatchObject([
       {
         service_id: 2,
-        name: 'test service2',
+        name: 'test service 2',
         description: 'test description2',
         contact_email: 'fksalfjasklf@fkjkdsjglk',
         day_of_week: 2,
@@ -237,6 +309,7 @@ describe('change account details', async () => {
         contact_number: null,
         website: null,
         promotional_image: null,
+        service_ic_username: 'testuser',
       },
       {
         service_id: 1,
@@ -249,6 +322,7 @@ describe('change account details', async () => {
         contact_number: null,
         website: null,
         promotional_image: null,
+        service_ic_username: 'serviceic',
       },
     ]);
   });

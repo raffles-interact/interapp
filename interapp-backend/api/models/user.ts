@@ -256,8 +256,8 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-    const services = user_services.map((service) => service.service_id);
-    if (!services) {
+    const service_ids = user_services.map((service) => service.service_id);
+    if (service_ids.length === 0) {
       throw new HTTPError(
         'Service not found',
         `The user with username ${username} has no services`,
@@ -268,7 +268,7 @@ export class UserModel {
       .createQueryBuilder()
       .select(['service'])
       .from(Service, 'service')
-      .where('service.service_id IN (:...services)', { services })
+      .where('service.service_id IN (:...services)', { services: service_ids })
       .getMany();
   }
   public static async addServiceUser(service_id: number, username: string) {
