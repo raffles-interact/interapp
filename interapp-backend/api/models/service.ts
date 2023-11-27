@@ -72,6 +72,16 @@ export class ServiceModel {
     session.end_time = service_session.end_time;
     session.ad_hoc_enabled = service_session.ad_hoc_enabled;
     session.service = await this.getService(service_session.service_id);
+    try {
+      await appDataSource.manager.insert(ServiceSession, session);
+    } catch (e) {
+      throw new HTTPError(
+        'Service session already exists',
+        `Service session with service_id ${service_session.service_id} already exists`,
+        HTTPErrorCode.CONFLICT_ERROR,
+      );
+    }
+    return session.service_session_id;
   }
   public static async getServiceSession(service_session_id: number) {
     const res = await appDataSource.manager

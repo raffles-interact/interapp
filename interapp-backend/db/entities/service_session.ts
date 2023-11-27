@@ -17,11 +17,11 @@ export class ServiceSession {
   @Column()
   service_id: number;
 
-  @Column()
-  start_time: Date;
+  @Column({ type: 'timestamp without time zone' })
+  start_time: string;
 
-  @Column()
-  end_time: Date;
+  @Column({ type: 'timestamp without time zone' })
+  end_time: string;
 
   @Column()
   ad_hoc_enabled: boolean;
