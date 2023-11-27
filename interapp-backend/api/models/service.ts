@@ -50,7 +50,7 @@ export class ServiceModel {
     } catch (e) {
       throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
     }
-    return service;
+    return await this.getService(service.service_id);
   }
   public static async deleteService(service_id: number) {
     await appDataSource.manager.delete(Service, { service_id });
@@ -109,7 +109,7 @@ export class ServiceModel {
     } catch (e) {
       throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
     }
-    return service_session;
+    return await this.getServiceSession(service_session.service_session_id);
   }
   public static async deleteServiceSession(service_session_id: number) {
     await appDataSource.manager.delete(ServiceSession, { service_session_id });

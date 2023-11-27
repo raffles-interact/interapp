@@ -355,8 +355,8 @@ describe('change account details', async () => {
     expect(await res.json()).toMatchObject({
       service_session_id: 1,
       service_id: 1,
-      start_time: '2023-11-27T16:42Z',
-      end_time: '2023-11-27T17:42Z',
+      start_time: '2023-11-27T16:42:00.000Z',
+      end_time: '2023-11-27T17:42:00.000Z',
       ad_hoc_enabled: false,
     });
   });
@@ -371,8 +371,8 @@ describe('change account details', async () => {
     expect(await res.json()).toMatchObject({
       service_session_id: 1,
       service_id: 1,
-      start_time: '2023-11-27T16:42Z',
-      end_time: '2023-11-27T17:42Z',
+      start_time: '2023-11-27T16:42:00.000Z',
+      end_time: '2023-11-27T17:42:00.000Z',
       ad_hoc_enabled: false,
     });
   });
