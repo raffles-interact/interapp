@@ -26,7 +26,7 @@ export class ServiceSessionUser {
   attended: AttendanceStatus;
 
   @Column()
-  is_admin: boolean;
+  is_ic: boolean;
 
   @ManyToOne(() => ServiceSession, (service_session) => service_session.service_session_users)
   service_session: Relation<ServiceSession>;

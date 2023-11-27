@@ -1,6 +1,7 @@
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
-import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
+import { Service, ServiceSession, ServiceSessionUser, User } from '@db/entities';
+import { AttendanceStatus } from '@db/entities';
 
 export class ServiceModel {
   public static async createService(service: Omit<Service, 'service_id'>) {
@@ -16,12 +17,27 @@ export class ServiceModel {
     newService.start_time = service.start_time;
     newService.end_time = service.end_time;
 
+    const service_ic = await appDataSource.manager
+      .createQueryBuilder()
+      .select('user')
+      .from(User, 'user')
+      .where('username = :username', { username: service.service_ic_username })
+      .getOne();
+    if (!service_ic) {
+      throw new HTTPError(
+        'Service IC not found',
+        `Service IC with username ${service.service_ic_username} does not exist`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    newService.service_ic = service_ic;
+    newService.service_ic_username = service.service_ic_username;
     try {
       await appDataSource.manager.insert(Service, newService);
     } catch (e) {
       throw new HTTPError(
         'Service already exists',
-        `Service with name ${service.name} already exists`,
+        `Service with name ${service.name} already exists, or service IC with username ${service.service_ic_username} already exists`,
         HTTPErrorCode.CONFLICT_ERROR,
       );
     }
@@ -45,6 +61,21 @@ export class ServiceModel {
     return service;
   }
   public static async updateService(service: Service) {
+    const service_ic = await appDataSource.manager
+      .createQueryBuilder()
+      .select('user')
+      .from(User, 'user')
+      .where('username = :username', { username: service.service_ic_username })
+      .getOne();
+    if (!service_ic) {
+      throw new HTTPError(
+        'Service IC not found',
+        `Service IC with username ${service.service_ic_username} does not exist`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    service.service_ic = service_ic;
+    service.service_ic_username = service.service_ic_username;
     try {
       await appDataSource.manager.update(Service, { service_id: service.service_id }, service);
     } catch (e) {
@@ -115,9 +146,7 @@ export class ServiceModel {
     await appDataSource.manager.delete(ServiceSession, { service_session_id });
   }
 
-  public static async createServiceSessionUser(service_session_id: number, username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
-  }
+  public static async createServiceSessionUser(user_session: ServiceSessionUser) {}
   public static async getServiceSessionUser(service_session_id: number, username: string) {
     throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
   }

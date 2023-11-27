@@ -1,5 +1,14 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, type Relation } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+  type Relation,
+} from 'typeorm';
 import { UserService } from './user_service';
+import { User } from './user';
 import { ServiceSession } from './service_session';
 
 export enum DayOfWeek {
@@ -44,9 +53,16 @@ export class Service {
   @Column({ type: 'time without time zone' })
   end_time: string;
 
+  @Column()
+  service_ic_username: string;
+
   @OneToMany(() => UserService, (user_service) => user_service.service)
   user_service: Relation<UserService[]>;
 
   @OneToMany(() => ServiceSession, (service_session) => service_session.service)
   service_sessions: Relation<ServiceSession[]>;
+
+  @OneToOne(() => User)
+  @JoinColumn()
+  service_ic: Relation<User>;
 }

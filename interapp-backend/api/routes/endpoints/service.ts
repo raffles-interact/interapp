@@ -9,7 +9,7 @@ const serviceRouter = Router();
 serviceRouter.post(
   '/',
   validateRequiredFields(
-    ['name', 'contact_email', 'day_of_week', 'start_time', 'end_time'],
+    ['name', 'contact_email', 'day_of_week', 'start_time', 'end_time', 'service_ic_username'],
     ['description', 'contact_number', 'website', 'promotional_image'],
   ),
   verifyJWT,
@@ -63,30 +63,30 @@ serviceRouter.post(
       );
     }
 
-    const serviceId = await ServiceModel.createService(req.body);
+    const service_id = await ServiceModel.createService(req.body);
     res.status(200).send({
-      serviceId: serviceId,
+      service_id: service_id,
     });
   },
 );
 
-serviceRouter.get('/', validateRequiredFields(['serviceId']), async (req, res) => {
-  if (Number.isNaN(req.body.serviceId)) {
+serviceRouter.get('/', validateRequiredFields(['service_id']), async (req, res) => {
+  if (Number.isNaN(req.body.service_id)) {
     throw new HTTPError(
       'Invalid field type',
-      'serviceId must be a number',
+      'service_id must be a number',
       HTTPErrorCode.BAD_REQUEST_ERROR,
     );
   }
 
-  const service = await ServiceModel.getService(Number(req.query.serviceId));
+  const service = await ServiceModel.getService(Number(req.query.service_id));
   res.status(200).send(service);
 });
 
 serviceRouter.patch(
   '/',
   validateRequiredFields(
-    ['serviceId'],
+    ['service_id'],
     [
       'name',
       'description',
@@ -97,21 +97,21 @@ serviceRouter.patch(
       'day_of_week',
       'start_time',
       'end_time',
+      'service_ic_username',
     ],
   ),
   verifyJWT,
   verifyRequiredRole(Permissions.EXCO),
   async (req, res) => {
-    if (Number.isNaN(req.body.serviceId)) {
+    if (Number.isNaN(req.body.service_id)) {
       throw new HTTPError(
         'Invalid field type',
-        'serviceId must be a number',
+        'service_id must be a number',
         HTTPErrorCode.BAD_REQUEST_ERROR,
       );
     }
 
-    const service = await ServiceModel.getService(Number(req.body.serviceId));
-    delete req.body.serviceId; // remove serviceId from req.body to prevent conflict with service.service_id
+    const service = await ServiceModel.getService(Number(req.body.service_id));
     const updated = await ServiceModel.updateService({ ...service, ...req.body });
     res.status(200).send(updated);
   },
@@ -119,19 +119,19 @@ serviceRouter.patch(
 
 serviceRouter.delete(
   '/',
-  validateRequiredFields(['serviceId']),
+  validateRequiredFields(['service_id']),
   verifyJWT,
   verifyRequiredRole(Permissions.EXCO),
   async (req, res) => {
-    if (Number.isNaN(req.body.serviceId)) {
+    if (Number.isNaN(req.body.service_id)) {
       throw new HTTPError(
         'Invalid field type',
-        'serviceId must be a number',
+        'service_id must be a number',
         HTTPErrorCode.BAD_REQUEST_ERROR,
       );
     }
 
-    await ServiceModel.deleteService(Number(req.body.serviceId));
+    await ServiceModel.deleteService(Number(req.body.service_id));
     res.status(204).send();
   },
 );
