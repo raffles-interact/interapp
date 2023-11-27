@@ -48,6 +48,11 @@ describe('change account details', async () => {
         username: 'testuser',
         permission_id: 4,
       });
+      await appDataSource.manager.insert(UserPermission, {
+        user: user!,
+        username: 'testuser',
+        permission_id: 2,
+      });
       await queryRunner.commitTransaction();
     } catch (err) {
       await queryRunner.rollbackTransaction();
@@ -268,6 +273,119 @@ describe('change account details', async () => {
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res2.status).toBe(204);
+  });
+
+  test('create service session', async () => {
+    const res = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      service_session_id: 1,
+    });
+
+    // test start time after end time
+    const res2 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1,
+        start_time: '2023-11-27T17:42Z',
+        end_time: '2023-11-27T16:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(400);
+
+    // test non-existent service
+    const res3 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1234,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res3.status).toBe(404);
+  });
+
+  test('get service session', async () => {
+    const res = await fetch(`${API_URL}/service/session?service_session_id=1`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      service_session_id: 1,
+      service_id: 1,
+      start_time: '2023-11-27T16:42:00.000Z',
+      end_time: '2023-11-27T17:42:00.000Z',
+      ad_hoc_enabled: true,
+    });
+
+    const res2 = await fetch(`${API_URL}/service/session?service_session_id=1234`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(404);
+  });
+
+  test('update service session', async () => {
+    // update ad_hoc_enabled
+    const res = await fetch(`${API_URL}/service/session`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_session_id: 1,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: false,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      service_session_id: 1,
+      service_id: 1,
+      start_time: '2023-11-27T16:42Z',
+      end_time: '2023-11-27T17:42Z',
+      ad_hoc_enabled: false,
+    });
+  });
+
+  // get it again to check it was updated
+  test('get updated service session', async () => {
+    const res = await fetch(`${API_URL}/service/session?service_session_id=1`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      service_session_id: 1,
+      service_id: 1,
+      start_time: '2023-11-27T16:42Z',
+      end_time: '2023-11-27T17:42Z',
+      ad_hoc_enabled: false,
+    });
+  });
+
+  test('delete service session', async () => {
+    const res = await fetch(`${API_URL}/service/session`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        service_session_id: 2,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
   });
 
   afterAll(async () => {

@@ -8,7 +8,7 @@ import { rateLimit } from 'express-rate-limit';
 export function validateRequiredFields(requiredFields: string[], optionalFields: string[] = []) {
   return (req: Request, res: Response, next: NextFunction) => {
     const content = req.method === 'GET' ? req.query : req.body;
-    const missing = requiredFields.filter((field) => !content[field]);
+    const missing = requiredFields.filter((field) => content[field] === undefined);
 
     if (missing.length > 0) {
       throw new HTTPError(
@@ -34,7 +34,6 @@ export async function verifyJWT(req: Request, res: Response, next: NextFunction)
     );
   }
   const { userId, username } = (await AuthModel.verify(token, 'access')).payload;
-  console.log(userId, username);
 
   req.headers.userId = String(userId);
   req.headers.username = username;
