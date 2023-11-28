@@ -10,6 +10,9 @@ export class AnnouncementCompletion {
   @PrimaryColumn()
   username: string;
 
+  @Column()
+  completed: boolean;
+
   @ManyToOne(() => Announcement, (announcement) => announcement.announcement_completions, {
     onDelete: 'CASCADE',
   })
@@ -17,7 +20,4 @@ export class AnnouncementCompletion {
 
   @ManyToOne(() => User)
   user: Relation<User>;
-
-  @Column()
-  completed: boolean;
 }
