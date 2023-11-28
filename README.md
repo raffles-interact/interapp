@@ -1,5 +1,10 @@
 # interapp
 
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=raffles-interact_interapp&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=raffles-interact_interapp)
+[![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=raffles-interact_interapp&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=raffles-interact_interapp)
+[![Bugs](https://sonarcloud.io/api/project_badges/measure?project=raffles-interact_interapp&metric=bugs)](https://sonarcloud.io/summary/new_code?id=raffles-interact_interapp)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=raffles-interact_interapp&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=raffles-interact_interapp)
+
 A monorepo for Raffles Interact's administrative application. Built with Next.js and Express along with the Bun runtime.
 
 ## Setting up (development)
