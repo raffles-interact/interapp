@@ -28,7 +28,9 @@ export class ServiceSessionUser {
   @Column()
   is_ic: boolean;
 
-  @ManyToOne(() => ServiceSession, (service_session) => service_session.service_session_users)
+  @ManyToOne(() => ServiceSession, (service_session) => service_session.service_session_users, {
+    onDelete: 'CASCADE',
+  })
   service_session: Relation<ServiceSession>;
 
   @ManyToOne(() => User, (user) => user.service_session_users)

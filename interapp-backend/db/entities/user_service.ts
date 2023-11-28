@@ -13,6 +13,6 @@ export class UserService {
   @ManyToOne(() => User, (user) => user.user_services)
   user: Relation<User>;
 
-  @ManyToOne(() => Service, (service) => service.user_service)
+  @ManyToOne(() => Service, (service) => service.user_service, { onDelete: 'CASCADE' })
   service: Relation<Service>;
 }

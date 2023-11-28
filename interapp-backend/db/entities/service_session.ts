@@ -26,12 +26,13 @@ export class ServiceSession {
   @Column()
   ad_hoc_enabled: boolean;
 
-  @ManyToOne(() => Service, (service) => service.service_sessions)
+  @ManyToOne(() => Service, (service) => service.service_sessions, { onDelete: 'CASCADE' })
   service: Relation<Service>;
 
   @OneToMany(
     () => ServiceSessionUser,
     (service_session_user) => service_session_user.service_session,
+    { cascade: true },
   )
   service_session_users: Relation<ServiceSessionUser[]>;
 }

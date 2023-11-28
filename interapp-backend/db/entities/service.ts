@@ -56,10 +56,10 @@ export class Service {
   @Column()
   service_ic_username: string;
 
-  @OneToMany(() => UserService, (user_service) => user_service.service)
+  @OneToMany(() => UserService, (user_service) => user_service.service, { cascade: true })
   user_service: Relation<UserService[]>;
 
-  @OneToMany(() => ServiceSession, (service_session) => service_session.service)
+  @OneToMany(() => ServiceSession, (service_session) => service_session.service, { cascade: true })
   service_sessions: Relation<ServiceSession[]>;
 
   @OneToOne(() => User)
