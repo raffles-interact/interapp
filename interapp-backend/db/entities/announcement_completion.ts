@@ -10,7 +10,9 @@ export class AnnouncementCompletion {
   @PrimaryColumn()
   username: string;
 
-  @ManyToOne(() => Announcement)
+  @ManyToOne(() => Announcement, (announcement) => announcement.announcement_completions, {
+    onDelete: 'CASCADE',
+  })
   announcement: Relation<Announcement>;
 
   @ManyToOne(() => User)
