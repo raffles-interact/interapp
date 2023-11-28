@@ -1,5 +1,5 @@
 'use client';
-import { TextInput, NumberInput, PasswordInput, Button, Group } from '@mantine/core';
+import { TextInput, PasswordInput, Button, Group } from '@mantine/core';
 import { useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { useForm } from '@mantine/form';

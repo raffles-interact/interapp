@@ -2,7 +2,7 @@ import { createContext, useEffect, useMemo, useState, useCallback } from 'react'
 import { AuthProviderProps, LogInDetails, AccountDetails, User, AuthContextType } from './types';
 import axiosClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
-import { RoutePermissions, noLoginRequiredRoutes, Permissions } from '@/app/route_permissions';
+import { RoutePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
 
 export const AuthContext = createContext<AuthContextType>({

@@ -1,4 +1,4 @@
-import { test, expect, describe, afterAll, beforeAll, beforeEach } from 'bun:test';
+import { test, expect, describe, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from './utils/recreate_db';
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
@@ -92,7 +92,7 @@ describe('change account details', async () => {
     });
     expect(res.status).toBe(204);
 
-    const perms = await appDataSource.manager
+    await appDataSource.manager
       .createQueryBuilder()
       .select(['user_permissions'])
       .from(UserPermission, 'user_permissions')

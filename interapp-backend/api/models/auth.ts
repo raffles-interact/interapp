@@ -78,8 +78,6 @@ export class AuthModel {
     userPermission.permission_id = 0;
 
     await appDataSource.manager.save(userPermission);
-
-    return;
   }
   public static async signIn(username: string, password: string) {
     const user = await appDataSource.manager

@@ -65,7 +65,6 @@ export class UserModel {
       }
     }
     await appDataSource.manager.update(User, { username: username }, user);
-    return;
   }
   public static async resetPassword(token: string) {
     // check if the user exists in redis
@@ -166,8 +165,6 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-
-    return;
   }
   public static async sendVerifyEmail(username: string) {
     const user = await appDataSource.manager

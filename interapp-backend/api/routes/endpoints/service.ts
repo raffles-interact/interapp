@@ -33,7 +33,7 @@ serviceRouter.post(
       }
     }
     // validate start_time and end_time
-    const timeRegex = new RegExp('^([0-1][0-9]|2[0-3]):[0-5][0-9]$');
+    const timeRegex = /^([0-1]\d|2[0-3]):[0-5]\d$/;
     if (!timeRegex.test(req.body.start_time) || !timeRegex.test(req.body.end_time)) {
       throw new HTTPError(
         'Invalid field type',

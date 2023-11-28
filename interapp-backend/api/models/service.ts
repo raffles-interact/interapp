@@ -1,6 +1,6 @@
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
-import { Service, ServiceSession, ServiceSessionUser, User } from '@db/entities';
+import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
 import { UserModel } from './user';
 
 export class ServiceModel {
@@ -51,7 +51,6 @@ export class ServiceModel {
   public static async updateService(service: Service) {
     const service_ic = await UserModel.getUser(service.service_ic_username);
     service.service_ic = service_ic;
-    service.service_ic_username = service.service_ic_username;
     try {
       await appDataSource.manager.update(Service, { service_id: service.service_id }, service);
     } catch (e) {
