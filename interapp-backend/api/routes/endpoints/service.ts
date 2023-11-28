@@ -3,6 +3,7 @@ import { validateRequiredFields, verifyJWT, verifyRequiredRole } from '../middle
 import { ServiceModel } from '@models/service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
+import { AttendanceStatus } from '@db/entities';
 
 const serviceRouter = Router();
 
@@ -199,6 +200,122 @@ serviceRouter.delete(
   validateRequiredFields(['service_session_id']),
   async (req, res) => {
     await ServiceModel.deleteServiceSession(Number(req.body.service_session_id));
+    res.status(204).send();
+  },
+);
+
+serviceRouter.post(
+  '/session_user',
+  validateRequiredFields(['service_session_id', 'username', 'ad_hoc', 'attended', 'is_ic']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.SERVICE_IC),
+  async (req, res) => {
+    if (!(req.body.attended in AttendanceStatus)) {
+      throw new HTTPError(
+        'Invalid field type',
+        `attended must be one of ${Object.values(AttendanceStatus)}`,
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    await ServiceModel.createServiceSessionUser(req.body);
+    res.status(204).send();
+  },
+);
+
+serviceRouter.post(
+  '/session_user_bulk',
+  validateRequiredFields(['service_session_id', 'users']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.SERVICE_IC),
+  async (req, res) => {
+    if (!Array.isArray(req.body.users)) {
+      throw new HTTPError(
+        'Invalid field type',
+        'users must be an array of users',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    // validate users
+    for (const user of req.body.users) {
+      if (
+        !(
+          'username' in user &&
+          'ad_hoc' in user &&
+          'attended' in user &&
+          'is_ic' in user &&
+          user.attended in AttendanceStatus
+        )
+      ) {
+        throw new HTTPError(
+          'Invalid field type',
+          'users must be a valid array of users',
+          HTTPErrorCode.BAD_REQUEST_ERROR,
+        );
+      }
+    }
+    for (const entry of req.body.users) {
+      entry.service_session_id = req.body.service_session_id;
+    }
+    await ServiceModel.createServiceSessionUsers(req.body.users);
+    res.status(204).send();
+  },
+);
+
+serviceRouter.get(
+  '/session_user',
+  validateRequiredFields(['service_session_id', 'username']),
+  async (req, res) => {
+    const session_user = await ServiceModel.getServiceSessionUser(
+      Number(req.query.service_session_id),
+      String(req.query.username),
+    );
+    res.status(200).send(session_user);
+  },
+);
+
+serviceRouter.get(
+  '/session_user_bulk',
+  validateRequiredFields(['service_session_id']),
+  async (req, res) => {
+    const session_users = await ServiceModel.getServiceSessionUsers(
+      Number(req.query.service_session_id),
+    );
+    res.status(200).send(session_users);
+  },
+);
+
+serviceRouter.patch(
+  '/session_user',
+  validateRequiredFields(['service_session_id', 'username'], ['ad_hoc', 'attended', 'is_ic']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.SERVICE_IC),
+  async (req, res) => {
+    if (req.body.attended && !(req.body.attended in AttendanceStatus)) {
+      throw new HTTPError(
+        'Invalid field type',
+        `attended must be one of ${Object.values(AttendanceStatus)}`,
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    const session_user = await ServiceModel.getServiceSessionUser(
+      Number(req.body.service_session_id),
+      String(req.body.username),
+    );
+    const updated = await ServiceModel.updateServiceSessionUser({ ...session_user, ...req.body });
+    res.status(200).send(updated);
+  },
+);
+
+serviceRouter.delete(
+  '/session_user',
+  validateRequiredFields(['service_session_id', 'username']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.SERVICE_IC),
+  async (req, res) => {
+    await ServiceModel.deleteServiceSessionUser(
+      Number(req.body.service_session_id),
+      String(req.body.username),
+    );
     res.status(204).send();
   },
 );

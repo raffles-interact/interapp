@@ -1,7 +1,7 @@
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
 import { Service, ServiceSession, ServiceSessionUser, User } from '@db/entities';
-import { AttendanceStatus } from '@db/entities';
+import { UserModel } from './user';
 
 export class ServiceModel {
   public static async createService(service: Omit<Service, 'service_id'>) {
@@ -17,19 +17,7 @@ export class ServiceModel {
     newService.start_time = service.start_time;
     newService.end_time = service.end_time;
 
-    const service_ic = await appDataSource.manager
-      .createQueryBuilder()
-      .select('user')
-      .from(User, 'user')
-      .where('username = :username', { username: service.service_ic_username })
-      .getOne();
-    if (!service_ic) {
-      throw new HTTPError(
-        'Service IC not found',
-        `Service IC with username ${service.service_ic_username} does not exist`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
-    }
+    const service_ic = await UserModel.getUser(service.service_ic_username);
     newService.service_ic = service_ic;
     newService.service_ic_username = service.service_ic_username;
     try {
@@ -61,19 +49,7 @@ export class ServiceModel {
     return service;
   }
   public static async updateService(service: Service) {
-    const service_ic = await appDataSource.manager
-      .createQueryBuilder()
-      .select('user')
-      .from(User, 'user')
-      .where('username = :username', { username: service.service_ic_username })
-      .getOne();
-    if (!service_ic) {
-      throw new HTTPError(
-        'Service IC not found',
-        `Service IC with username ${service.service_ic_username} does not exist`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
-    }
+    const service_ic = await UserModel.getUser(service.service_ic_username);
     service.service_ic = service_ic;
     service.service_ic_username = service.service_ic_username;
     try {
@@ -146,14 +122,95 @@ export class ServiceModel {
     await appDataSource.manager.delete(ServiceSession, { service_session_id });
   }
 
-  public static async createServiceSessionUser(user_session: ServiceSessionUser) {}
-  public static async getServiceSessionUser(service_session_id: number, username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+  public static async createServiceSessionUser(user_session: ServiceSessionUser) {
+    const session = new ServiceSessionUser();
+    session.service_session_id = user_session.service_session_id;
+    session.username = user_session.username;
+    session.ad_hoc = user_session.ad_hoc;
+    session.attended = user_session.attended;
+    session.is_ic = user_session.is_ic;
+    session.service_session = await this.getServiceSession(user_session.service_session_id);
+    session.user = await UserModel.getUser(user_session.username);
+    try {
+      await appDataSource.manager.insert(ServiceSessionUser, session);
+    } catch (e) {
+      throw new HTTPError(
+        'Service session user already exists',
+        `Service session user with service_session_id ${user_session.service_session_id} and username ${user_session.username} already exists`,
+        HTTPErrorCode.CONFLICT_ERROR,
+      );
+    }
+    return session;
   }
-  public static async updateServiceSessionUser(service_session_id: number, username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+  public static async createServiceSessionUsers(user_sessions: ServiceSessionUser[]) {
+    const sessions = [];
+    for (const user_session of user_sessions) {
+      const session = new ServiceSessionUser();
+      session.service_session_id = user_session.service_session_id;
+      session.username = user_session.username;
+      session.ad_hoc = user_session.ad_hoc;
+      session.attended = user_session.attended;
+      session.is_ic = user_session.is_ic;
+      session.service_session = await this.getServiceSession(user_session.service_session_id);
+      session.user = await UserModel.getUser(user_session.username);
+      sessions.push(session);
+    }
+    try {
+      await appDataSource.manager.insert(ServiceSessionUser, sessions);
+    } catch (e) {
+      throw new HTTPError(
+        'DB error',
+        `Error inserting service session users: ${String(e)}`,
+        HTTPErrorCode.INTERNAL_SERVER_ERROR,
+      );
+    }
+    return sessions;
+  }
+  public static async getServiceSessionUser(service_session_id: number, username: string) {
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session_user')
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_id = :service_session_id', { service_session_id })
+      .andWhere('username = :username', { username })
+      .getOne();
+    if (!res) {
+      throw new HTTPError(
+        'Service session user not found',
+        `Service session user with service_session_id ${service_session_id} and username ${username} does not exist`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return res;
+  }
+  public static async getServiceSessionUsers(service_session_id: number) {
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session_user')
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_id = :service_session_id', { service_session_id })
+      .getMany();
+    return res;
+  }
+  public static async updateServiceSessionUser(new_service_session_user: ServiceSessionUser) {
+    try {
+      await appDataSource.manager.update(
+        ServiceSessionUser,
+        {
+          service_session_id: new_service_session_user.service_session_id,
+          username: new_service_session_user.username,
+        },
+        new_service_session_user,
+      );
+    } catch (e) {
+      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
+    }
+    return await this.getServiceSessionUser(
+      new_service_session_user.service_session_id,
+      new_service_session_user.username,
+    );
   }
   public static async deleteServiceSessionUser(service_session_id: number, username: string) {
-    throw new HTTPError('Not implemented', '', HTTPErrorCode.NOT_IMPLEMENTED_ERROR);
+    await appDataSource.manager.delete(ServiceSessionUser, { service_session_id, username });
   }
 }
