@@ -1,10 +1,10 @@
-
 name: API Tests
 
 on:
   push:
     branches:
       - '**'
+  workflow_dispatch:
 
 jobs:
   build:
