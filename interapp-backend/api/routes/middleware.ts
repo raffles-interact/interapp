@@ -30,7 +30,7 @@ export async function verifyJWT(req: Request, res: Response, next: NextFunction)
     throw new HTTPError(
       'Missing JWT',
       'You must provide a JWT token in the Authorization header',
-      HTTPErrorCode.FORBIDDEN_ERROR,
+      HTTPErrorCode.UNAUTHORIZED_ERROR,
     );
   }
   const { userId, username } = (await AuthModel.verify(token, 'access')).payload;

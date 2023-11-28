@@ -10,6 +10,7 @@ export class AnnouncementModel {
     newAnnouncement.description = announcement.description;
     newAnnouncement.attachment = announcement.attachment;
     newAnnouncement.username = announcement.username;
+    newAnnouncement.title = announcement.title;
 
     const user = await UserModel.getUser(announcement.username);
     newAnnouncement.user = user;
@@ -19,7 +20,7 @@ export class AnnouncementModel {
     } catch (e) {
       throw new HTTPError(
         'Announcement already exists',
-        `Announcement with description ${announcement.description} already exists`,
+        `Announcement with title ${announcement.title} already exists`,
         HTTPErrorCode.CONFLICT_ERROR,
       );
     }

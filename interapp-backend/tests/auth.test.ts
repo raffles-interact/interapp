@@ -58,6 +58,20 @@ describe('sign up and sign in endpoints', () => {
     });
   });
 
+  test('access restricted announcement endpoint', async () => {
+    const res = await fetch(`${API_URL}/announcement/`, {
+      method: 'POST',
+      body: JSON.stringify({
+        creation_date: '2020-01-01T00:00Z',
+        title: 'test',
+        description: 'test',
+        username: 'testuser',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(401);
+  });
+
   afterAll(async () => {
     await recreateDB();
   });
