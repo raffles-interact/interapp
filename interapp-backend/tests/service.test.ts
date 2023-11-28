@@ -1,7 +1,7 @@
-import { test, expect, describe, afterAll, beforeAll, beforeEach } from 'bun:test';
+import { test, expect, describe, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from './utils/recreate_db';
 import appDataSource from '@utils/init_datasource';
-import { User, UserPermission } from '@db/entities';
+import { User, UserPermission, ServiceSession, ServiceSessionUser } from '@db/entities';
 
 const API_URL = process.env.API_URL;
 
@@ -460,6 +460,236 @@ describe('change account details', async () => {
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(204);
+  });
+
+  test('add user to service session', async () => {
+    const res = await fetch(`${API_URL}/service/session_user`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_session_id: 1,
+        username: 'testuser',
+        ad_hoc: false,
+        attended: 'Attended',
+        is_ic: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('delete user from service session', async () => {
+    const res = await fetch(`${API_URL}/service/session_user`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        service_session_id: 1,
+        username: 'testuser',
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('add multiple users to service session', async () => {
+    const res = await fetch(`${API_URL}/service/session_user_bulk`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_session_id: 1,
+        users: [
+          {
+            username: 'testuser',
+            ad_hoc: false,
+            attended: 'Attended',
+            is_ic: true,
+          },
+          {
+            username: 'testuser2',
+            ad_hoc: false,
+            attended: 'Attended',
+            is_ic: false,
+          },
+        ],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('get service session users', async () => {
+    const res = await fetch(`${API_URL}/service/session_user_bulk?service_session_id=1`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject([
+      {
+        service_session_id: 1,
+        username: 'testuser',
+        ad_hoc: false,
+        attended: 'Attended',
+        is_ic: true,
+      },
+      {
+        service_session_id: 1,
+        username: 'testuser2',
+        ad_hoc: false,
+        attended: 'Attended',
+        is_ic: false,
+      },
+    ]);
+  });
+
+  test('get individual service session user', async () => {
+    const res = await fetch(
+      `${API_URL}/service/session_user?service_session_id=1&username=testuser`,
+      {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${accessToken}` },
+      },
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      service_session_id: 1,
+      username: 'testuser',
+      ad_hoc: false,
+      attended: 'Attended',
+      is_ic: true,
+    });
+  });
+
+  test('update service session user', async () => {
+    const res = await fetch(`${API_URL}/service/session_user`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_session_id: 1,
+        username: 'testuser',
+        ad_hoc: false,
+        attended: 'Absent',
+        is_ic: false,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+  });
+
+  test('delete service session user', async () => {
+    const res = await fetch(`${API_URL}/service/session_user`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        service_session_id: 1,
+        username: 'testuser',
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('delete service session', async () => {
+    const res = await fetch(`${API_URL}/service/session`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        service_session_id: 1,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  // create 2 more service sessions with the same service id and insert 2 users into each
+  test('create multiple service sessions + populated', async () => {
+    const res = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const res2 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1,
+        start_time: '2023-12-27T16:42Z',
+        end_time: '2023-12-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(200);
+
+    const res3 = await fetch(`${API_URL}/service/session_user_bulk`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_session_id: 2,
+        users: [
+          {
+            username: 'testuser',
+            ad_hoc: false,
+            attended: 'Attended',
+            is_ic: true,
+          },
+          {
+            username: 'testuser2',
+            ad_hoc: false,
+            attended: 'Attended',
+            is_ic: false,
+          },
+        ],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res3.status).toBe(204);
+    const res4 = await fetch(`${API_URL}/service/session_user_bulk`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_session_id: 3,
+        users: [
+          {
+            username: 'testuser',
+            ad_hoc: false,
+            attended: 'Attended',
+            is_ic: true,
+          },
+          {
+            username: 'testuser2',
+            ad_hoc: false,
+            attended: 'Attended',
+            is_ic: false,
+          },
+        ],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res4.status).toBe(204);
+  });
+
+  test('delete service with a cascade', async () => {
+    const res = await fetch(`${API_URL}/service`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        service_id: 1,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+
+    // ensure service sessions and service session users are deleted
+    const res2 = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where('service_id = :id', { id: 1 })
+      .execute();
+    expect(res2.length).toBe(0);
+    const res3 = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session_user')
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_id IN (:...id)', { id: [2, 3] })
+      .execute();
+    expect(res3.length).toBe(0);
   });
 
   afterAll(async () => {

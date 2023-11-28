@@ -78,8 +78,6 @@ userRouter.patch(
 );
 
 userRouter.get('/userservices', validateRequiredFields(['username']), async (req, res) => {
-  console.log(req.params.username);
-
   const services = await UserModel.getAllServicesByUser(req.query.username as string);
   res.status(200).send(services);
 });

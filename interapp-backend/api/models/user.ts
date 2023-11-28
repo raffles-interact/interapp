@@ -12,6 +12,22 @@ interface EmailOptions extends Mail.Options {
 }
 
 export class UserModel {
+  public static async getUser(username: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username: username })
+      .getOne();
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return user;
+  }
   public static async changePassword(username: string, oldPassword: string, newPassword: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
