@@ -1,0 +1,85 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: interapp-postgres
+    image: postgres:alpine
+    restart: on-failure
+    ports:
+      - 5432:5432
+    command: postgres
+    env_file:
+      - ./interapp-backend/.env.development
+    volumes:
+      - ./interapp-backend/pgdata:/var/lib/postgresql/data
+    networks:
+      - interapp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 60s
+  
+  redis:
+    container_name: interapp-redis
+    image: redis:alpine
+    restart: on-failure
+    env_file:
+      - ./interapp-backend/.env.development
+    ports:
+      - 6379:6379
+    networks:
+      - interapp-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 2s
+      timeout: 2s
+      retries: 7
+
+  backend:
+    container_name: interapp-backend
+    restart: on-failure
+    build:
+      context: ./interapp-backend
+      dockerfile: dev.Dockerfile
+    develop:
+      watch:
+        - path: ./interapp-backend/api
+          action: sync
+          target: /app/api
+        - path: ./interapp-backend/db
+          action: sync
+          target: /app/db
+    env_file:
+      - ./interapp-backend/.env.development
+    ports:
+      - 8000:8000
+    networks:
+      - interapp-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    container_name: interapp-frontend
+    build:
+      context: ./interapp-frontend
+      dockerfile: dev.Dockerfile
+    volumes:
+      - ./interapp-frontend/src:/app/src
+    env_file:
+      - ./interapp-frontend/.env.development
+    ports:
+      - 3000:3000
+    networks:
+      - interapp-network
+    depends_on:
+      - backend
+      - postgres
+
+networks:
+  interapp-network:
+    driver: bridge

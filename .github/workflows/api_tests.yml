@@ -1,0 +1,31 @@
+name: API Tests
+
+on:
+  push:
+    branches:
+      - '**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup test environment
+        run: docker compose -f docker-compose.test.yml up -d --build
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+      
+      - name: Install dependencies
+        run: cd interapp-backend && bun install
+      - name: Test with bun
+        run: cd interapp-backend && bun test --env-file tests/config/.env.test --coverage
+
+      - name: Tear down test environment
+        run: docker compose -f docker-compose.test.yml down

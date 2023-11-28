@@ -18,13 +18,19 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
     "types": [
       "bun-types" // add Bun global
     ],
     "paths": {
       "@db/*": ["./db/*"],
       "@routes/*": ["./api/routes/*"],
-      "@service/*": ["./api/service/*"]
+      "@models/*": ["./api/models/*"],
+      "@utils/*": ["./api/utils/*"],
+      "@email_handler/*": ["./api/email_handler/*"]
     }
-  }
+  },
+  "include": ["**/*.tsx", "**/*.ts", "**/*.json"],
+  "exclude": ["node_modules"]
 }

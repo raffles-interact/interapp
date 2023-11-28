@@ -3,14 +3,19 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "prettier": "prettier --write .",
+    "dev": "NODE_ENV=development next dev",
+    "build": "NODE_ENV=production next build",
+    "start": "NODE_ENV=production next start",
     "lint": "next lint"
   },
   "dependencies": {
+    "@mantine/core": "^7.2.2",
+    "@mantine/form": "^7.2.2",
+    "@mantine/hooks": "^7.2.2",
+    "@mantine/notifications": "^7.2.2",
+    "axios": "^1.6.2",
     "next": "14.0.1",
-    "prettier": "^3.0.3",
     "react": "^18",
     "react-dom": "^18"
   },
@@ -21,6 +26,7 @@
     "bun-types": "^1.0.11",
     "eslint": "^8",
     "eslint-config-next": "14.0.1",
+    "prettier": "^3.1.0",
     "typescript": "^5"
   }
 }

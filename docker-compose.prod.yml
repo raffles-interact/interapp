@@ -1,0 +1,75 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: interapp-postgres
+    image: postgres:alpine
+    restart: always
+    ports:
+      - 5432:5432
+    command: postgres
+    env_file:
+      - ./interapp-backend/.env.production
+    volumes:
+      - ./interapp-backend/pgdata:/var/lib/postgresql/data
+    networks:
+      - interapp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  redis:
+    container_name: interapp-redis
+    image: redis:alpine
+    restart: always
+    env_file:
+      - ./interapp-backend/.env.production
+    ports:
+      - 6379:6379
+    networks:
+      - interapp-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: 2s
+      timeout: 2s
+      retries: 7
+
+  backend:
+    container_name: interapp-backend
+    restart: always
+    build:
+      context: ./interapp-backend
+      dockerfile: prod.Dockerfile
+    env_file:
+      - ./interapp-backend/.env.production
+    ports:
+      - 8000:8000
+    networks:
+      - interapp-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  frontend:
+    container_name: interapp-frontend
+    build:
+      context: ./interapp-frontend
+      dockerfile: prod.Dockerfile
+    ports:
+      - 3000:3000
+    env_file:
+      - ./interapp-frontend/.env.production
+    networks:
+      - interapp-network
+    depends_on:
+      - backend
+      - postgres
+
+networks:
+  interapp-network:
+    driver: bridge

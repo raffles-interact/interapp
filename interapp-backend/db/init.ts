@@ -1,10 +1,11 @@
-import { AppDataSource } from '@db/data-source';
+import AppDataSource from '@db/data-source';
 
-AppDataSource.getInstance()
-  .initialize()
+AppDataSource.initialize()
   .then(() => {
     console.log('Database initialized');
+    process.exit(0);
   })
   .catch((err) => {
-    console.log('Error initializing database', err);
+    console.error('Error initializing database', err);
+    process.exit(1);
   });

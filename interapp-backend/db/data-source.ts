@@ -1,27 +1,27 @@
 import { DataSource } from 'typeorm';
-import { HelloWorld } from './entities/hello_world';
+import { DataSourceOptions } from 'typeorm';
 
-export class AppDataSource {
-  private static instance: DataSource | null = null;
+export const AppDataSourceOptions: DataSourceOptions = {
+  type: 'postgres',
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+  database: process.env.POSTGRES_DB,
+  synchronize: false,
+  logging: process.env.NODE_ENV === 'development' ? 'all' : ['schema', 'error', 'warn'],
+  logger: 'advanced-console',
+  maxQueryExecutionTime: 1000,
+  entities: [`${__dirname}/entities/*.ts`],
+  subscribers: [],
+  migrations: [`${__dirname}/migrations/*.ts`],
+  migrationsRun: true,
+};
 
-  constructor() {}
-
-  static getInstance() {
-    if (!AppDataSource.instance) {
-      AppDataSource.instance = new DataSource({
-        type: 'postgres',
-        host: process.env.POSTGRES_HOST,
-        port: Number(process.env.POSTGRES_PORT),
-        username: process.env.POSTGRES_USER,
-        password: process.env.POSTGRES_PASSWORD,
-        database: process.env.POSTGRES_DB,
-        synchronize: true,
-        logging: true,
-        entities: [HelloWorld],
-        subscribers: [],
-        migrations: [],
-      });
-    }
-    return AppDataSource.instance;
-  }
-}
+// for migrations only
+// override host to localhost to avoid docker networking issues in CLI
+const migrationDataSource = new DataSource({
+  ...AppDataSourceOptions,
+  host: 'localhost',
+});
+export default migrationDataSource;

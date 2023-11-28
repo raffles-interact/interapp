@@ -1,0 +1,62 @@
+version: "3"
+
+services:
+  postgres:
+    container_name: interapp-postgres-test
+    image: postgres:alpine
+    restart: on-failure
+    ports:
+      - 2345:2345
+    command: postgres -p 2345
+    env_file:
+      - ./interapp-backend/tests/config/.env.docker
+
+    networks:
+      - interapp-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -p 2345"]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 60s
+  
+  redis:
+    container_name: interapp-redis-test
+    image: redis:alpine
+    command: redis-server --port 3456
+    restart: on-failure
+    env_file:
+      - ./interapp-backend/tests/config/.env.docker
+    ports:
+      - 3456:3456
+    networks:
+      - interapp-network
+    healthcheck:
+      test: [ "CMD-SHELL", "redis-cli -p 3456 ping" ]
+      interval: 2s
+      timeout: 2s
+      retries: 7
+      start_period: 60s
+
+  backend:
+    container_name: interapp-backend-test
+    restart: on-failure
+    build:
+      context: ./interapp-backend/
+      dockerfile: tests/config/test.Dockerfile
+    env_file:
+      - ./interapp-backend/tests/config/.env.docker
+    ports:
+      - 1234:1234
+    networks:
+      - interapp-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  
+networks:
+  interapp-network:
+    driver: bridge
