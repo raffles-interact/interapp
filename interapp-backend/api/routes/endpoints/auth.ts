@@ -28,7 +28,7 @@ authRouter.post(
     }
 
     await AuthModel.signUp(req.body.userId, req.body.username, req.body.email, req.body.password);
-    res.status(204).send();
+    res.status(201).send();
   },
 );
 

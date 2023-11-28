@@ -218,7 +218,7 @@ serviceRouter.post(
       );
     }
     await ServiceModel.createServiceSessionUser(req.body);
-    res.status(204).send();
+    res.status(201).send();
   },
 );
 
@@ -257,7 +257,7 @@ serviceRouter.post(
       entry.service_session_id = req.body.service_session_id;
     }
     await ServiceModel.createServiceSessionUsers(req.body.users);
-    res.status(204).send();
+    res.status(201).send();
   },
 );
 

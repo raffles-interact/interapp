@@ -474,7 +474,7 @@ describe('change account details', async () => {
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(201);
   });
 
   test('delete user from service session', async () => {
@@ -511,7 +511,7 @@ describe('change account details', async () => {
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(201);
   });
 
   test('get service session users', async () => {
@@ -640,7 +640,7 @@ describe('change account details', async () => {
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    expect(res3.status).toBe(204);
+    expect(res3.status).toBe(201);
     const res4 = await fetch(`${API_URL}/service/session_user_bulk`, {
       method: 'POST',
       body: JSON.stringify({
@@ -662,7 +662,7 @@ describe('change account details', async () => {
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    expect(res4.status).toBe(204);
+    expect(res4.status).toBe(201);
   });
 
   test('delete service with a cascade', async () => {

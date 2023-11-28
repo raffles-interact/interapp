@@ -16,7 +16,7 @@ describe('sign up and sign in endpoints', () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(201);
 
     const res2 = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
