@@ -14,8 +14,8 @@ export class Announcement {
   @PrimaryGeneratedColumn()
   announcement_id: number;
 
-  @Column()
-  creation_date: Date;
+  @Column({ type: 'timestamp without time zone' })
+  creation_date: string;
 
   @Column()
   description: string;

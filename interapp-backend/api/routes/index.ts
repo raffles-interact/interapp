@@ -3,6 +3,7 @@ import helloRouter from './endpoints/hello';
 import authRouter from './endpoints/auth';
 import userRouter from './endpoints/user';
 import serviceRouter from './endpoints/service';
+import announcementRouter from './endpoints/announcement';
 
 import 'express-async-errors';
 import cors from 'cors';
@@ -25,6 +26,7 @@ app.use('/api/hello', helloRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
 app.use('/api/service', serviceRouter);
+app.use('/api/announcement', announcementRouter);
 
 app.use(handleError);
 app.use(generateRateLimit(1000 * 60 * 60, 500)); // 500 requests per hour
