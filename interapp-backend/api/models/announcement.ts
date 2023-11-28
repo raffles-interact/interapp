@@ -66,4 +66,33 @@ export class AnnouncementModel {
   public static async deleteAnnouncement(announcement_id: number) {
     await appDataSource.manager.delete(Announcement, { announcement_id });
   }
+  public static async getAnnouncementCompletions(announcement_id: number) {
+    const completions = await appDataSource.manager
+      .createQueryBuilder()
+      .select('announcement_completion')
+      .from(AnnouncementCompletion, 'announcement_completion')
+      .where('announcement_completion.announcement_id = :announcement_id', { announcement_id })
+      .getMany();
+    return completions;
+  }
+  public static async addAnnouncementCompletions(announcement_id: number, usernames: string[]) {
+    const announcement = await this.getAnnouncement(announcement_id);
+    const completions = await Promise.all(usernames.map(async (username) => {
+      const completion = new AnnouncementCompletion();
+      completion.announcement = announcement;
+      completion.username = username;
+      completion.user = await UserModel.getUser(username);
+      completion.completed = false;
+      return completion;
+    }));
+
+    await appDataSource.manager.insert(AnnouncementCompletion, completions);
+  }
+  public static async updateAnnouncementCompletion(announcement_id: number, username: string, completed: boolean) {
+    await appDataSource.manager.update(
+      AnnouncementCompletion,
+      { announcement_id, username },
+      { completed },
+    );
+  }
 }
