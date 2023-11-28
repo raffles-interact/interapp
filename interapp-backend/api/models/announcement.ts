@@ -69,17 +69,18 @@ export class AnnouncementModel {
   public static async getAnnouncementCompletions(announcement_id: number) {
     const completions = await appDataSource.manager
       .createQueryBuilder()
-      .select('announcement_completion')
+      .select(['announcement_completion.username', 'announcement_completion.completed'])
       .from(AnnouncementCompletion, 'announcement_completion')
       .where('announcement_completion.announcement_id = :announcement_id', { announcement_id })
       .getMany();
-    return completions;
+    return Object.fromEntries(completions.map((completion) => [completion.username, completion.completed]));
   }
   public static async addAnnouncementCompletions(announcement_id: number, usernames: string[]) {
     const announcement = await this.getAnnouncement(announcement_id);
     const completions = await Promise.all(usernames.map(async (username) => {
       const completion = new AnnouncementCompletion();
       completion.announcement = announcement;
+      completion.announcement_id = announcement_id;
       completion.username = username;
       completion.user = await UserModel.getUser(username);
       completion.completed = false;

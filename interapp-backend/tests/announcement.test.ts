@@ -18,6 +18,16 @@ describe('test announcement endpoints', () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
+    await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        userId: 2,
+        username: 'testuser2',
+        email: 'fkfdjs@fmk.com',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
     const res = await fetch(`${API_URL}/auth/signin`, {
       method: 'POST',
       body: JSON.stringify({
@@ -69,6 +79,60 @@ describe('test announcement endpoints', () => {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(201);
+  });
+
+  // Test for adding users to announcement
+  test('add users to announcement', async () => {
+    const res = await fetch(`${API_URL}/announcement/completions`, {
+      method: 'POST',
+      body: JSON.stringify({
+        announcement_id: 1,
+        usernames: ['testuser', 'testuser2'],
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(201);
+  });
+
+  // Test for getting users announcement completion status
+  test('get users announcement completion status', async () => {
+    const res = await fetch(`${API_URL}/announcement/completions?announcement_id=1`, {
+      method: 'GET',
+      
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      testuser: false,
+      testuser2: false,
+    })
+  });
+
+  // Test for updating users announcement completion status
+  test('update users announcement completion status', async () => {
+    const res = await fetch(`${API_URL}/announcement/completion`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        announcement_id: 1,
+        username: 'testuser',
+        completed: true,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  // check if user has completed announcement
+  test('check if user has completed announcement', async () => {
+    const res = await fetch(`${API_URL}/announcement/completions?announcement_id=1`, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      testuser: true,
+      testuser2: false,
+    })
   });
 
   // Test for invalid POST endpoint
