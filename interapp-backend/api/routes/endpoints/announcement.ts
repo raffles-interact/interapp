@@ -77,8 +77,11 @@ announcementRouter.delete(
 );
 
 announcementRouter.get('/completions', validateRequiredFields(['announcement_id']),verifyJWT, async (req, res) => {
-  const completions = await AnnouncementModel.getAnnouncementCompletions(req.body.announcement_id);
-  res.status(200).json(completions);
+  
+  
+  const completions = await AnnouncementModel.getAnnouncementCompletions(Number(req.query.announcement_id));
+  
+  res.status(200).send(completions);
 });
 
 announcementRouter.post('/completions', validateRequiredFields(['announcement_id', 'usernames']),verifyJWT, async (req, res) => {
@@ -103,6 +106,6 @@ announcementRouter.patch('/completion', validateRequiredFields(['announcement_id
     );
   }
   await AnnouncementModel.updateAnnouncementCompletion(req.body.announcement_id, req.body.username, req.body.completed);
-  res.status(200).send();
+  res.status(204).send();
 });
 export default announcementRouter;
