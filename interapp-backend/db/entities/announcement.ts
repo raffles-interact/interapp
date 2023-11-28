@@ -18,6 +18,9 @@ export class Announcement {
   creation_date: string;
 
   @Column()
+  title: string;
+
+  @Column()
   description: string;
 
   @Column({ type: 'bytea', nullable: true })
