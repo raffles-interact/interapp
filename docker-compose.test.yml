@@ -20,6 +20,22 @@ services:
       retries: 5
       start_period: 60s
   
+  scheduler:
+    container_name: interapp-scheduler
+    restart: on-failure
+    build:
+      context: ./interapp-backend/scheduler
+      dockerfile: prod.Dockerfile
+    env_file:
+      - ./interapp-backend/.env.development
+    networks:
+      - interapp-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  
   redis:
     container_name: interapp-redis-test
     image: redis:alpine

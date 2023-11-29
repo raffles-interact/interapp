@@ -37,6 +37,27 @@ services:
       timeout: 2s
       retries: 7
 
+  scheduler:
+    container_name: interapp-scheduler
+    restart: on-failure
+    build:
+      context: ./interapp-backend/scheduler
+      dockerfile: dev.Dockerfile
+    develop:
+      watch:
+        - path: ./interapp-backend/scheduler
+          action: sync
+          target: /app
+    env_file:
+      - ./interapp-backend/.env.development
+    networks:
+      - interapp-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
   backend:
     container_name: interapp-backend
     restart: on-failure
