@@ -24,8 +24,8 @@ services:
     container_name: interapp-scheduler
     restart: on-failure
     build:
-      context: ./interapp-backend/scheduler
-      dockerfile: prod.Dockerfile
+      context: ./interapp-backend
+      dockerfile: scheduler/prod.Dockerfile
     env_file:
       - ./interapp-backend/.env.development
     networks:

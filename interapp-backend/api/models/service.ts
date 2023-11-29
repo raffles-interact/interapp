@@ -4,7 +4,7 @@ import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
 import { UserModel } from './user';
 
 export class ServiceModel {
-  public static async createService(service: Omit<Service, 'service_id'>) {
+  public static async createService(service: Omit<Service, 'service_id' | 'service_ic' | 'user_service' | 'service_sessions'>) {
     const newService = new Service();
     newService.name = service.name;
     newService.description = service.description;
@@ -70,7 +70,7 @@ export class ServiceModel {
     return services;
   }
   public static async createServiceSession(
-    service_session: Omit<ServiceSession, 'service_session_id'>,
+    service_session: Omit<ServiceSession, 'service_session_id' | 'service' | 'service_session_users'>,
   ) {
     const session = new ServiceSession();
     session.service_id = service_session.service_id;

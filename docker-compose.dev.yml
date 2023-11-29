@@ -41,13 +41,13 @@ services:
     container_name: interapp-scheduler
     restart: on-failure
     build:
-      context: ./interapp-backend/scheduler
-      dockerfile: dev.Dockerfile
+      context: ./interapp-backend
+      dockerfile: scheduler/dev.Dockerfile
     develop:
       watch:
         - path: ./interapp-backend/scheduler
           action: sync
-          target: /app
+          target: /app/scheduler
     env_file:
       - ./interapp-backend/.env.development
     networks:

@@ -1,8 +1,13 @@
 FROM oven/bun:1.0.14
 WORKDIR /app
 
-RUN bun install node-cron
-
 COPY . .
 
-CMD ["bun", "--watch", "scheduler.ts"]
+RUN bun install
+
+RUN apt-get update && apt-get install -y tzdata
+ENV TZ=Asia/Singapore
+RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
+
+CMD ["bun", "run", "scheduler/scheduler.ts"]

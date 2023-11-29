@@ -30,19 +30,19 @@ export class Service {
   name: string;
 
   @Column({ nullable: true })
-  description: string;
+  description?: string;
 
   @Column()
   contact_email: string;
 
   @Column({ type: 'int', width: 8, nullable: true }) // 8 digit phone number (country code assumed to be +65)
-  contact_number: number;
+  contact_number?: number;
 
   @Column({ nullable: true })
-  website: string;
+  website?: string;
 
   @Column({ type: 'bytea', nullable: true })
-  promotional_image: string;
+  promotional_image?: string;
 
   @Column({ type: 'smallint' })
   day_of_week: DayOfWeek;
