@@ -1,9 +1,9 @@
 import { test, expect, describe, afterAll } from 'bun:test';
-import { recreateDB } from './utils/recreate_db';
+import { recreateDB } from '../utils/recreate_db';
 
 const API_URL = process.env.API_URL;
 
-describe('sign up and sign in endpoints', () => {
+describe('API (auth)', () => {
   // Test for registration endpoint
   test('create accounts', async () => {
     const res = await fetch(`${API_URL}/auth/signup`, {

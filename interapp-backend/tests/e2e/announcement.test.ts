@@ -1,11 +1,11 @@
 import { test, expect, describe, afterAll, beforeAll } from 'bun:test';
-import { recreateDB } from './utils/recreate_db';
+import { recreateDB } from '../utils/recreate_db';
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
 
 const API_URL = process.env.API_URL;
 
-describe('test announcement endpoints', () => {
+describe('API (announcements)', () => {
   let accessToken: string;
   beforeAll(async () => {
     await fetch(`${API_URL}/auth/signup`, {

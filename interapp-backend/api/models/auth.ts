@@ -162,7 +162,6 @@ export class AuthModel {
       .from(User, 'user')
       .where('user.username = :username', { username: username })
       .getOne();
-
     if (!user) {
       throw new HTTPError(
         'User not found',

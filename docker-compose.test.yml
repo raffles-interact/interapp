@@ -21,13 +21,13 @@ services:
       start_period: 60s
   
   scheduler:
-    container_name: interapp-scheduler
+    container_name: interapp-scheduler-test
     restart: on-failure
     build:
       context: ./interapp-backend
       dockerfile: scheduler/prod.Dockerfile
     env_file:
-      - ./interapp-backend/.env.development
+      - ./interapp-backend/tests/config/.env.docker
     networks:
       - interapp-network
     depends_on:
