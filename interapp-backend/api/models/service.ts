@@ -129,6 +129,13 @@ export class ServiceModel {
     session.attended = user_session.attended;
     session.is_ic = user_session.is_ic;
     session.service_session = await this.getServiceSession(user_session.service_session_id);
+    if (!session.service_session.ad_hoc_enabled && session.ad_hoc) {
+      throw new HTTPError(
+        'Ad hoc not enabled',
+        `Ad hoc is not enabled for service session with service_session_id ${user_session.service_session_id}`,
+        HTTPErrorCode.FORBIDDEN_ERROR,
+      );
+    }
     session.user = await UserModel.getUser(user_session.username);
     try {
       await appDataSource.manager.insert(ServiceSessionUser, session);
@@ -151,6 +158,13 @@ export class ServiceModel {
       session.attended = user_session.attended;
       session.is_ic = user_session.is_ic;
       session.service_session = await this.getServiceSession(user_session.service_session_id);
+      if (!session.service_session.ad_hoc_enabled && session.ad_hoc) {
+        throw new HTTPError(
+          'Ad hoc not enabled',
+          `Ad hoc is not enabled for service session with service_session_id ${user_session.service_session_id}`,
+          HTTPErrorCode.FORBIDDEN_ERROR,
+        );
+      }
       session.user = await UserModel.getUser(user_session.username);
       sessions.push(session);
     }

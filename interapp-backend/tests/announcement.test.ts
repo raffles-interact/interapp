@@ -81,6 +81,34 @@ describe('test announcement endpoints', () => {
     expect(res.status).toBe(201);
   });
 
+  // Test for invalid creation of announcement
+  test('create announcement with missing date', async () => {
+    const res = await fetch(`${API_URL}/announcement/`, {
+      method: 'POST',
+      body: JSON.stringify({
+        title: 'Test Title',
+        description: 'Test Description',
+        username: 'testuser',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test('create announcement with non existant username', async () => {
+    const res = await fetch(`${API_URL}/announcement/`, {
+      method: 'POST',
+      body: JSON.stringify({
+        creation_date: '2022-01-01T00:00Z',
+        title: 'Test Title',
+        description: 'Test Description',
+        username: 'testuser3',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(404);
+  });
+
   // Test for adding users to announcement
   test('add users to announcement', async () => {
     const res = await fetch(`${API_URL}/announcement/completions`, {
@@ -98,14 +126,14 @@ describe('test announcement endpoints', () => {
   test('get users announcement completion status', async () => {
     const res = await fetch(`${API_URL}/announcement/completions?announcement_id=1`, {
       method: 'GET',
-      
+
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({
       testuser: false,
       testuser2: false,
-    })
+    });
   });
 
   // Test for updating users announcement completion status
@@ -132,7 +160,7 @@ describe('test announcement endpoints', () => {
     expect(await res.json()).toMatchObject({
       testuser: true,
       testuser2: false,
-    })
+    });
   });
 
   // Test for invalid POST endpoint

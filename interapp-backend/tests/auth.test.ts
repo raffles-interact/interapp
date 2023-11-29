@@ -17,7 +17,9 @@ describe('sign up and sign in endpoints', () => {
       headers: { 'Content-Type': 'application/json' },
     });
     expect(res.status).toBe(201);
+  });
 
+  test('use school email', async () => {
     const res2 = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
@@ -29,6 +31,58 @@ describe('sign up and sign in endpoints', () => {
       headers: { 'Content-Type': 'application/json' },
     });
     expect(res2.status).toBe(400); // should fail because email is a school email
+
+    const res3 = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 2,
+        username: 'testuser2',
+        email: 'faskj@rafflesgirlssch.edu.sg',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res3.status).toBe(400); // should fail because email is a school email
+  });
+
+  test('missing user_id', async () => {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'testuser',
+        email: 'fffkoefk@ifgeji',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test('duplicate user_id', async () => {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 1,
+        username: 'fejkdlsjlksjlskdjf;lasjf',
+        email: 'fffkoefk@ifgeji',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(409);
+  });
+
+  test('missing username', async () => {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 10,
+        email: 'fffkoefk@ifgeji',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(400);
   });
 
   // Test for login endpoint

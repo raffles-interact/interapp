@@ -100,6 +100,43 @@ describe('change account details', async () => {
       .getMany();
   });
 
+  test('create a new user', async () => {
+    await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 2,
+        username: 'testuser2',
+        email: 'test@example.com',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  });
+
+  test('add roles to new user', async () => {
+    const res = await fetch(`${API_URL}/user/permissions/update`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser2',
+        permissions: [0, 1, 2, 3, 6],
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('remove roles from user', async () => {
+    const res = await fetch(`${API_URL}/user/permissions/update`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser2',
+        permissions: [0, 6],
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
   //test logout
   test('logout', async () => {
     const res = await fetch(`${API_URL}/auth/signout`, {
