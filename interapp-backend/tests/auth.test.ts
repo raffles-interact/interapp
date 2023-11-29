@@ -9,7 +9,7 @@ describe('sign up and sign in endpoints', () => {
     const res = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         password: 'testpassword',
@@ -21,7 +21,7 @@ describe('sign up and sign in endpoints', () => {
     const res2 = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 2,
+        user_id: 2,
         username: 'testuser2',
         email: 'sdkjfsa@student.ri.edu.sg',
         password: 'testpassword',
@@ -47,7 +47,7 @@ describe('sign up and sign in endpoints', () => {
     expect(response_as_json).toMatchObject({
       accessToken: expect.any(String),
       user: {
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         verified: false,

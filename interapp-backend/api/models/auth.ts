@@ -6,7 +6,7 @@ import { SignJWT, jwtVerify, JWTPayload, JWTVerifyResult } from 'jose';
 import redisClient from '@utils/init_redis';
 
 export interface UserJWT {
-  userId: number;
+  user_id: number;
   username: string;
 }
 
@@ -38,10 +38,10 @@ export class AuthModel {
 
     return { token, expire: expireTime };
   }
-  public static async signUp(userId: number, username: string, email: string, password: string) {
+  public static async signUp(user_id: number, username: string, email: string, password: string) {
     // init a new user
     const user = new User();
-    user.user_id = userId;
+    user.user_id = user_id;
     user.username = username;
     user.email = email;
     user.service_hours = 0;
@@ -111,7 +111,7 @@ export class AuthModel {
     }
 
     const JWTBody: UserJWT = {
-      userId: user.user_id,
+      user_id: user.user_id,
       username: username,
     };
 
@@ -122,7 +122,7 @@ export class AuthModel {
     await appDataSource.manager.update(User, { username: username }, { refresh_token: refresh });
 
     const parsedUser = {
-      userId: user.user_id,
+      user_id: user.user_id,
       username: user.username,
       email: user.email,
       verified: user.verified,
@@ -181,7 +181,7 @@ export class AuthModel {
 
     // passed all checks, sign a new access token and return it
     const JWTBody: UserJWT = {
-      userId: result.payload.userId,
+      user_id: result.payload.user_id,
       username: username,
     };
 

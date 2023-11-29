@@ -17,12 +17,12 @@ export interface LogInDetails {
 
 export interface AccountDetails extends LogInDetails {
   email: string;
-  userId: number;
+  user_id: number;
 }
 
 export interface User {
   username: string;
-  userId: number;
+  user_id: number;
   email: string;
   permissions: Permissions[];
   verified: boolean;

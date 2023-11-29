@@ -12,7 +12,7 @@ describe('change account details', async () => {
     await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         password: 'testpassword',
@@ -135,7 +135,7 @@ describe('change account details', async () => {
     expect(response_as_json).toMatchObject({
       accessToken: expect.any(String),
       user: {
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         verified: false,

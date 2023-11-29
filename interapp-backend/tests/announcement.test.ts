@@ -11,7 +11,7 @@ describe('test announcement endpoints', () => {
     await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'aspoda@gmail.com',
         password: 'testpassword',
@@ -21,7 +21,7 @@ describe('test announcement endpoints', () => {
     await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 2,
+        user_id: 2,
         username: 'testuser2',
         email: 'fkfdjs@fmk.com',
         password: 'testpassword',
