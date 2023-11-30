@@ -126,7 +126,9 @@ export class ServiceModel {
     await appDataSource.manager.delete(ServiceSession, { service_session_id });
   }
 
-  public static async createServiceSessionUser(user_session: ServiceSessionUser) {
+  public static async createServiceSessionUser(
+    user_session: Omit<ServiceSessionUser, 'service_session' | 'user'>,
+  ) {
     const session = new ServiceSessionUser();
     session.service_session_id = user_session.service_session_id;
     session.username = user_session.username;

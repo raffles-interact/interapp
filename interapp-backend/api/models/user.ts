@@ -284,6 +284,35 @@ export class UserModel {
       .where('service.service_id IN (:...services)', { services: service_ids })
       .getMany();
   }
+  public static async getAllUsersByService(service_id: number) {
+    const service_users = await appDataSource
+      .createQueryBuilder()
+      .select(['user_service.username'])
+      .from(UserService, 'user_service')
+      .where('user_service.service_id = :service_id', { service_id })
+      .getMany();
+    if (!service_users) {
+      throw new HTTPError(
+        'Service not found',
+        `The service with service_id ${service_id} has no users`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    const usernames = service_users.map((service) => service.username);
+    if (usernames.length === 0) {
+      throw new HTTPError(
+        'Service not found',
+        `The service with service_id ${service_id} has no users`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username IN (:...usernames)', { usernames })
+      .getMany();
+  }
   public static async addServiceUser(service_id: number, username: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
