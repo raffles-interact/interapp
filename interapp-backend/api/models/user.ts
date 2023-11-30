@@ -132,6 +132,7 @@ export class UserModel {
     };
 
     await transporter.sendMail(email);
+    return token;
   }
   public static async verifyEmail(token: string) {
     // check if the user exists in redis
@@ -211,6 +212,7 @@ export class UserModel {
     };
 
     await transporter.sendMail(email);
+    return token;
   }
   public static async checkPermissions(username: string) {
     const user = await appDataSource.manager
@@ -306,12 +308,17 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-    return await appDataSource.manager
+    const users: Partial<User>[] = await appDataSource.manager
       .createQueryBuilder()
       .select(['user'])
       .from(User, 'user')
       .where('user.username IN (:...usernames)', { usernames })
       .getMany();
+    users.forEach((user) => {
+      delete user.password_hash;
+      delete user.refresh_token;
+    });
+    return users;
   }
   public static async addServiceUser(service_id: number, username: string) {
     const user = await appDataSource.manager
