@@ -1,5 +1,5 @@
 import appDataSource from '@utils/init_datasource';
-import { User, UserPermission, Announcement, AnnouncementCompletion } from '@db/entities';
+import { Announcement, AnnouncementCompletion } from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { UserModel } from './user';
 

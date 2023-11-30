@@ -1,5 +1,4 @@
-import { DataSource } from 'typeorm';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
 import { LogLevel } from 'typeorm/browser';
 
 function getLoggingLevel(): 'all' | LogLevel[] {
