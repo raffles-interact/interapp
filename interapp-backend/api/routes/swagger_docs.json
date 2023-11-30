@@ -128,14 +128,14 @@
                   "oldPassword": {
                     "type": "string"
                   },
-                  "newPassword": {
+                  "new_password": {
                     "type": "string"
                   }
                 }
               },
               "example": {
                 "oldPassword": "jeofjeoifjwero",
-                "newPassword": "pass123"
+                "new_password": "pass123"
               }
             }
           },

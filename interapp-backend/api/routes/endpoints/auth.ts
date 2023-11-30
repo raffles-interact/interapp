@@ -42,7 +42,7 @@ authRouter.post('/signin', validateRequiredFields(['username', 'password']), asy
     path: '/api/auth/refresh',
   });
   res.status(200).send({
-    accessToken: token,
+    access_token: token,
     user: user,
     expire: expire,
   });
@@ -56,7 +56,7 @@ authRouter.post('/refresh', async (req, res) => {
     path: '/api/auth/refresh',
   });
   res.status(200).send({
-    accessToken: token,
+    access_token: token,
     expire: expire,
   });
 });

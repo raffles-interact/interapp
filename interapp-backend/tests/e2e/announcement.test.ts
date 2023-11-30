@@ -37,8 +37,8 @@ describe('API (announcements)', () => {
       headers: { 'Content-Type': 'application/json' },
     });
     const response_as_json = (await res.json()) as Object;
-    if ('accessToken' in response_as_json) {
-      accessToken = response_as_json.accessToken as string;
+    if ('access_token' in response_as_json) {
+      accessToken = response_as_json.access_token as string;
     } else throw new Error('No access token found');
 
     const queryRunner = appDataSource.createQueryRunner();

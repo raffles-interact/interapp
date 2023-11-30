@@ -8,13 +8,13 @@ const userRouter = Router();
 
 userRouter.patch(
   '/password/change',
-  validateRequiredFields(['oldPassword', 'newPassword']),
+  validateRequiredFields(['old_password', 'new_password']),
   verifyJWT,
   async (req, res) => {
     await UserModel.changePassword(
       req.headers.username as string,
-      req.body.oldPassword,
-      req.body.newPassword,
+      req.body.old_password,
+      req.body.new_password,
     );
     res.status(204).send();
   },

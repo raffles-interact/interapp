@@ -28,8 +28,8 @@ describe('API (account)', async () => {
       headers: { 'Content-Type': 'application/json' },
     });
     const response_as_json = (await res.json()) as Object;
-    if ('accessToken' in response_as_json) {
-      accessToken = response_as_json.accessToken as string;
+    if ('access_token' in response_as_json) {
+      accessToken = response_as_json.access_token as string;
     } else throw new Error('No access token found');
   });
 
@@ -37,8 +37,8 @@ describe('API (account)', async () => {
     const res = await fetch(`${API_URL}/user/password/change`, {
       method: 'PATCH',
       body: JSON.stringify({
-        oldPassword: 'testpassword',
-        newPassword: 'newpassword',
+        old_password: 'testpassword',
+        new_password: 'new_password',
       }),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -162,7 +162,7 @@ describe('API (account)', async () => {
       method: 'POST',
       body: JSON.stringify({
         username: 'testuser',
-        password: 'newpassword',
+        password: 'new_password',
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -170,13 +170,13 @@ describe('API (account)', async () => {
 
     const response_as_json = (await res.json()) as Object;
     expect(response_as_json).toMatchObject({
-      accessToken: expect.any(String),
+      access_token: expect.any(String),
       user: {
         user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         verified: false,
-        serviceHours: 0,
+        service_hours: 0,
         permissions: [0, 6],
       },
       expire: expect.any(Number),

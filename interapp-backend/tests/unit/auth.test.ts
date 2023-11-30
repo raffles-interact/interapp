@@ -45,7 +45,7 @@ describe('Unit (auth)', () => {
           username: 'unit test user',
           email: 'dskjfklsjf@jfndcdfs',
           verified: false,
-          serviceHours: 0,
+          service_hours: 0,
           permissions: expect.any(Array<Number>),
         },
       });

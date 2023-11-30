@@ -28,7 +28,7 @@ export class UserModel {
     }
     return user;
   }
-  public static async changePassword(username: string, oldPassword: string, newPassword: string) {
+  public static async changePassword(username: string, old_password: string, new_password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
       .select(['user.username', 'user.password_hash'])
@@ -44,7 +44,7 @@ export class UserModel {
       );
     }
 
-    if (!(await Bun.password.verify(oldPassword, user.password_hash))) {
+    if (!(await Bun.password.verify(old_password, user.password_hash))) {
       throw new HTTPError(
         'Invalid password',
         'The old password you entered is incorrect',
@@ -53,7 +53,7 @@ export class UserModel {
     }
 
     try {
-      user.password_hash = await Bun.password.hash(newPassword);
+      user.password_hash = await Bun.password.hash(new_password);
     } catch (err) {
       // err should be of type Error always
       if (err instanceof Error) {
@@ -78,10 +78,10 @@ export class UserModel {
     }
 
     // generate a random password
-    const newPassword = randomBytes(8).toString('hex');
+    const new_password = randomBytes(8).toString('hex');
 
     // hash the password
-    const newPasswordHash = await Bun.password.hash(newPassword);
+    const newPasswordHash = await Bun.password.hash(new_password);
 
     // update the user's password, and delete the refresh token
     await appDataSource.manager.update(
@@ -93,7 +93,7 @@ export class UserModel {
     // delete the token
     await redisClient.del(`resetpw:${token}`);
 
-    return newPassword;
+    return new_password;
   }
   public static async sendResetPasswordEmail(username: string) {
     const user = await appDataSource.manager

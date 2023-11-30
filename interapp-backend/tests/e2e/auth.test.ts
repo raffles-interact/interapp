@@ -99,13 +99,13 @@ describe('API (auth)', () => {
 
     const response_as_json = (await res.json()) as Object;
     expect(response_as_json).toMatchObject({
-      accessToken: expect.any(String),
+      access_token: expect.any(String),
       user: {
         user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         verified: false,
-        serviceHours: 0,
+        service_hours: 0,
         permissions: [0],
       },
       expire: expect.any(Number),

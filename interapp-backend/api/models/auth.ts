@@ -126,7 +126,7 @@ export class AuthModel {
       username: user.username,
       email: user.email,
       verified: user.verified,
-      serviceHours: user.service_hours,
+      service_hours: user.service_hours,
       permissions: user.user_permissions.map((perm) => perm.permission_id),
     };
 

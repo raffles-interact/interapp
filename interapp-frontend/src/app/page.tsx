@@ -18,7 +18,7 @@ export default function Home() {
           <h2>{user.email}</h2>
           <h2>{user.permissions}</h2>
           <h3>{user.verified}</h3>
-          <h3>{user.serviceHours}</h3>
+          <h3>{user.service_hours}</h3>
 
           <button onClick={logout}>Logout</button>
         </>

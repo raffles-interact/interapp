@@ -26,7 +26,7 @@ export interface User {
   email: string;
   permissions: Permissions[];
   verified: boolean;
-  serviceHours: number;
+  service_hours: number;
 }
 
 export interface AuthProviderProps {
@@ -35,6 +35,6 @@ export interface AuthProviderProps {
 
 export interface UserWithJWT {
   user: User;
-  accessToken: string;
+  access_token: string;
   expire: number;
 }
