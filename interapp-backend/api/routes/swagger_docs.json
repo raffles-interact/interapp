@@ -1,8 +1,8 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.0",
   "info": {
     "title": "Interapp API",
-    "description": "This is the spec for all routes defined in the `api/routes/*` directory. All routes should be prefixed with `/api/*`.",
+    "description": "This is the specification for all routes defined in the `api/routes/endpoints/*` directory. All routes should be prefixed with `/api/*`. This spec is not yet fully compliant with openapi >=3.0.0 (DELETE should not have a response body in the newest version)",
     "contact": {
       "email": "sebastian.ong@hotmail.com"
     },
@@ -18,12 +18,26 @@
     {
       "name": "auth",
       "description": "Authentication with JWT"
+    },
+    {
+      "name": "user",
+      "description": "Operations related to users"
+    },
+    {
+      "name": "service",
+      "description": "Operations related to interact's service"
+    },
+    {
+      "name": "announcement",
+      "description": "Operations related to announcements by interact's leaders"
     }
   ],
   "paths": {
     "/auth/signup": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Sign a user up for the application",
         "requestBody": {
           "content": {
@@ -31,11 +45,11 @@
               "schema": {
                 "type": "object",
                 "properties": {
+                  "user_id": {
+                    "type": "integer"
+                  },
                   "username": {
                     "type": "string"
-                  },
-                  "userId": {
-                    "type": "integer"
                   },
                   "email": {
                     "type": "string"
@@ -46,8 +60,8 @@
                 }
               },
               "example": {
-                "username": "joe",
-                "userId": 123,
+                "user_id": 123,
+                "username": "fatass12345",
                 "email": "joejoejoe@gmail.com",
                 "password": "MyNewPassword"
               }
@@ -56,25 +70,23 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "Successful operation",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/JWTresponse"
-                }
-              }
-            }
+          "201": {
+            "description": "Successful operation"
           },
           "400": {
             "description": "Missing body/bad userId type/invalid email"
+          },
+          "409": {
+            "description": "Duplicate user id/username"
           }
         }
       }
     },
     "/auth/signin": {
       "post": {
-        "tags": ["auth"],
+        "tags": [
+          "auth"
+        ],
         "summary": "Logs user into the app",
         "requestBody": {
           "content": {
@@ -104,7 +116,66 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JWTresponse"
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "user": {
+                      "type": "object"
+                    },
+                    "expire": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoic2ViZmFzdyIsInZlcmlmaWVkIjpmYWxzZSwicGVybWlzc2lvbnMiOlswXSwiaWF0IjoxNzAwMzEzNjQ1LCJpc3MiOiJpbnRlcmFwcCIsImF1ZCI6ImludGVyYWN0X2NsdWIiLCJleHAiOjE3MDA0MDAwNDV9.vJg4hmBY_slUmGjHK4H_8UITIX9417_BRXznt_6p4rk",
+                  "user": "<user details as an object>",
+                  "expire": 1701411555
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing body"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Refresh access token",
+        "security": [
+          {
+            "cookieAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "access_token": {
+                      "type": "string"
+                    },
+                    "expire": {
+                      "type": "number"
+                    }
+                  }
+                },
+                "example": {
+                  "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoic2ViZmFzdyIsInZlcmlmaWVkIjpmYWxzZSwicGVybWlzc2lvbnMiOlswXSwiaWF0IjoxNzAwMzEzNjQ1LCJpc3MiOiJpbnRlcmFwcCIsImF1ZCI6ImludGVyYWN0X2NsdWIiLCJleHAiOjE3MDA0MDAwNDV9.vJg4hmBY_slUmGjHK4H_8UITIX9417_BRXznt_6p4rk",
+                  "expire": 1701411555
                 }
               }
             }
@@ -115,17 +186,40 @@
         }
       }
     },
-    "/auth/password/change": {
+    "/auth/signout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Sign the user out by invalidating tokens",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        }
+      }
+    },
+    "/user/password/change": {
       "patch": {
-        "tags": ["auth"],
-        "summary": "Change password to a new password",
+        "tags": [
+          "user"
+        ],
+        "summary": "Change password",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
                 "type": "object",
                 "properties": {
-                  "oldPassword": {
+                  "old_password": {
                     "type": "string"
                   },
                   "new_password": {
@@ -134,13 +228,18 @@
                 }
               },
               "example": {
-                "oldPassword": "jeofjeoifjwero",
-                "new_password": "pass123"
+                "old_password": "fsafsdhfjsd",
+                "new_password": "fsdjfsdfhsadkfhds"
               }
             }
           },
           "required": true
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "204": {
             "description": "Successful operation"
@@ -148,18 +247,15 @@
           "400": {
             "description": "Missing body"
           }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
+        }
       }
     },
-    "/auth/password/reset_email": {
+    "/user/password/reset_email": {
       "post": {
-        "tags": ["auth"],
-        "summary": "Send a reset email to the specified user",
+        "tags": [
+          "user"
+        ],
+        "summary": "Set a reset password email to the user's email if it exists",
         "requestBody": {
           "content": {
             "application/json": {
@@ -188,19 +284,28 @@
         }
       }
     },
-    "/auth/password/reset": {
+    "/user/password/reset": {
       "patch": {
-        "tags": ["auth"],
-        "summary": "Reset passsword to random value given access token",
+        "tags": [
+          "user"
+        ],
+        "summary": "Reset password given token sent in email",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/tokenInput"
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "token": "61ccbddcf94bbfc4b45fd6caa0bb36a7be96a93ec19ce7714616818dca4e129e82d6e36c2772a5a04165efa01bbbc64d5e7244cc138d6fb7884d730e27956c704810e099da33cb02287f7f27bd53fcb03dcf2fbe41f31faf40a9ac1c812418415be39e121f39b85b9ddcd5969e95d050fc9673c61ef66c9bd370953b02d7eb3d"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
@@ -210,27 +315,32 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "tempPassword": {
+                    "temp_password": {
                       "type": "string"
                     }
                   }
                 },
                 "example": {
-                  "tempPassword": "5b009b035c2b24e1"
+                  "temp_password": "5b009b035c2b24e1"
                 }
               }
             }
           },
           "400": {
             "description": "Missing body"
+          },
+          "401": {
+            "description": "Invalid token"
           }
         }
       }
     },
-    "/auth/verify_email": {
+    "/user/verify_email": {
       "post": {
-        "tags": ["auth"],
-        "summary": "Send a verify email to the specified user",
+        "tags": [
+          "user"
+        ],
+        "summary": "Send a verification email to the user",
         "requestBody": {
           "content": {
             "application/json": {
@@ -249,9 +359,142 @@
           },
           "required": true
         },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
         "responses": {
           "204": {
             "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
+        }
+      }
+    },
+    "/user/verify": {
+      "patch": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Verify email of user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "token": "61ccbddcf94bbfc4b45fd6caa0bb36a7be96a93ec19ce7714616818dca4e129e82d6e36c2772a5a04165efa01bbbc64d5e7244cc138d6fb7884d730e27956c704810e099da33cb02287f7f27bd53fcb03dcf2fbe41f31faf40a9ac1c812418415be39e121f39b85b9ddcd5969e95d050fc9673c61ef66c9bd370953b02d7eb3d"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
+        }
+      }
+    },
+    "/user/permissions": {
+      "patch": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Update permissions of user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "permissions": {
+                    "type": "array",
+                    "items": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "username": "testuser",
+                "permissions": [
+                  0,
+                  1,
+                  2,
+                  3
+                ]
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
+        }
+      }
+    },
+    "/user/userservices": {
+      "get": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Get user services",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "username",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserService"
+                  }
+                }
+              }
+            }
           },
           "400": {
             "description": "Missing body"
@@ -262,17 +505,67 @@
             "bearerAuth": []
           }
         ]
-      }
-    },
-    "/auth/password/verify": {
-      "patch": {
-        "tags": ["auth"],
-        "summary": "Verify a user given access token",
+      },
+      "post": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Submit user services",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/tokenInput"
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "service_id": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "username": "testuser",
+                "service_id": 1
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "user"
+        ],
+        "summary": "Delete user service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "service_id": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "username": "testuser",
+                "service_id": 1
               }
             }
           }
@@ -284,23 +577,22 @@
           "400": {
             "description": "Missing body"
           }
-        },
-        "security": [
-          {
-            "bearerAuth": []
-          }
-        ]
+        }
       }
     }
   },
   "components": {
     "schemas": {
-      "JWTresponse": {
+      "UserService": {
         "type": "object",
         "properties": {
-          "jwt": {
+          "username": {
             "type": "string",
-            "example": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoic2ViZmFzdyIsInZlcmlmaWVkIjpmYWxzZSwicGVybWlzc2lvbnMiOlswXSwiaWF0IjoxNzAwMzEzNjQ1LCJpc3MiOiJpbnRlcmFwcCIsImF1ZCI6ImludGVyYWN0X2NsdWIiLCJleHAiOjE3MDA0MDAwNDV9.vJg4hmBY_slUmGjHK4H_8UITIX9417_BRXznt_6p4rk"
+            "example": "joe"
+          },
+          "service_id": {
+            "type": "integer",
+            "example": 1
           }
         }
       },
@@ -315,6 +607,11 @@
       }
     },
     "securitySchemes": {
+      "cookieAuth": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "refresh"
+      },
       "bearerAuth": {
         "type": "http",
         "scheme": "bearer",

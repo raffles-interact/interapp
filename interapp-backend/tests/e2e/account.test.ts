@@ -47,7 +47,7 @@ describe('API (account)', async () => {
 
   test('attempt to bypass role restrictions', async () => {
     // testuser should not have admin permissions
-    const res = await fetch(`${API_URL}/user/permissions/update`, {
+    const res = await fetch(`${API_URL}/user/permissions`, {
       method: 'PATCH',
       body: JSON.stringify({
         username: 'testuser',
@@ -82,7 +82,7 @@ describe('API (account)', async () => {
       await queryRunner.release();
     }
 
-    const res = await fetch(`${API_URL}/user/permissions/update`, {
+    const res = await fetch(`${API_URL}/user/permissions`, {
       method: 'PATCH',
       body: JSON.stringify({
         username: 'testuser',
@@ -114,7 +114,7 @@ describe('API (account)', async () => {
   });
 
   test('add roles to new user', async () => {
-    const res = await fetch(`${API_URL}/user/permissions/update`, {
+    const res = await fetch(`${API_URL}/user/permissions`, {
       method: 'PATCH',
       body: JSON.stringify({
         username: 'testuser2',
@@ -126,7 +126,7 @@ describe('API (account)', async () => {
   });
 
   test('remove roles from user', async () => {
-    const res = await fetch(`${API_URL}/user/permissions/update`, {
+    const res = await fetch(`${API_URL}/user/permissions`, {
       method: 'PATCH',
       body: JSON.stringify({
         username: 'testuser2',
