@@ -123,7 +123,7 @@ describe('Unit (announcement)', () => {
   });
 
   test('update announcement completions with invalid username', async () => {
-    expect( () =>  AnnouncementModel.updateAnnouncementCompletion(1, 'invalid', true)).toThrow(
+    expect(() => AnnouncementModel.updateAnnouncementCompletion(1, 'invalid', true)).toThrow(
       'The user with username invalid was not found in the database',
     );
   });

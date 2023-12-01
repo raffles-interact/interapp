@@ -86,11 +86,7 @@ export class ServiceModel {
     try {
       await appDataSource.manager.insert(ServiceSession, session);
     } catch (e) {
-      throw new HTTPError(
-        'Service session already exists',
-        `Service session with service_id ${service_session.service_id} already exists`,
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
     }
     return session.service_session_id;
   }
@@ -111,11 +107,12 @@ export class ServiceModel {
     return res;
   }
   public static async updateServiceSession(service_session: ServiceSession) {
+    const service = await this.getService(service_session.service_id); // check if service exists
     try {
       await appDataSource.manager.update(
         ServiceSession,
         { service_session_id: service_session.service_session_id },
-        service_session,
+        { ...service_session, service },
       );
     } catch (e) {
       throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
@@ -155,7 +152,9 @@ export class ServiceModel {
     }
     return session;
   }
-  public static async createServiceSessionUsers(user_sessions: ServiceSessionUser[]) {
+  public static async createServiceSessionUsers(
+    user_sessions: Omit<ServiceSessionUser, 'service_session' | 'user'>[],
+  ) {
     const sessions = [];
     for (const user_session of user_sessions) {
       const session = new ServiceSessionUser();
@@ -212,7 +211,13 @@ export class ServiceModel {
       .getMany();
     return res;
   }
-  public static async updateServiceSessionUser(new_service_session_user: ServiceSessionUser) {
+  public static async updateServiceSessionUser(
+    new_service_session_user: Omit<ServiceSessionUser, 'service_session' | 'user'>,
+  ) {
+    const service_session = await this.getServiceSession(
+      new_service_session_user.service_session_id,
+    ); // check if service session exists
+    const user = await UserModel.getUser(new_service_session_user.username); // check if user exists
     try {
       await appDataSource.manager.update(
         ServiceSessionUser,
@@ -220,7 +225,7 @@ export class ServiceModel {
           service_session_id: new_service_session_user.service_session_id,
           username: new_service_session_user.username,
         },
-        new_service_session_user,
+        { ...new_service_session_user, service_session, user },
       );
     } catch (e) {
       throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);

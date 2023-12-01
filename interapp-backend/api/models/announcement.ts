@@ -116,14 +116,14 @@ export class AnnouncementModel {
   ) {
     const user = await UserModel.getUser(username);
     const announcement = await this.getAnnouncement(announcement_id);
-    if (!user){
+    if (!user) {
       throw new HTTPError(
         'User not found',
         `The user with username ${username} was not found in the database`,
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-    if (!announcement){
+    if (!announcement) {
       throw new HTTPError(
         'Announcement not found',
         `Announcement with id ${announcement_id} not found`,
