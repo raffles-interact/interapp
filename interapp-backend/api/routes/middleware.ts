@@ -33,14 +33,14 @@ export async function verifyJWT(req: Request, res: Response, next: NextFunction)
       HTTPErrorCode.UNAUTHORIZED_ERROR,
     );
   }
-  const { userId, username } = (await AuthModel.verify(token, 'access')).payload;
+  const { user_id, username } = (await AuthModel.verify(token, 'access')).payload;
 
-  req.headers.userId = String(userId);
+  req.headers.user_id = String(user_id);
   req.headers.username = username;
   next();
 }
 
-// must be used after verifyJWT to get the userId and username
+// must be used after verifyJWT to get the user_id and username
 export function verifyRequiredRole(role: number) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const username = req.headers.username;

@@ -58,18 +58,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, [user, loading]);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('accessToken');
+    const access_token = localStorage.getItem('access_token');
     const user = localStorage.getItem('user');
-    if (user && accessToken) {
+    if (user && access_token) {
       setUser(JSON.parse(user));
     }
-    const expired = Number(localStorage.getItem('accessTokenExpire')) < Date.now();
+    const expired = Number(localStorage.getItem('access_token_expire')) < Date.now();
 
-    if (expired && accessToken) {
+    if (expired && access_token) {
       axiosClient
         .refreshAccessToken()
         .then((res) => {
-          localStorage.setItem('accessToken', res.accessToken);
+          localStorage.setItem('access_token', res.access_token);
         })
         .catch(logout);
     }
@@ -79,12 +79,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = useCallback(async (details: LogInDetails) => {
     const { data, status } = await axiosClient.signIn(details);
-    const { accessToken, expire, user } = data;
+    const { access_token, expire, user } = data;
 
     if (status !== 200) return status;
 
-    localStorage.setItem('accessTokenExpire', expire.toString());
-    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('access_token_expire', expire.toString());
+    localStorage.setItem('access_token', access_token);
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
     router.refresh(); // invalidate browser cache
@@ -95,8 +95,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const status = await axiosClient.signOut();
     setUser(null);
     localStorage.removeItem('user');
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('accessTokenExpire');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('access_token_expire');
     router.refresh(); // invalidate browser cache
     return status;
   }, []);

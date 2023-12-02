@@ -28,7 +28,7 @@ export class UserModel {
     }
     return user;
   }
-  public static async changePassword(username: string, oldPassword: string, newPassword: string) {
+  public static async changePassword(username: string, old_password: string, new_password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
       .select(['user.username', 'user.password_hash'])
@@ -44,7 +44,7 @@ export class UserModel {
       );
     }
 
-    if (!(await Bun.password.verify(oldPassword, user.password_hash))) {
+    if (!(await Bun.password.verify(old_password, user.password_hash))) {
       throw new HTTPError(
         'Invalid password',
         'The old password you entered is incorrect',
@@ -53,7 +53,7 @@ export class UserModel {
     }
 
     try {
-      user.password_hash = await Bun.password.hash(newPassword);
+      user.password_hash = await Bun.password.hash(new_password);
     } catch (err) {
       // err should be of type Error always
       if (err instanceof Error) {
@@ -78,10 +78,10 @@ export class UserModel {
     }
 
     // generate a random password
-    const newPassword = randomBytes(8).toString('hex');
+    const new_password = randomBytes(8).toString('hex');
 
     // hash the password
-    const newPasswordHash = await Bun.password.hash(newPassword);
+    const newPasswordHash = await Bun.password.hash(new_password);
 
     // update the user's password, and delete the refresh token
     await appDataSource.manager.update(
@@ -93,7 +93,7 @@ export class UserModel {
     // delete the token
     await redisClient.del(`resetpw:${token}`);
 
-    return newPassword;
+    return new_password;
   }
   public static async sendResetPasswordEmail(username: string) {
     const user = await appDataSource.manager
@@ -132,6 +132,7 @@ export class UserModel {
     };
 
     await transporter.sendMail(email);
+    return token;
   }
   public static async verifyEmail(token: string) {
     // check if the user exists in redis
@@ -211,6 +212,7 @@ export class UserModel {
     };
 
     await transporter.sendMail(email);
+    return token;
   }
   public static async checkPermissions(username: string) {
     const user = await appDataSource.manager
@@ -283,6 +285,40 @@ export class UserModel {
       .from(Service, 'service')
       .where('service.service_id IN (:...services)', { services: service_ids })
       .getMany();
+  }
+  public static async getAllUsersByService(service_id: number) {
+    const service_users = await appDataSource
+      .createQueryBuilder()
+      .select(['user_service.username'])
+      .from(UserService, 'user_service')
+      .where('user_service.service_id = :service_id', { service_id })
+      .getMany();
+    if (!service_users) {
+      throw new HTTPError(
+        'Service not found',
+        `The service with service_id ${service_id} has no users`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    const usernames = service_users.map((service) => service.username);
+    if (usernames.length === 0) {
+      throw new HTTPError(
+        'Service not found',
+        `The service with service_id ${service_id} has no users`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    const users: Partial<User>[] = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username IN (:...usernames)', { usernames })
+      .getMany();
+    users.forEach((user) => {
+      delete user.password_hash;
+      delete user.refresh_token;
+    });
+    return users;
   }
   public static async addServiceUser(service_id: number, username: string) {
     const user = await appDataSource.manager

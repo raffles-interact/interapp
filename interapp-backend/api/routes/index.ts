@@ -20,7 +20,8 @@ app.use(express.json({ limit: '50mb' }));
 app.use(cors());
 app.use(cookieParser());
 
-process.env.NODE_ENV === 'development' && app.use('/api/docs', serve, setup(swagger_docs));
+process.env.NODE_ENV === 'development' &&
+  app.use('/api/docs', serve, setup(swagger_docs, { swaggerOptions: { validatorUrl: null } }));
 
 app.use('/api/hello', helloRouter);
 app.use('/api/auth', authRouter);

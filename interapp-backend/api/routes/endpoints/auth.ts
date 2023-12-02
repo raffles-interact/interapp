@@ -7,12 +7,12 @@ const authRouter = Router();
 
 authRouter.post(
   '/signup',
-  validateRequiredFields(['userId', 'username', 'email', 'password']),
+  validateRequiredFields(['user_id', 'username', 'email', 'password']),
   async (req, res) => {
-    if (typeof req.body.userId !== 'number') {
+    if (typeof req.body.user_id !== 'number') {
       throw new HTTPError(
         'Invalid field type',
-        'userId must be a number',
+        'user_id must be a number',
         HTTPErrorCode.BAD_REQUEST_ERROR,
       );
     }
@@ -27,7 +27,7 @@ authRouter.post(
       );
     }
 
-    await AuthModel.signUp(req.body.userId, req.body.username, req.body.email, req.body.password);
+    await AuthModel.signUp(req.body.user_id, req.body.username, req.body.email, req.body.password);
     res.status(201).send();
   },
 );
@@ -42,7 +42,7 @@ authRouter.post('/signin', validateRequiredFields(['username', 'password']), asy
     path: '/api/auth/refresh',
   });
   res.status(200).send({
-    accessToken: token,
+    access_token: token,
     user: user,
     expire: expire,
   });
@@ -56,7 +56,7 @@ authRouter.post('/refresh', async (req, res) => {
     path: '/api/auth/refresh',
   });
   res.status(200).send({
-    accessToken: token,
+    access_token: token,
     expire: expire,
   });
 });

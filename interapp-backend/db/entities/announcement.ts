@@ -24,7 +24,7 @@ export class Announcement {
   description: string;
 
   @Column({ type: 'bytea', nullable: true })
-  attachment: string;
+  attachment?: string;
 
   @Column()
   username: string;

@@ -1,15 +1,15 @@
 import { test, expect, describe, afterAll } from 'bun:test';
-import { recreateDB } from './utils/recreate_db';
+import { recreateDB } from '../utils/recreate_db';
 
 const API_URL = process.env.API_URL;
 
-describe('sign up and sign in endpoints', () => {
+describe('API (auth)', () => {
   // Test for registration endpoint
   test('create accounts', async () => {
     const res = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         password: 'testpassword',
@@ -17,11 +17,13 @@ describe('sign up and sign in endpoints', () => {
       headers: { 'Content-Type': 'application/json' },
     });
     expect(res.status).toBe(201);
+  });
 
+  test('use school email', async () => {
     const res2 = await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 2,
+        user_id: 2,
         username: 'testuser2',
         email: 'sdkjfsa@student.ri.edu.sg',
         password: 'testpassword',
@@ -29,6 +31,58 @@ describe('sign up and sign in endpoints', () => {
       headers: { 'Content-Type': 'application/json' },
     });
     expect(res2.status).toBe(400); // should fail because email is a school email
+
+    const res3 = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 2,
+        username: 'testuser2',
+        email: 'faskj@rafflesgirlssch.edu.sg',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res3.status).toBe(400); // should fail because email is a school email
+  });
+
+  test('missing user_id', async () => {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'testuser',
+        email: 'fffkoefk@ifgeji',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(400);
+  });
+
+  test('duplicate user_id', async () => {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 1,
+        username: 'fejkdlsjlksjlskdjf;lasjf',
+        email: 'fffkoefk@ifgeji',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(409);
+  });
+
+  test('missing username', async () => {
+    const res = await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 10,
+        email: 'fffkoefk@ifgeji',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+    expect(res.status).toBe(400);
   });
 
   // Test for login endpoint
@@ -45,13 +99,13 @@ describe('sign up and sign in endpoints', () => {
 
     const response_as_json = (await res.json()) as Object;
     expect(response_as_json).toMatchObject({
-      accessToken: expect.any(String),
+      access_token: expect.any(String),
       user: {
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         verified: false,
-        serviceHours: 0,
+        service_hours: 0,
         permissions: [0],
       },
       expire: expect.any(Number),

@@ -7,7 +7,7 @@ import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 
 interface SignUpFormProps {
-  userId: number | '';
+  user_id: number | '';
   email: string;
   username: string;
   password: string;
@@ -19,14 +19,14 @@ export default function SignUpForm() {
   const router = useRouter();
   const form = useForm<SignUpFormProps>({
     initialValues: {
-      userId: '',
+      user_id: '',
       email: '',
       username: '',
       password: '',
       confirmPassword: '',
     },
     validate: {
-      userId: (value) => {
+      user_id: (value) => {
         if (value === '') return 'User ID is required';
         if (Number.isNaN(Number(value))) return 'User ID must be a number';
       },
@@ -52,7 +52,7 @@ export default function SignUpForm() {
 
   const handleSubmitStatus = (status: number) => {
     switch (status) {
-      case 204:
+      case 201:
         notifications.show({
           title: 'Success!',
           message: 'Your account has been created. Please login.',
@@ -79,7 +79,7 @@ export default function SignUpForm() {
 
   const handleSubmit = async (values: SignUpFormProps) => {
     registerUserAccount({
-      userId: Number(values.userId),
+      user_id: Number(values.user_id),
       email: values.email,
       username: values.username,
       password: values.password,
@@ -113,7 +113,7 @@ export default function SignUpForm() {
           allowDecimal={false}
           allowNegative={false}
           hideControls
-          {...form.getInputProps('userId')}
+          {...form.getInputProps('user_id')}
         />
         <Group justify='center'>
           <Button type='submit' mt='sm'>

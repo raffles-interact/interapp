@@ -1,18 +1,18 @@
 import { test, expect, describe, afterAll, beforeAll } from 'bun:test';
-import { recreateDB } from './utils/recreate_db';
+import { recreateDB } from '../utils/recreate_db';
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
 
 const API_URL = process.env.API_URL;
 
-describe('change account details', async () => {
+describe('API (account)', async () => {
   let accessToken: string;
 
   beforeAll(async () => {
     await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
       body: JSON.stringify({
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         password: 'testpassword',
@@ -28,8 +28,8 @@ describe('change account details', async () => {
       headers: { 'Content-Type': 'application/json' },
     });
     const response_as_json = (await res.json()) as Object;
-    if ('accessToken' in response_as_json) {
-      accessToken = response_as_json.accessToken as string;
+    if ('access_token' in response_as_json) {
+      accessToken = response_as_json.access_token as string;
     } else throw new Error('No access token found');
   });
 
@@ -37,8 +37,8 @@ describe('change account details', async () => {
     const res = await fetch(`${API_URL}/user/password/change`, {
       method: 'PATCH',
       body: JSON.stringify({
-        oldPassword: 'testpassword',
-        newPassword: 'newpassword',
+        old_password: 'testpassword',
+        new_password: 'new_password',
       }),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -47,7 +47,7 @@ describe('change account details', async () => {
 
   test('attempt to bypass role restrictions', async () => {
     // testuser should not have admin permissions
-    const res = await fetch(`${API_URL}/user/permissions/update`, {
+    const res = await fetch(`${API_URL}/user/permissions`, {
       method: 'PATCH',
       body: JSON.stringify({
         username: 'testuser',
@@ -82,7 +82,7 @@ describe('change account details', async () => {
       await queryRunner.release();
     }
 
-    const res = await fetch(`${API_URL}/user/permissions/update`, {
+    const res = await fetch(`${API_URL}/user/permissions`, {
       method: 'PATCH',
       body: JSON.stringify({
         username: 'testuser',
@@ -98,6 +98,43 @@ describe('change account details', async () => {
       .from(UserPermission, 'user_permissions')
       .where('user_permissions.username = :username', { username: 'testuser' })
       .getMany();
+  });
+
+  test('create a new user', async () => {
+    await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 2,
+        username: 'testuser2',
+        email: 'test@example.com',
+        password: 'testpassword',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  });
+
+  test('add roles to new user', async () => {
+    const res = await fetch(`${API_URL}/user/permissions`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser2',
+        permissions: [0, 1, 2, 3, 6],
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('remove roles from user', async () => {
+    const res = await fetch(`${API_URL}/user/permissions`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser2',
+        permissions: [0, 6],
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
   });
 
   //test logout
@@ -125,7 +162,7 @@ describe('change account details', async () => {
       method: 'POST',
       body: JSON.stringify({
         username: 'testuser',
-        password: 'newpassword',
+        password: 'new_password',
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -133,13 +170,13 @@ describe('change account details', async () => {
 
     const response_as_json = (await res.json()) as Object;
     expect(response_as_json).toMatchObject({
-      accessToken: expect.any(String),
+      access_token: expect.any(String),
       user: {
-        userId: 1,
+        user_id: 1,
         username: 'testuser',
         email: 'test@example.com',
         verified: false,
-        serviceHours: 0,
+        service_hours: 0,
         permissions: [0, 6],
       },
       expire: expect.any(Number),

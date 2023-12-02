@@ -1,5 +1,18 @@
-import { DataSource } from 'typeorm';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { LogLevel } from 'typeorm/browser';
+
+function getLoggingLevel(): 'all' | LogLevel[] {
+  switch (process.env.NODE_ENV) {
+    case 'production':
+      return ['error', 'warn'];
+    case 'test':
+      return [];
+    case 'development':
+      return 'all';
+    default:
+      return 'all';
+  }
+}
 
 export const AppDataSourceOptions: DataSourceOptions = {
   type: 'postgres',
@@ -9,7 +22,7 @@ export const AppDataSourceOptions: DataSourceOptions = {
   password: process.env.POSTGRES_PASSWORD,
   database: process.env.POSTGRES_DB,
   synchronize: false,
-  logging: process.env.NODE_ENV === 'development' ? 'all' : ['schema', 'error', 'warn'],
+  logging: getLoggingLevel(),
   logger: 'advanced-console',
   maxQueryExecutionTime: 1000,
   entities: [`${__dirname}/entities/*.ts`],

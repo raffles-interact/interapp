@@ -1,10 +1,12 @@
 import appDataSource from '@utils/init_datasource';
-import { User, UserPermission, Announcement, AnnouncementCompletion } from '@db/entities';
+import { Announcement, AnnouncementCompletion } from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { UserModel } from './user';
 
 export class AnnouncementModel {
-  public static async createAnnouncement(announcement: Omit<Announcement, 'announcement_id'>) {
+  public static async createAnnouncement(
+    announcement: Omit<Announcement, 'announcement_id' | 'user' | 'announcement_completions'>,
+  ) {
     const newAnnouncement = new Announcement();
     newAnnouncement.creation_date = announcement.creation_date;
     newAnnouncement.description = announcement.description;
@@ -15,6 +17,7 @@ export class AnnouncementModel {
     const user = await UserModel.getUser(announcement.username);
     newAnnouncement.user = user;
     newAnnouncement.username = user.username;
+    newAnnouncement.announcement_completions = [];
     try {
       await appDataSource.manager.insert(Announcement, newAnnouncement);
     } catch (e) {
@@ -51,12 +54,17 @@ export class AnnouncementModel {
       .getMany();
     return announcements;
   }
-  public static async updateAnnouncement(new_announcement: Announcement) {
+  public static async updateAnnouncement(
+    new_announcement: Omit<Announcement, 'user' | 'announcement_completions'>,
+  ) {
+    const announcement: Partial<Announcement> = new_announcement;
+    announcement.user = await UserModel.getUser(new_announcement.username);
+
     try {
       await appDataSource.manager.update(
         Announcement,
         { announcement_id: new_announcement.announcement_id },
-        new_announcement,
+        announcement,
       );
     } catch (e) {
       throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
@@ -67,33 +75,65 @@ export class AnnouncementModel {
     await appDataSource.manager.delete(Announcement, { announcement_id });
   }
   public static async getAnnouncementCompletions(announcement_id: number) {
+    const announcement = await this.getAnnouncement(announcement_id);
+    if (!announcement) {
+      throw new HTTPError(
+        'Announcement not found',
+        `Announcement with id ${announcement_id} not found`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
     const completions = await appDataSource.manager
       .createQueryBuilder()
       .select(['announcement_completion.username', 'announcement_completion.completed'])
       .from(AnnouncementCompletion, 'announcement_completion')
       .where('announcement_completion.announcement_id = :announcement_id', { announcement_id })
       .getMany();
-    return Object.fromEntries(completions.map((completion) => [completion.username, completion.completed]));
+    return Object.fromEntries(
+      completions.map((completion) => [completion.username, completion.completed]),
+    );
   }
   public static async addAnnouncementCompletions(announcement_id: number, usernames: string[]) {
     const announcement = await this.getAnnouncement(announcement_id);
-    const completions = await Promise.all(usernames.map(async (username) => {
-      const completion = new AnnouncementCompletion();
-      completion.announcement = announcement;
-      completion.announcement_id = announcement_id;
-      completion.username = username;
-      completion.user = await UserModel.getUser(username);
-      completion.completed = false;
-      return completion;
-    }));
+    const completions = await Promise.all(
+      usernames.map(async (username) => {
+        const completion = new AnnouncementCompletion();
+        completion.announcement = announcement;
+        completion.announcement_id = announcement_id;
+        completion.username = username;
+        completion.user = await UserModel.getUser(username);
+        completion.completed = false;
+        return completion;
+      }),
+    );
 
     await appDataSource.manager.insert(AnnouncementCompletion, completions);
   }
-  public static async updateAnnouncementCompletion(announcement_id: number, username: string, completed: boolean) {
+  public static async updateAnnouncementCompletion(
+    announcement_id: number,
+    username: string,
+    completed: boolean,
+  ) {
+    const user = await UserModel.getUser(username);
+    const announcement = await this.getAnnouncement(announcement_id);
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    if (!announcement) {
+      throw new HTTPError(
+        'Announcement not found',
+        `Announcement with id ${announcement_id} not found`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
     await appDataSource.manager.update(
       AnnouncementCompletion,
       { announcement_id, username },
-      { completed },
+      { completed, user, announcement },
     );
   }
 }

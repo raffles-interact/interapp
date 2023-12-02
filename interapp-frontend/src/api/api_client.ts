@@ -11,7 +11,7 @@ export class APIClient {
       validateStatus: (status) => status < 500,
     });
     this.instance.interceptors.request.use((req) => {
-      const token = localStorage.getItem('accessToken');
+      const token = localStorage.getItem('access_token');
       if (token) {
         req.headers['Authorization'] = `Bearer ${token}`;
       }

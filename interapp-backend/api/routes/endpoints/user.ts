@@ -8,13 +8,13 @@ const userRouter = Router();
 
 userRouter.patch(
   '/password/change',
-  validateRequiredFields(['oldPassword', 'newPassword']),
+  validateRequiredFields(['old_password', 'new_password']),
   verifyJWT,
   async (req, res) => {
     await UserModel.changePassword(
       req.headers.username as string,
-      req.body.oldPassword,
-      req.body.newPassword,
+      req.body.old_password,
+      req.body.new_password,
     );
     res.status(204).send();
   },
@@ -29,7 +29,7 @@ userRouter.patch('/password/reset', validateRequiredFields(['token']), async (re
   const newPw = await UserModel.resetPassword(req.body.token);
   res.clearCookie('refresh', { path: '/api/auth/refresh' });
   res.status(200).send({
-    tempPassword: newPw,
+    temp_password: newPw,
   });
 });
 
@@ -49,7 +49,7 @@ userRouter.patch('/verify', validateRequiredFields(['token']), verifyJWT, async 
 });
 
 userRouter.patch(
-  '/permissions/update',
+  '/permissions',
   validateRequiredFields(['username', 'permissions']),
   verifyJWT,
   verifyRequiredRole(Permissions.ADMIN),
@@ -77,13 +77,20 @@ userRouter.patch(
   },
 );
 
-userRouter.get('/userservices', validateRequiredFields(['username']), async (req, res) => {
-  const services = await UserModel.getAllServicesByUser(req.query.username as string);
-  res.status(200).send(services);
-});
+userRouter.get(
+  '/userservices',
+  verifyJWT,
+  validateRequiredFields(['username']),
+  async (req, res) => {
+    const services = await UserModel.getAllServicesByUser(req.query.username as string);
+    res.status(200).send(services);
+  },
+);
 
 userRouter.post(
   '/userservices',
+  verifyJWT,
+  verifyRequiredRole(Permissions.EXCO),
   validateRequiredFields(['username', 'service_id']),
   async (req, res) => {
     await UserModel.addServiceUser(req.body.service_id, req.body.username);
@@ -93,6 +100,8 @@ userRouter.post(
 
 userRouter.delete(
   '/userservices',
+  verifyJWT,
+  verifyRequiredRole(Permissions.EXCO),
   validateRequiredFields(['username', 'service_id']),
   async (req, res) => {
     await UserModel.removeServiceUser(req.body.service_id, req.body.username);

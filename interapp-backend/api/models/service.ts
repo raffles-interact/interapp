@@ -4,7 +4,9 @@ import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
 import { UserModel } from './user';
 
 export class ServiceModel {
-  public static async createService(service: Omit<Service, 'service_id'>) {
+  public static async createService(
+    service: Omit<Service, 'service_id' | 'service_ic' | 'user_service' | 'service_sessions'>,
+  ) {
     const newService = new Service();
     newService.name = service.name;
     newService.description = service.description;
@@ -70,7 +72,10 @@ export class ServiceModel {
     return services;
   }
   public static async createServiceSession(
-    service_session: Omit<ServiceSession, 'service_session_id'>,
+    service_session: Omit<
+      ServiceSession,
+      'service_session_id' | 'service' | 'service_session_users'
+    >,
   ) {
     const session = new ServiceSession();
     session.service_id = service_session.service_id;
@@ -81,11 +86,7 @@ export class ServiceModel {
     try {
       await appDataSource.manager.insert(ServiceSession, session);
     } catch (e) {
-      throw new HTTPError(
-        'Service session already exists',
-        `Service session with service_id ${service_session.service_id} already exists`,
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
     }
     return session.service_session_id;
   }
@@ -106,11 +107,12 @@ export class ServiceModel {
     return res;
   }
   public static async updateServiceSession(service_session: ServiceSession) {
+    const service = await this.getService(service_session.service_id); // check if service exists
     try {
       await appDataSource.manager.update(
         ServiceSession,
         { service_session_id: service_session.service_session_id },
-        service_session,
+        { ...service_session, service },
       );
     } catch (e) {
       throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
@@ -121,7 +123,9 @@ export class ServiceModel {
     await appDataSource.manager.delete(ServiceSession, { service_session_id });
   }
 
-  public static async createServiceSessionUser(user_session: ServiceSessionUser) {
+  public static async createServiceSessionUser(
+    user_session: Omit<ServiceSessionUser, 'service_session' | 'user'>,
+  ) {
     const session = new ServiceSessionUser();
     session.service_session_id = user_session.service_session_id;
     session.username = user_session.username;
@@ -129,6 +133,13 @@ export class ServiceModel {
     session.attended = user_session.attended;
     session.is_ic = user_session.is_ic;
     session.service_session = await this.getServiceSession(user_session.service_session_id);
+    if (!session.service_session.ad_hoc_enabled && session.ad_hoc) {
+      throw new HTTPError(
+        'Ad hoc not enabled',
+        `Ad hoc is not enabled for service session with service_session_id ${user_session.service_session_id}`,
+        HTTPErrorCode.FORBIDDEN_ERROR,
+      );
+    }
     session.user = await UserModel.getUser(user_session.username);
     try {
       await appDataSource.manager.insert(ServiceSessionUser, session);
@@ -141,7 +152,9 @@ export class ServiceModel {
     }
     return session;
   }
-  public static async createServiceSessionUsers(user_sessions: ServiceSessionUser[]) {
+  public static async createServiceSessionUsers(
+    user_sessions: Omit<ServiceSessionUser, 'service_session' | 'user'>[],
+  ) {
     const sessions = [];
     for (const user_session of user_sessions) {
       const session = new ServiceSessionUser();
@@ -151,6 +164,13 @@ export class ServiceModel {
       session.attended = user_session.attended;
       session.is_ic = user_session.is_ic;
       session.service_session = await this.getServiceSession(user_session.service_session_id);
+      if (!session.service_session.ad_hoc_enabled && session.ad_hoc) {
+        throw new HTTPError(
+          'Ad hoc not enabled',
+          `Ad hoc is not enabled for service session with service_session_id ${user_session.service_session_id}`,
+          HTTPErrorCode.FORBIDDEN_ERROR,
+        );
+      }
       session.user = await UserModel.getUser(user_session.username);
       sessions.push(session);
     }
@@ -191,7 +211,13 @@ export class ServiceModel {
       .getMany();
     return res;
   }
-  public static async updateServiceSessionUser(new_service_session_user: ServiceSessionUser) {
+  public static async updateServiceSessionUser(
+    new_service_session_user: Omit<ServiceSessionUser, 'service_session' | 'user'>,
+  ) {
+    const service_session = await this.getServiceSession(
+      new_service_session_user.service_session_id,
+    ); // check if service session exists
+    const user = await UserModel.getUser(new_service_session_user.username); // check if user exists
     try {
       await appDataSource.manager.update(
         ServiceSessionUser,
@@ -199,7 +225,7 @@ export class ServiceModel {
           service_session_id: new_service_session_user.service_session_id,
           username: new_service_session_user.username,
         },
-        new_service_session_user,
+        { ...new_service_session_user, service_session, user },
       );
     } catch (e) {
       throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
