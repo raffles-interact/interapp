@@ -35,9 +35,7 @@
   "paths": {
     "/auth/signup": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Sign a user up for the application",
         "requestBody": {
           "content": {
@@ -84,9 +82,7 @@
     },
     "/auth/signin": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Logs user into the app",
         "requestBody": {
           "content": {
@@ -148,9 +144,7 @@
     },
     "/auth/refresh": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Refresh access token",
         "security": [
           {
@@ -188,9 +182,7 @@
     },
     "/auth/signout": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Sign the user out by invalidating tokens",
         "security": [
           {
@@ -209,9 +201,7 @@
     },
     "/user/password/change": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Change password",
         "requestBody": {
           "content": {
@@ -252,9 +242,7 @@
     },
     "/user/password/reset_email": {
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Set a reset password email to the user's email if it exists",
         "requestBody": {
           "content": {
@@ -286,23 +274,13 @@
     },
     "/user/password/reset": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Reset password given token sent in email",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "token": "61ccbddcf94bbfc4b45fd6caa0bb36a7be96a93ec19ce7714616818dca4e129e82d6e36c2772a5a04165efa01bbbc64d5e7244cc138d6fb7884d730e27956c704810e099da33cb02287f7f27bd53fcb03dcf2fbe41f31faf40a9ac1c812418415be39e121f39b85b9ddcd5969e95d050fc9673c61ef66c9bd370953b02d7eb3d"
+                "$ref": "#/components/schemas/Token"
               }
             }
           }
@@ -337,9 +315,7 @@
     },
     "/user/verify_email": {
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Send a verification email to the user",
         "requestBody": {
           "content": {
@@ -379,23 +355,13 @@
     },
     "/user/verify": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Verify email of user",
         "requestBody": {
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "token": {
-                    "type": "string"
-                  }
-                }
-              },
-              "example": {
-                "token": "61ccbddcf94bbfc4b45fd6caa0bb36a7be96a93ec19ce7714616818dca4e129e82d6e36c2772a5a04165efa01bbbc64d5e7244cc138d6fb7884d730e27956c704810e099da33cb02287f7f27bd53fcb03dcf2fbe41f31faf40a9ac1c812418415be39e121f39b85b9ddcd5969e95d050fc9673c61ef66c9bd370953b02d7eb3d"
+                "$ref": "#/components/schemas/Token"
               }
             }
           }
@@ -415,9 +381,7 @@
     },
     "/user/permissions": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Update permissions of user",
         "requestBody": {
           "content": {
@@ -438,12 +402,7 @@
               },
               "example": {
                 "username": "testuser",
-                "permissions": [
-                  0,
-                  1,
-                  2,
-                  3
-                ]
+                "permissions": [0, 1, 2, 3]
               }
             }
           }
@@ -468,9 +427,7 @@
     },
     "/user/userservices": {
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Get user services",
         "parameters": [
           {
@@ -507,9 +464,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Submit user services",
         "requestBody": {
           "content": {
@@ -545,9 +500,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Delete user service",
         "requestBody": {
           "content": {
@@ -579,6 +532,801 @@
           }
         }
       }
+    },
+    "/announcement": {
+      "post": {
+        "tags": ["announcement"],
+        "summary": "Create a new announcement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnnouncement"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Announcement created"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": ["announcement"],
+        "summary": "Get an announcement by ID",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "announcement_id",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Announcement"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Announcement not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": ["announcement"],
+        "summary": "Update an existing announcement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Announcement"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Announcement updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Announcement not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["announcement"],
+        "summary": "Deletes an announcement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "announcement_id": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "announcement_id": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Announcement updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Announcement not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/announcement/all": {
+      "get": {
+        "tags": ["announcement"],
+        "summary": "Get all announcements",
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Announcement"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/announcement/completions": {
+      "get": {
+        "tags": ["announcement"],
+        "summary": "Get all completions for a specific announcement",
+        "parameters": [
+          {
+            "name": "announcement_id",
+            "in": "query",
+            "description": "ID of the announcement to get completions for",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AnnouncementCompletion"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Announcement not found"
+          }
+        }
+      },
+      "post": {
+        "tags": ["announcement"],
+        "summary": "Add users that need to view the announcement",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "announcement_id": {
+                    "type": "integer"
+                  },
+                  "usernames": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              },
+              "example": {
+                "announcement_id": 1,
+                "usernames": ["user1", "user2"]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Announcement or users not found"
+          }
+        }
+      }
+    },
+    "/announcement/completion": {
+      "post": {
+        "tags": ["announcement"],
+        "summary": "Modify the viewed status of an announcement for a user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "announcement_id": {
+                    "type": "integer"
+                  },
+                  "username": {
+                    "type": "string"
+                  },
+                  "completed": {
+                    "type": "boolean"
+                  }
+                }
+              },
+              "example": {
+                "announcement_id": 123,
+                "username": "joe",
+                "completed": true
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Announcement or users not found"
+          }
+        }
+      }
+    },
+    "/service": {
+      "post": {
+        "tags": ["service"],
+        "summary": "Create a new service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Service created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "service_id": {
+                      "type": "integer",
+                      "example": 1
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "get": {
+        "tags": ["service"],
+        "summary": "Get a service by ID",
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "query",
+            "description": "ID of the service to return",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Service not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": ["service"],
+        "summary": "Update an existing service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Service"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Service updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Service not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["service"],
+        "summary": "Deletes a service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_id": {
+                    "type": "integer"
+                  }
+                }
+              },
+              "example": {
+                "service_id": 1
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "deleted"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/service/session": {
+      "get": {
+        "tags": ["service"],
+        "summary": "Get the current session user",
+        "parameters": [
+          {
+            "name": "service_session_id",
+            "in": "query",
+            "description": "ID of the service session",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceSession"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["service"],
+        "summary": "Create a new session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateServiceSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Session created"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": ["service"],
+        "summary": "Update an existing session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceSession"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Session updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Session not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["service"],
+        "summary": "Deletes a session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "session_id": {
+                    "type": "integer",
+                    "format": "int64"
+                  }
+                },
+                "required": ["session_id"]
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Session deleted"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Session not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/service/session_user": {
+      "get": {
+        "tags": ["service"],
+        "summary": "Get the info of service session wrt to a specific user",
+        "parameters": [
+          {
+            "name": "service_session_id",
+            "in": "query",
+            "description": "ID of the session",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "username",
+            "in": "query",
+            "description": "username to get",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceSessionUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["service"],
+        "summary": "Create a new session user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceSessionUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Session user created"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": ["service"],
+        "summary": "Update an existing session user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceSessionUser"
+              }
+            }
+          },
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "description": "Session user updated"
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "404": {
+            "description": "Session user not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["service"],
+        "summary": "Deletes a session user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_session_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "joejeorjeoreorjoejroer"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Session user deleted"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Session user not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/session_user_bulk": {
+      "get": {
+        "tags": ["service"],
+        "summary": "Get all session users",
+        "parameters": [
+          {
+            "name": "service_session_id",
+            "in": "query",
+            "description": "ID of the session",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceSessionUser"
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["service"],
+        "summary": "Create new session users in bulk",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_session_id": {
+                    "type": "integer",
+                    "example": 123
+                  },
+                  "users": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "username": {
+                          "type": "string",
+                          "example": "rjwrwer"
+                        },
+                        "ad_hoc": {
+                          "type": "boolean",
+                          "example": true
+                        },
+                        "attended": {
+                          "type": "string",
+                          "enum": ["Attended", "Absent", "Valid Reason"],
+                          "example": "Absent"
+                        },
+                        "is_ic": {
+                          "type": "boolean",
+                          "example": true
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Session users created"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -596,12 +1344,176 @@
           }
         }
       },
-      "tokenInput": {
+      "Token": {
         "type": "object",
         "properties": {
           "token": {
             "type": "string",
             "example": "61ccbddcf94bbfc4b45fd6caa0bb36a7be96a93ec19ce7714616818dca4e129e82d6e36c2772a5a04165efa01bbbc64d5e7244cc138d6fb7884d730e27956c704810e099da33cb02287f7f27bd53fcb03dcf2fbe41f31faf40a9ac1c812418415be39e121f39b85b9ddcd5969e95d050fc9673c61ef66c9bd370953b02d7eb3d"
+          }
+        }
+      },
+      "CreateAnnouncement": {
+        "type": "object",
+        "properties": {
+          "creation_date": {
+            "type": "string",
+            "example": "2022-01-01T00:00Z"
+          },
+          "title": {
+            "type": "string",
+            "example": "this is an example announcement"
+          },
+          "description": {
+            "type": "string",
+            "example": "description desctiotiofuierohfewrjfhejkfh"
+          },
+          "attatchment": {
+            "type": "string",
+            "nullable": true,
+            "example": "data:image;base64,ewkjfowejfoiwjfioerjfioerjfioejfoiewrjfoierjf...."
+          },
+          "username": {
+            "type": "string",
+            "example": "joe"
+          }
+        }
+      },
+      "Announcement": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAnnouncement"
+          },
+          {
+            "type": "object"
+          }
+        ],
+        "properties": {
+          "announcement_id": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "AnnouncementCompletion": {
+        "type": "object",
+        "properties": {
+          "announcement_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "fhdfhsdajfh"
+          },
+          "completed": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "Service": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "contact_email": {
+            "type": "string"
+          },
+          "day_of_week": {
+            "type": "string"
+          },
+          "start_time": {
+            "type": "string"
+          },
+          "end_time": {
+            "type": "string"
+          },
+          "service_ic_username": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "contact_number": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          },
+          "promotional_image": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "contact_email",
+          "day_of_week",
+          "start_time",
+          "end_time",
+          "service_ic_username"
+        ]
+      },
+      "CreateServiceSession": {
+        "type": "object",
+        "properties": {
+          "service_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "start_time": {
+            "type": "string",
+            "example": "2023-11-27T16:42:00.000Z"
+          },
+          "end_time": {
+            "type": "string",
+            "example": "2023-11-27T16:42:00.000Z"
+          },
+          "ad_hoc_enabled": {
+            "type": "boolean",
+            "example": true
+          }
+        }
+      },
+      "ServiceSession": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateServiceSession"
+          },
+          {
+            "type": "object"
+          }
+        ],
+        "properties": {
+          "service_session_id": {
+            "type": "integer",
+            "example": 1
+          }
+        }
+      },
+      "ServiceSessionUser": {
+        "type": "object",
+        "properties": {
+          "service_session_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "joe_biden"
+          },
+          "ad_hoc": {
+            "type": "boolean",
+            "example": true
+          },
+          "attended": {
+            "type": "string",
+            "enum": ["Attended", "Absent", "Valid Reason"]
+          },
+          "is_ic": {
+            "type": "boolean",
+            "example": false
           }
         }
       }
