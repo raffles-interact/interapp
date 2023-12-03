@@ -54,8 +54,9 @@ describe('API (user service)', async () => {
         .leftJoinAndSelect('user.user_permissions', 'user_permissions')
         .where('user.username = :username', { username: 'testuser' })
         .getOne();
+      if (!user) throw new Error('User not found');
       await appDataSource.manager.insert(UserPermission, {
-        user: user!,
+        user: user,
         username: 'testuser',
         permission_id: 4,
       });

@@ -54,13 +54,14 @@ describe('API (service session user)', async () => {
         .leftJoinAndSelect('user.user_permissions', 'user_permissions')
         .where('user.username = :username', { username: 'testuser' })
         .getOne();
+      if (!user) throw new Error('User not found');
       await appDataSource.manager.insert(UserPermission, {
-        user: user!,
+        user: user,
         username: 'testuser',
         permission_id: 2,
       });
       await appDataSource.manager.insert(UserPermission, {
-        user: user!,
+        user: user,
         username: 'testuser',
         permission_id: 4,
       });
@@ -72,7 +73,7 @@ describe('API (service session user)', async () => {
     }
 
     // create 2 services
-    const a = await fetch(`${API_URL}/service`, {
+    await fetch(`${API_URL}/service`, {
       method: 'POST',
       body: JSON.stringify({
         name: 'L bozo',

@@ -2,7 +2,6 @@ import { AnnouncementModel } from '@models/announcement';
 import { AuthModel } from '@models/auth';
 import { describe, expect, test, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
-import appDataSource from '@utils/init_datasource';
 
 describe('Unit (announcement)', () => {
   beforeAll(async () => {
