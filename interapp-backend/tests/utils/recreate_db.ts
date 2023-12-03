@@ -7,4 +7,6 @@ export const recreateDB = async () => {
   const queryRunner = appDataSource.createQueryRunner();
 
   await queryRunner.manager.query(`TRUNCATE ${tableNames} RESTART IDENTITY CASCADE;`);
+
+  await queryRunner.release();
 };
