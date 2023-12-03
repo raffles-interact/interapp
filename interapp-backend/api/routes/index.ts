@@ -30,7 +30,7 @@ app.use('/api/service', serviceRouter);
 app.use('/api/announcement', announcementRouter);
 
 app.use(handleError);
-app.use(generateRateLimit(1000 * 60 * 60, 500)); // 500 requests per hour
+process.env.NODE_ENV === 'production' && app.use(generateRateLimit(1000 * 60 * 60, 500)); // 500 requests per hour
 
 try {
   app.listen(PORT, () => console.log('Server running on port 8000!'));

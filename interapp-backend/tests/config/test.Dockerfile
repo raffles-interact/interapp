@@ -3,6 +3,7 @@ WORKDIR /app
 
 COPY  . . 
 
+ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH 0
 RUN bun install --frozen-lockfile
 
 EXPOSE 1234

@@ -25,7 +25,7 @@ jobs:
       - name: Install dependencies
         run: cd interapp-backend && bun install
       - name: Test with bun
-        run: cd interapp-backend && bun test --env-file tests/config/.env.test --coverage --timeout 10000
+        run: cd interapp-backend && bun run test
 
       - name: Tear down test environment
         run: docker compose -f docker-compose.test.yml down
