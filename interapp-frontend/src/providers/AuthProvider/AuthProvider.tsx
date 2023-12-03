@@ -16,12 +16,17 @@ export const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [justLoggedIn, setJustLoggedIn] = useState(false); // used to prevent redirecting to home page after login
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
     if (loading) return; // we dont know if user is logged in or not yet
+    if (justLoggedIn) {
+      setJustLoggedIn(false);
+      return;
+    }
 
     if (!user) {
       if (!noLoginRequiredRoutes.includes(pathname)) {
@@ -39,7 +44,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         message: 'You are already logged in. Redirecting to home page.',
         color: 'red',
       });
-      return router.replace('/');
+      router.replace('/');
+      return;
     }
 
     const userPermissions = user.permissions;
@@ -54,7 +60,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       message: 'You do not have permission to access this page',
       color: 'red',
     });
-    return router.replace('/');
+    router.replace('/');
+    return;
   }, [user, loading]);
 
   useEffect(() => {
@@ -87,6 +94,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.setItem('access_token', access_token);
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
+    setJustLoggedIn(true);
     router.refresh(); // invalidate browser cache
     return status;
   }, []);
