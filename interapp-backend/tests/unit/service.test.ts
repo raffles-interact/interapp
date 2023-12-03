@@ -1,9 +1,7 @@
-import { UserModel } from '@models/user';
 import { AuthModel } from '@models/auth';
 import { ServiceModel } from '@models/service';
 import { describe, expect, test, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
-import appDataSource from '@utils/init_datasource';
 import { AttendanceStatus } from '@db/entities';
 
 describe('Unit (service)', () => {

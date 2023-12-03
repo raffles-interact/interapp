@@ -46,7 +46,7 @@ describe('Unit (auth)', () => {
           email: 'dskjfklsjf@jfndcdfs',
           verified: false,
           service_hours: 0,
-          permissions: expect.any(Array<Number>),
+          permissions: expect.any(Array<number>),
         },
       });
     });
