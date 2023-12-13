@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ColorSchemeScript } from '@mantine/core';
+import Navbar from '@/components/Navbar/Navbar';
 
 import { AppProvider } from '@/providers';
 
@@ -18,7 +19,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ColorSchemeScript defaultColorScheme='auto' />
       </head>
       <body className={inter.className}>
-        <AppProvider>{children}</AppProvider>
+        <AppProvider>
+          <Navbar />
+          {children}
+        </AppProvider>
       </body>
     </html>
   );
