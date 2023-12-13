@@ -69,7 +69,7 @@ export default function LoginForm() {
   return (
     <div>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <TextInput label='Name' placeholder='Name' {...form.getInputProps('username')} />
+        <TextInput label='Username' placeholder='Username' {...form.getInputProps('username')} />
         <PasswordInput
           mt='sm'
           label='Password'
