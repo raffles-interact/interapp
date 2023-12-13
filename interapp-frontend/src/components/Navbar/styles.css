@@ -1,0 +1,6 @@
+.navbar {
+  backdrop-filter: blur(10px);
+  position: sticky;
+  padding: 0.6rem;
+  border-bottom: 1px solid var(--mantine-color-dark-0);
+}

@@ -1,0 +1,16 @@
+.navbar-notifications {
+  padding: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.navbar-notifications-icon {
+  width: 100%;
+  height: 100%;
+}
+
+.navbar-notifications:hover {
+  cursor: pointer;
+  background-color: var(--mantine-color-default-hover);
+  border-radius: 7px;
+}
