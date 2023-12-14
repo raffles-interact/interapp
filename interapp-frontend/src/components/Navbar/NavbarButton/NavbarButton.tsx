@@ -66,7 +66,7 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
   {
     name: 'Logout',
     callback: async () =>
-      logout()
+      await logout()
         .then((res) => {
           switch (res) {
             case 204:
@@ -106,8 +106,8 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
   },
   {
     name: 'Resend Verification Email',
-    callback: () =>
-      resendVerificationEmail()
+    callback: async () =>
+      await resendVerificationEmail()
         .then((res) => {
           switch (res) {
             case 204:
