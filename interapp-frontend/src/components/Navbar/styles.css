@@ -3,4 +3,6 @@
   position: sticky;
   padding: 0.6rem;
   border-bottom: 1px solid var(--mantine-color-dark-0);
+  margin-bottom: 2rem;
+  top: 0;
 }
