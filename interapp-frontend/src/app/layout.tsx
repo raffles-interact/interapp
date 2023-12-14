@@ -4,6 +4,7 @@ import { ColorSchemeScript } from '@mantine/core';
 import Navbar from '@/components/Navbar/Navbar';
 
 import { AppProvider } from '@/providers';
+import Footer from '@/components/Footer/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AppProvider>
           <Navbar />
           {children}
+          <Footer />
         </AppProvider>
       </body>
     </html>
