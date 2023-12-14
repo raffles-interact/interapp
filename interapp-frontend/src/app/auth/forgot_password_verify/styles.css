@@ -1,0 +1,14 @@
+.forgot-password-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  padding: 10%;
+}
+.forgot-password-new-password {
+  color: var(--mantine-color-blue-6);
+}

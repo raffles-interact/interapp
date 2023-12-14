@@ -1,6 +1,7 @@
 import LoginForm from './loginForm';
-import { Text, Title, Paper, Box, Anchor } from '@mantine/core';
+import { Text, Title, Paper, Box } from '@mantine/core';
 import Image from 'next/image';
+import Link from 'next/link';
 import './styles.css';
 
 export default function Login() {
@@ -21,7 +22,10 @@ export default function Login() {
       <Paper className='login-form-container' shadow='md'>
         <LoginForm />
         <Text className='login-form-already-member'>
-          Not a member? <Anchor href='/auth/signup'>Sign Up</Anchor>
+          Not a member? <Link href='/auth/signup'>Sign Up</Link>
+        </Text>
+        <Text className='login-form-forgot-password'>
+          Forgot your password? <Link href='/auth/forgot_password'>Reset Password</Link>
         </Text>
       </Paper>
     </div>
