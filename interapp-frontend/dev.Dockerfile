@@ -1,11 +1,10 @@
-FROM oven/bun:1.0.17-slim
+FROM oven/bun:1.0.18-slim
 WORKDIR /app
 
 COPY . .
 
 ENV NODE_ENV development
 ENV WATCHPACK_POLLING true
-ENV CHOKIDAR_USEPOLLING true
 RUN bun install --frozen-lockfile
 
 
