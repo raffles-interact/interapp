@@ -5,6 +5,7 @@ import { usePathname } from 'next/navigation';
 import {
   IconHome,
   IconLogin,
+  IconCheck,
   IconLogin2,
   IconSettings,
   IconUserSquare,
@@ -32,6 +33,11 @@ const getNavbarTitle = (pathname: string) => {
       return {
         title: 'Sign Up',
         Icon: IconLogin,
+      };
+    case '/auth/verify_email':
+      return {
+        title: 'Verify Email',
+        Icon: IconCheck,
       };
     default:
       return {
