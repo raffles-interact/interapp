@@ -10,6 +10,6 @@ const footer = () => {
       </Group>
     </footer>
   );
-}
+};
 
 export default memo(footer);

@@ -10,6 +10,7 @@ import {
   IconSpeakerphone,
   IconPlaylistAdd,
   IconMenu2,
+  IconMail,
   type TablerIconsProps,
 } from '@tabler/icons-react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
@@ -18,6 +19,7 @@ import { Permissions } from '@/app/route_permissions';
 import { Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
+import APIClient from '@/api/api_client';
 import './styles.css';
 
 export type NavbarCategories = 'Authentication' | 'Settings' | 'Administration' | 'General';
@@ -34,11 +36,12 @@ export type NavbarTab = {
 export type NavbarActions = {
   goTo: (href: string) => void;
   logout: () => Promise<number>;
+  resendVerificationEmail: () => Promise<number>;
 };
 
 const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarTab[] = (
   user,
-  { goTo, logout },
+  { goTo, logout, resendVerificationEmail },
 ) => [
   {
     name: 'Home',
@@ -63,34 +66,82 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
   {
     name: 'Logout',
     callback: async () =>
-      logout().then((res) => {
-        switch (res) {
-          case 204:
-            notifications.show({
-              title: 'Success!',
-              message: 'You have been logged out.',
-              color: 'green',
-            });
-            goTo('/');
-            break;
-          case 401:
-            notifications.show({
-              title: 'Error!',
-              message: 'You are not logged in.',
-              color: 'red',
-            });
-            break;
-          default:
-            notifications.show({
-              title: 'Error!',
-              message: 'Something went wrong.',
-              color: 'red',
-            });
-            break;
-        }
-      }),
+      logout()
+        .then((res) => {
+          switch (res) {
+            case 204:
+              notifications.show({
+                title: 'Success!',
+                message: 'You have been logged out.',
+                color: 'green',
+              });
+              goTo('/');
+              break;
+            case 401:
+              notifications.show({
+                title: 'Error!',
+                message: 'You are not logged in.',
+                color: 'red',
+              });
+              break;
+            default:
+              notifications.show({
+                title: 'Error!',
+                message: 'Something went wrong.',
+                color: 'red',
+              });
+              break;
+          }
+        })
+        .catch(() => {
+          notifications.show({
+            title: 'Error!',
+            message: 'Something went wrong.',
+            color: 'red',
+          });
+        }),
     icon: IconLogin2,
     show: !!user,
+    category: 'Authentication',
+  },
+  {
+    name: 'Resend Verification Email',
+    callback: () =>
+      resendVerificationEmail()
+        .then((res) => {
+          switch (res) {
+            case 204:
+              notifications.show({
+                title: 'Success!',
+                message: 'Verification email sent.',
+                color: 'green',
+              });
+              break;
+            case 400:
+              notifications.show({
+                title: 'Error!',
+                message: 'You are already verified.',
+                color: 'red',
+              });
+              break;
+            default:
+              notifications.show({
+                title: 'Error!',
+                message: 'Something went wrong.',
+                color: 'red',
+              });
+              break;
+          }
+        })
+        .catch(() => {
+          notifications.show({
+            title: 'Error!',
+            message: 'Something went wrong.',
+            color: 'red',
+          });
+        }),
+    icon: IconMail,
+    show: !!user && !user.verified && user.permissions.includes(Permissions.CLUB_MEMBER),
     category: 'Authentication',
   },
   {
@@ -133,7 +184,8 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
 const catagoriseTabs = (tabs: NavbarTab[]) => {
   const catagorisedTabs = tabs.reduce(
     (acc, tab) => {
-      if (!tab.show) {
+      if (tab.show === false) {
+        // if show is false, don't show the tab, because it could be undefined which means always show
         return acc;
       }
       if (acc[tab.category] === undefined) {
@@ -153,7 +205,17 @@ const NavbarButton = () => {
   const goTo = (href: string) => router.push(href);
 
   const { user, logout } = useContext(AuthContext);
-  const tabs = useMemo(() => generateNavbarTabs(user, { goTo, logout }), [user, goTo, logout]);
+  const apiClient = new APIClient().instance;
+  const resendVerificationEmail = useMemo(
+    () => async () =>
+      (await apiClient.post('/api/user/verify_email', { username: user?.username })).status,
+    [user],
+  );
+
+  const tabs = useMemo(
+    () => generateNavbarTabs(user, { goTo, logout, resendVerificationEmail }),
+    [user, goTo, logout],
+  );
   const catagorisedTabs = useMemo(() => catagoriseTabs(tabs), [tabs]);
 
   const [opened, setOpened] = useState(false);
