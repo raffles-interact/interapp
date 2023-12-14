@@ -1,10 +1,10 @@
-import { AccountDetails, LogInDetails, UserWithJWT } from '@/providers/AuthProvider/types';
 import axios, { AxiosInstance } from 'axios';
 
 export interface APIClientConfig {
   useClient?: boolean;
 }
 
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_AXIOS_BASE_URL as string;
 export class APIClient {
   public readonly instance: AxiosInstance;
   private readonly config: APIClientConfig;
@@ -13,7 +13,6 @@ export class APIClient {
       useClient: true,
     };
     this.instance = axios.create({
-      baseURL: process.env.AXIOS_BASE_URL as string,
       timeout: 10000,
       withCredentials: true,
       validateStatus: (status) => status < 500,

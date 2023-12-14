@@ -1,6 +1,6 @@
 'use client';
 
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, memo } from 'react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import APIClient from '@/api/api_client';
 import { Loader, Button } from '@mantine/core';
@@ -38,7 +38,7 @@ const VerifyStatus = ({ token }: { token: string }) => {
       };
     }
 
-    const res = await apiClient.patch('/api/user/verify', { token });
+    const res = await apiClient.patch('/user/verify', { token });
 
     switch (res.status) {
       case 204:
@@ -92,4 +92,4 @@ const VerifyStatus = ({ token }: { token: string }) => {
   );
 };
 
-export default VerifyStatus;
+export default memo(VerifyStatus);
