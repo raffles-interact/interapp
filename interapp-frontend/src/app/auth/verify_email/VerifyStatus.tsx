@@ -4,60 +4,77 @@ import { useContext, useState, useEffect } from 'react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import APIClient from '@/api/api_client';
 import { Loader, Button } from '@mantine/core';
-import { useRouter } from 'next/navigation';
 import GoHomeButton from '@/components/GoHomeButton/GoHomeButton';
+
+interface VerifyStatusResult {
+  message: string;
+  success: boolean;
+}
 
 const VerifyStatus = ({ token }: { token: string }) => {
   const { user, updateUser } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState('');
+  const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(true);
   const apiClient = new APIClient().instance;
-  const router = useRouter();
 
-  const handleUserVerify = () => {
-    setSuccess(false);
+  const handleUserVerify: () => Promise<VerifyStatusResult> = async () => {
     if (!user) {
-      setMessage('You must be logged in to verify your email!');
-      return;
+      return {
+        message: 'You must be logged in to verify your email!',
+        success: false,
+      };
     }
     if (!token) {
-      setMessage('No token provided!');
-      return;
+      return {
+        message: 'No token provided!',
+        success: false,
+      };
     }
     if (user.verified) {
-      setMessage('Your email is already verified!');
-      setSuccess(true);
-      return;
+      return {
+        message: `${user.email} has already been verified!`,
+        success: true,
+      };
     }
 
-    setLoading(true);
-    apiClient
-      .patch('/api/user/verify', { token })
-      .then((res) => {
-        switch (res.status) {
-          case 204:
-            updateUser({ ...user, verified: true });
-            setMessage(`${user.email} has been verified! Thanks for using Interapp.`);
-            setSuccess(true);
-            break;
-          case 401:
-            setMessage('Invalid token provided');
-            break;
-          default:
-            setMessage('Error verifying email');
-            break;
-        }
-      })
-      .catch(() => {
-        setMessage('Error verifying email');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
+    const res = await apiClient.patch('/api/user/verify', { token });
+
+    switch (res.status) {
+      case 204:
+        updateUser({ ...user, verified: true });
+        return {
+          message: `${user.email} has been verified!`,
+          success: true,
+        };
+      case 401:
+        return {
+          message: 'Invalid token provided.',
+          success: false,
+        };
+      case 404:
+        return {
+          message: 'User not found.',
+          success: false,
+        };
+      default:
+        return {
+          message: 'An unknown error occurred.',
+          success: false,
+        };
+    }
   };
 
-  useEffect(handleUserVerify, []);
+  const handleUpdateVerifyStatus = () => {
+    setLoading(true);
+    handleUserVerify().then(({ message, success }) => {
+      setMessage(message);
+      setSuccess(success);
+    });
+    setLoading(false);
+  };
+
+  useEffect(handleUpdateVerifyStatus, []);
 
   return (
     <>
@@ -66,7 +83,7 @@ const VerifyStatus = ({ token }: { token: string }) => {
         <GoHomeButton />
       ) : (
         !loading && (
-          <Button onClick={handleUserVerify} variant='outline' color='red'>
+          <Button onClick={handleUpdateVerifyStatus} variant='outline' color='red'>
             Retry
           </Button>
         )
