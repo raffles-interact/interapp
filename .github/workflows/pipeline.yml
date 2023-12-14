@@ -1,4 +1,4 @@
-name: Tests
+name: Pipeline
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-backend:
+  test-backend:
     runs-on: ubuntu-latest
 
     steps:
@@ -30,7 +30,7 @@ jobs:
       - name: Tear down test environment
         run: docker compose -f docker-compose.test.yml down
   
-  build-frontend:
+  build-application:
     runs-on: ubuntu-latest
 
     steps:
