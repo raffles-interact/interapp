@@ -5,10 +5,11 @@ import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import APIClient from '@/api/api_client';
 import { Loader, Button } from '@mantine/core';
 import { useRouter } from 'next/navigation';
+import GoHomeButton from '@/components/GoHomeButton/GoHomeButton';
 
 const VerifyStatus = ({ token }: { token: string }) => {
   const { user, updateUser } = useContext(AuthContext);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [success, setSuccess] = useState(false);
   const [message, setMessage] = useState('');
   const apiClient = new APIClient().instance;
@@ -56,17 +57,13 @@ const VerifyStatus = ({ token }: { token: string }) => {
       });
   };
 
-  useEffect(() => {
-    handleUserVerify();
-  }, []);
+  useEffect(handleUserVerify, []);
 
   return (
     <>
       {loading ? <Loader /> : message}
       {success ? (
-        <Button onClick={() => router.push('/')} variant='outline' color='green'>
-          Go Home
-        </Button>
+        <GoHomeButton />
       ) : (
         !loading && (
           <Button onClick={handleUserVerify} variant='outline' color='red'>
