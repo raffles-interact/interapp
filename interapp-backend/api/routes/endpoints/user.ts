@@ -33,6 +33,24 @@ userRouter.patch('/password/reset', validateRequiredFields(['token']), async (re
   });
 });
 
+userRouter.patch(
+  '/change_email',
+  validateRequiredFields(['new_email']),
+  verifyJWT,
+  async (req, res) => {
+    const emailRegex = new RegExp(process.env.SCHOOL_EMAIL_REGEX as string);
+    if (emailRegex.test(req.body.new_email)) {
+      throw new HTTPError(
+        'Invalid email',
+        'Email cannot be a valid school email',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    await UserModel.changeEmail(req.headers.username as string, req.body.new_email);
+    res.status(204).send();
+  },
+);
+
 userRouter.post(
   '/verify_email',
   validateRequiredFields(['username']),

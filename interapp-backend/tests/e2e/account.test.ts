@@ -45,6 +45,28 @@ describe('API (account)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('change email', async () => {
+    const res = await fetch(`${API_URL}/user/change_email`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        new_email: 'new_email@new_email.com',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('change email to school email', async () => {
+    const res = await fetch(`${API_URL}/user/change_email`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        new_email: 'new_email@rafflesgirlssch.edu.sg',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(400);
+  });
+
   test('attempt to bypass role restrictions', async () => {
     // testuser should not have admin permissions
     const res = await fetch(`${API_URL}/user/permissions`, {
@@ -175,7 +197,7 @@ describe('API (account)', async () => {
       user: {
         user_id: 1,
         username: 'testuser',
-        email: 'test@example.com',
+        email: 'new_email@new_email.com',
         verified: false,
         service_hours: 0,
         permissions: [0, 6],
