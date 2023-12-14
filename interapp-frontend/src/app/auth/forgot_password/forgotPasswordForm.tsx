@@ -48,7 +48,7 @@ export default function ForgotPasswordForm() {
   };
 
   const handleSubmit = async (values: ForgotPasswordProps) => {
-    const status = (await apiClient.post('/api/user/password/reset_email', values)).status;
+    const status = (await apiClient.post('/user/password/reset_email', values)).status;
     handleSubmitStatus(status);
   };
 

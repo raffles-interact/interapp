@@ -193,7 +193,7 @@ const NavbarButton = () => {
   const apiClient = new APIClient().instance;
   const resendVerificationEmail = useMemo(
     () => async () =>
-      (await apiClient.post('/api/user/verify_email', { username: user?.username })).status,
+      (await apiClient.post('/user/verify_email', { username: user?.username })).status,
     [user],
   );
 

@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (expired && access_token) {
       apiClient
-        .post('/api/auth/refresh')
+        .post('/auth/refresh')
         .then((res) => {
           localStorage.setItem(
             'access_token',
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const login = useCallback(async (details: LogInDetails) => {
     const { data, status }: { data: UserWithJWT; status: number } = await apiClient.post(
-      '/api/auth/signin',
+      '/auth/signin',
       JSON.stringify({ ...details }),
     );
     const { access_token, expire, user } = data;
@@ -114,7 +114,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const logout = useCallback(async () => {
-    const status = (await apiClient.delete('/api/auth/signout')).status;
+    const status = (await apiClient.delete('/auth/signout')).status;
     if (status !== 204) return status;
     setUser(null);
     localStorage.removeItem('user');
@@ -130,7 +130,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const registerUserAccount = useCallback(async (accountDetails: AccountDetails) => {
-    const status = (await apiClient.post('/api/auth/signup', JSON.stringify(accountDetails)))
+    const status = (await apiClient.post('/auth/signup', JSON.stringify(accountDetails)))
       .status;
     return status;
   }, []);
