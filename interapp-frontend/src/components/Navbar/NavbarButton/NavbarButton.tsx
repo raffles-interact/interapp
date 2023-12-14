@@ -27,7 +27,7 @@ const NavbarCategories = ['Authentication', 'Settings', 'Administration', 'Gener
 
 export type NavbarTab = {
   name: string;
-  callback: () => void;
+  callback: (() => void) | (() => Promise<void>);
   icon: (props: TablerIconsProps) => JSX.Element;
   category: NavbarCategories;
   show?: boolean;
