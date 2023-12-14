@@ -165,9 +165,8 @@ export class UserModel {
       subject: 'Reset Password from Interapp',
       template: 'reset_password',
       context: {
-        token: token,
         username: username,
-        url: 'localhost:3000', //TODO
+        url: process.env.FRONTEND_URL as string + '/auth/forgot_password_verify?token=' + token,
       },
     };
 
