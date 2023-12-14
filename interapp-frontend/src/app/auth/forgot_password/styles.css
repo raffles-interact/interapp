@@ -1,8 +1,8 @@
-.login-page {
+.forgot-password-page {
   margin: 7%;
 }
 
-.login-headers {
+.forgot-password-headers {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -11,49 +11,49 @@
   padding: 0 3rem;
   gap: 2rem;
 }
-.login-headers-text {
+.forgot-password-headers-text {
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: 1rem;
 }
 
-.login-logo {
+.forgot-password-logo {
   width: min(20%, 7rem);
   position: relative;
   aspect-ratio: 1/1;
 }
 
-.login-form-container {
+.forgot-password-form-container {
   display: flex;
   flex-direction: column;
   margin: 0 3rem;
   padding: 2%;
   gap: 1rem;
 }
-.login-form-already-member {
+.forgot-password-form-already-member {
   align-self: center;
 }
-.login-form-forgot-password {
+.forgot-password-form-forgot-password {
   align-self: center;
 }
 
 @media screen and (max-width: 48em) {
-  .login-page {
+  .forgot-password-page {
     margin: 3%;
   }
-  .login-headers {
+  .forgot-password-headers {
     flex-direction: column;
     margin: 0;
     padding: 0 1rem;
   }
-  .login-headers-text {
+  .forgot-password-headers-text {
     margin-bottom: 2%;
   }
-  .login-logo {
+  .forgot-password-logo {
     margin-bottom: 2%;
   }
-  .login-form-container {
+  .forgot-password-form-container {
     margin: 0;
   }
 }
