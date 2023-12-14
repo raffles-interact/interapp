@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   description: 'Raffles Interact web application',
   referrer: 'origin-when-cross-origin',
   keywords: ['Next.js', 'React', 'TypeScript', 'Mantine', 'Interact'],
-  viewport: 'width=device-width, initial-scale=1',
   authors: [{ name: 'Raffles Interact' }],
 };
 
