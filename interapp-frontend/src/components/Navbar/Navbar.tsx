@@ -6,8 +6,8 @@ import './styles.css';
 
 const Navbar = () => {
   return (
-    <nav>
-      <Group className='navbar' justify='space-between'>
+    <nav className='navbar'>
+      <Group justify='space-between'>
         <NavbarButton />
         <NavbarTitle />
         <NavbarNotifications />
