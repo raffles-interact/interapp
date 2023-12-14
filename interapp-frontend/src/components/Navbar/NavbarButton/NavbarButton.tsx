@@ -65,81 +65,66 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
   },
   {
     name: 'Logout',
-    callback: async () =>
-      await logout()
-        .then((res) => {
-          switch (res) {
-            case 204:
-              notifications.show({
-                title: 'Success!',
-                message: 'You have been logged out.',
-                color: 'green',
-              });
-              goTo('/');
-              break;
-            case 401:
-              notifications.show({
-                title: 'Error!',
-                message: 'You are not logged in.',
-                color: 'red',
-              });
-              break;
-            default:
-              notifications.show({
-                title: 'Error!',
-                message: 'Something went wrong.',
-                color: 'red',
-              });
-              break;
-          }
-        })
-        .catch(() => {
+    callback: async () => {
+      const res = await logout();
+      switch (res) {
+        case 204:
+          notifications.show({
+            title: 'Success!',
+            message: 'You have been logged out.',
+            color: 'green',
+          });
+          goTo('/');
+          break;
+        case 401:
+          notifications.show({
+            title: 'Error!',
+            message: 'You are not logged in.',
+            color: 'red',
+          });
+          break;
+        default:
           notifications.show({
             title: 'Error!',
             message: 'Something went wrong.',
             color: 'red',
           });
-        }),
+          break;
+      }
+    },
+
     icon: IconLogin2,
     show: !!user,
     category: 'Authentication',
   },
   {
     name: 'Resend Verification Email',
-    callback: async () =>
-      await resendVerificationEmail()
-        .then((res) => {
-          switch (res) {
-            case 204:
-              notifications.show({
-                title: 'Success!',
-                message: 'Verification email sent.',
-                color: 'green',
-              });
-              break;
-            case 400:
-              notifications.show({
-                title: 'Error!',
-                message: 'You are already verified.',
-                color: 'red',
-              });
-              break;
-            default:
-              notifications.show({
-                title: 'Error!',
-                message: 'Something went wrong.',
-                color: 'red',
-              });
-              break;
-          }
-        })
-        .catch(() => {
+    callback: async () => {
+      const res = await resendVerificationEmail();
+      switch (res) {
+        case 204:
+          notifications.show({
+            title: 'Success!',
+            message: 'Verification email sent.',
+            color: 'green',
+          });
+          break;
+        case 400:
+          notifications.show({
+            title: 'Error!',
+            message: 'You are already verified.',
+            color: 'red',
+          });
+          break;
+        default:
           notifications.show({
             title: 'Error!',
             message: 'Something went wrong.',
             color: 'red',
           });
-        }),
+          break;
+      }
+    },
     icon: IconMail,
     show: !!user && !user.verified && user.permissions.includes(Permissions.CLUB_MEMBER),
     category: 'Authentication',
