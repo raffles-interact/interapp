@@ -28,6 +28,25 @@ export class UserModel {
     }
     return user;
   }
+  public static async changeEmail(username: string, new_email: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user.username', 'user.email'])
+      .from(User, 'user')
+      .where('user.username = :username', { username: username })
+      .getOne();
+
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    user.email = new_email;
+    await appDataSource.manager.update(User, { username: username }, user);
+  }
   public static async changePassword(username: string, old_password: string, new_password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()

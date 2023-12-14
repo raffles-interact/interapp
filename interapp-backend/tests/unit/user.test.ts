@@ -36,6 +36,12 @@ describe('Unit (user)', () => {
     expect(user).toMatchObject(User);
   });
 
+  test('change email', async () => {
+    await UserModel.changeEmail('testuser', 'newemail@newemail');
+    const user = await UserModel.getUser('testuser');
+    expect(user.email).toBe('newemail@newemail');
+  });
+
   test('change password', async () => {
     await UserModel.changePassword('testuser', 'password', 'newpassword');
     // attempt to sign in with old password
@@ -123,7 +129,7 @@ describe('Unit (user)', () => {
     expect((await UserModel.getAllUsersByService(1))[0]).toMatchObject({
       user_id: 1,
       username: 'testuser',
-      email: 'safjsakdj@jfkljlfa',
+      email: 'newemail@newemail',
       verified: true,
       service_hours: 0,
     });
