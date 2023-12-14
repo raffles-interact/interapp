@@ -1,6 +1,13 @@
 import { createContext, useEffect, useMemo, useState, useCallback } from 'react';
-import { AuthProviderProps, LogInDetails, AccountDetails, User, AuthContextType } from './types';
-import axiosClient from '@api/api_client';
+import {
+  AuthProviderProps,
+  LogInDetails,
+  AccountDetails,
+  User,
+  AuthContextType,
+  UserWithJWT,
+} from './types';
+import APIClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
 import { RoutePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
@@ -20,6 +27,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const apiClient = useMemo(() => new APIClient().instance, []);
 
   useEffect(() => {
     if (loading) return; // we dont know if user is logged in or not yet
@@ -73,10 +81,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const expired = Number(localStorage.getItem('access_token_expire')) < Date.now();
 
     if (expired && access_token) {
-      axiosClient
-        .refreshAccessToken()
+      apiClient
+        .post('/api/auth/refresh')
         .then((res) => {
-          localStorage.setItem('access_token', res.access_token);
+          localStorage.setItem(
+            'access_token',
+            (res.data as Omit<UserWithJWT, 'user'>).access_token,
+          );
         })
         .catch(logout);
     }
@@ -85,7 +96,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const login = useCallback(async (details: LogInDetails) => {
-    const { data, status } = await axiosClient.signIn(details);
+    const { data, status }: { data: UserWithJWT; status: number } = await apiClient.post(
+      '/api/auth/signin',
+      JSON.stringify({ ...details }),
+    );
     const { access_token, expire, user } = data;
 
     if (status !== 200) return status;
@@ -100,7 +114,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const logout = useCallback(async () => {
-    const status = await axiosClient.signOut();
+    const status = (await apiClient.delete('/api/auth/signout')).status;
+    if (status !== 204) return status;
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
@@ -115,7 +130,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const registerUserAccount = useCallback(async (accountDetails: AccountDetails) => {
-    const status = await axiosClient.signUp(accountDetails);
+    const status = (await apiClient.post('/api/auth/signup', JSON.stringify(accountDetails)))
+      .status;
     return status;
   }, []);
 

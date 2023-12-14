@@ -12,7 +12,7 @@ export const noLoginRequiredRoutes = ['/', '/auth/login', '/auth/signup', '/forg
 
 export const RoutePermissions = {
   [Permissions.VISTOR]: ['/'],
-  [Permissions.CLUB_MEMBER]: ['/', '/protected'],
+  [Permissions.CLUB_MEMBER]: ['/', '/protected', '/auth/verify_email'],
   [Permissions.SERVICE_IC]: ['/'],
   [Permissions.MENTORSHIP_IC]: ['/'],
   [Permissions.EXCO]: ['/'],
