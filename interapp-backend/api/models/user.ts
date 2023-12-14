@@ -245,9 +245,8 @@ export class UserModel {
       subject: 'Verify Email from Interapp',
       template: 'verify_email',
       context: {
-        token: token,
         username: username,
-        url: 'localhost:3000', //TODO
+        url: process.env.FRONTEND_URL as string + '/auth/verify_email?token=' + token,
       },
     };
 
