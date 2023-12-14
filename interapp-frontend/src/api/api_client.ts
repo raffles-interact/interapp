@@ -9,7 +9,7 @@ export class APIClient {
   public readonly instance: AxiosInstance;
   private readonly config: APIClientConfig;
   public constructor(config?: APIClientConfig) {
-    this.config = config || {
+    this.config = config ?? {
       useClient: true,
     };
     this.instance = axios.create({
