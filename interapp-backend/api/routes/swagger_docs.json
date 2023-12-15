@@ -199,6 +199,80 @@
         }
       }
     },
+    "/user": {
+      "get": {
+        "tags": ["user"],
+        "summary": "get all user's info",
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "username": {
+                        "type": "string",
+                        "example": "joe"
+                      },
+                      "user_id": {
+                        "type": "integer",
+                        "example": 123
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "dfjsldkj2@gmail.com"
+                      },
+                      "verified": {
+                        "type": "boolean",
+                        "example": true
+                      },
+                      "service_hours": {
+                        "type": "integer",
+                        "example": 31
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/user/change_email": {
+      "patch": {
+        "tags": ["user"],
+        "summary": "change email of a user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "new_email": {
+                    "type": "string",
+                    "example": "fsalfkj@gmail.com"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "successful operation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
     "/user/password/change": {
       "patch": {
         "tags": ["user"],
@@ -421,6 +495,46 @@
           },
           "401": {
             "description": "Invalid token"
+          }
+        }
+      },
+      "get": {
+        "tags": ["user"],
+        "summary": "Get user permissions",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "username to look for",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "username": {
+                      "type": "string",
+                      "example": "joe"
+                    },
+                    "permissions": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "example": 0
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }
         }
       }
