@@ -135,6 +135,30 @@ describe('API (account)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('add service hours', async () => {
+    const res = await fetch(`${API_URL}/user/service_hours`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser',
+        hours: 10,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('add service hours (non-existant)', async () => {
+    const res = await fetch(`${API_URL}/user/service_hours`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'nonexistant',
+        hours: 10,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(404);
+  });
+
   test('create a new user', async () => {
     await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
@@ -253,7 +277,7 @@ describe('API (account)', async () => {
         username: 'testuser',
         email: 'new_email@new_email.com',
         verified: false,
-        service_hours: 0,
+        service_hours: 10,
         permissions: [0, 6],
       },
       expire: expect.any(Number),
