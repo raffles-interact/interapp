@@ -6,6 +6,7 @@ import {
   IconHome,
   IconLogin,
   IconCheck,
+  IconPasswordUser,
   IconLogin2,
   IconSettings,
   IconUserSquare,
@@ -17,7 +18,7 @@ import {
 } from '@tabler/icons-react';
 import { Group, Text } from '@mantine/core';
 
-const getNavbarTitle = (pathname: string) => {
+export const getNavbarTitle = (pathname: string) => {
   switch (pathname) {
     case '/':
       return {
@@ -38,6 +39,21 @@ const getNavbarTitle = (pathname: string) => {
       return {
         title: 'Verify Email',
         Icon: IconCheck,
+      };
+    case '/auth/forgot_password':
+      return {
+        title: 'Forgot Password',
+        Icon: IconPasswordUser,
+      };
+    case '/auth/forgot_password_verify':
+      return {
+        title: 'Forgot Password Verify',
+        Icon: IconPasswordUser,
+      };
+    case '/settings':
+      return {
+        title: 'Settings',
+        Icon: IconSettings,
       };
     default:
       return {

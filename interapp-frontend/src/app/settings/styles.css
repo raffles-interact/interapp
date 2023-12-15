@@ -1,0 +1,14 @@
+
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin: 0 auto;
+  gap: 2vh;
+  padding: 5%;
+}
+
+.settings-divider {
+  border: 1px solid var(--mantine-color-dark-6);
+  width: 100%;
+}
