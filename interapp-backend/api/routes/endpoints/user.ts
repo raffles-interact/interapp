@@ -6,6 +6,11 @@ import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
+userRouter.get('/', verifyJWT, verifyRequiredRole(Permissions.ADMIN), async (req, res) => {
+  const users = await UserModel.getAllUsers();
+  res.status(200).send(users);
+});
+
 userRouter.patch(
   '/password/change',
   validateRequiredFields(['old_password', 'new_password']),
@@ -92,6 +97,18 @@ userRouter.patch(
     }
     await UserModel.updatePermissions(req.body.username, req.body.permissions);
     res.status(204).send();
+  },
+);
+
+userRouter.get(
+  '/permissions',
+  validateRequiredFields([], ['username']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.ADMIN),
+  async (req, res) => {
+    const username = req.query.username as string | undefined;
+    const permissions = await UserModel.getPermissions(username);
+    res.status(200).send(permissions);
   },
 );
 

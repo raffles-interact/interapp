@@ -28,6 +28,27 @@ export class UserModel {
     }
     return user;
   }
+  public static async getAllUsers() {
+    const users = await appDataSource.manager
+      .createQueryBuilder()
+      .select([
+        'user.username',
+        'user.email',
+        'user.verified',
+        'user.user_id',
+        'user.service_hours',
+      ])
+      .from(User, 'user')
+      .getMany();
+    return users as Omit<
+      User,
+      | 'password_hash'
+      | 'refresh_token'
+      | 'user_permissions'
+      | 'user_services'
+      | 'service_session_users'
+    >[];
+  }
   public static async changeEmail(username: string, new_email: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
@@ -274,6 +295,29 @@ export class UserModel {
     await appDataSource.manager.insert(
       UserPermission,
       permissions.map((perm) => ({ username, permission_id: perm, user })),
+    );
+  }
+  public static async getPermissions(username?: string) {
+    const perms = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user_permissions'])
+      .from(UserPermission, 'user_permissions')
+      .where(username ? 'user_permissions.username = :username' : '1=1', { username })
+      .getMany();
+    if (perms.length === 0) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return perms.reduce(
+      (acc, perm) => {
+        if (!acc[perm.username]) acc[perm.username] = [];
+        acc[perm.username].push(perm.permission_id);
+        return acc;
+      },
+      {} as Record<string, number[]>,
     );
   }
   public static async getAllServicesByUser(username: string) {

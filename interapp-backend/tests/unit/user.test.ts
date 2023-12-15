@@ -160,6 +160,27 @@ describe('Unit (user)', () => {
     );
   });
 
+  test('get all users', async () => {
+    const users = await UserModel.getAllUsers();
+    expect(users).toBeArray();
+    expect(users).toHaveLength(2);
+  });
+
+  test('get permissions of all users', async () => {
+    const perms = await UserModel.getPermissions();
+    expect(perms).toMatchObject({
+      testuser: [0, 1],
+      testuser2: [0],
+    });
+  });
+
+  test('get permissions of user', async () => {
+    const perms = await UserModel.getPermissions('testuser');
+    expect(perms).toMatchObject({
+      testuser: [0, 1],
+    });
+  });
+
   afterAll(async () => {
     await recreateDB();
   });
