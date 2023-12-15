@@ -45,7 +45,7 @@ userRouter.patch(
   async (req, res) => {
     if (req.body.username) {
       // we are changing someone else's email
-      const perms = await UserModel.checkPermissions(req.body.username);
+      const perms = await UserModel.checkPermissions(req.headers.username as string);
       if (!perms.includes(Permissions.ADMIN)) {
         throw new HTTPError(
           'Insufficient permissions',
