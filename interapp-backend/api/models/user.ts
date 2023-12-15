@@ -166,7 +166,7 @@ export class UserModel {
       template: 'reset_password',
       context: {
         username: username,
-        url: process.env.FRONTEND_URL as string + '/auth/forgot_password_verify?token=' + token,
+        url: (process.env.FRONTEND_URL as string) + '/auth/forgot_password_verify?token=' + token,
       },
     };
 
@@ -245,7 +245,7 @@ export class UserModel {
       template: 'verify_email',
       context: {
         username: username,
-        url: process.env.FRONTEND_URL as string + '/auth/verify_email?token=' + token,
+        url: (process.env.FRONTEND_URL as string) + '/auth/verify_email?token=' + token,
       },
     };
 
