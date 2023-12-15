@@ -40,9 +40,21 @@ userRouter.patch('/password/reset', validateRequiredFields(['token']), async (re
 
 userRouter.patch(
   '/change_email',
-  validateRequiredFields(['new_email']),
+  validateRequiredFields(['new_email'], ['username']),
   verifyJWT,
   async (req, res) => {
+    if (req.body.username) {
+      // we are changing someone else's email
+      const perms = await UserModel.checkPermissions(req.body.username);
+      if (!perms.includes(Permissions.ADMIN)) {
+        throw new HTTPError(
+          'Insufficient permissions',
+          "Only admins can change other users' emails",
+          HTTPErrorCode.UNAUTHORIZED_ERROR,
+        );
+      }
+    }
+    const username = req.body.username ?? req.headers.username;
     const emailRegex = new RegExp(process.env.SCHOOL_EMAIL_REGEX as string);
     if (emailRegex.test(req.body.new_email)) {
       throw new HTTPError(
@@ -51,7 +63,7 @@ userRouter.patch(
         HTTPErrorCode.BAD_REQUEST_ERROR,
       );
     }
-    await UserModel.changeEmail(req.headers.username as string, req.body.new_email);
+    await UserModel.changeEmail(username, req.body.new_email);
     res.status(204).send();
   },
 );
