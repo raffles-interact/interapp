@@ -18,10 +18,10 @@ export const noLoginRequiredRoutes = [
 
 export const RoutePermissions = {
   [Permissions.VISTOR]: ['/'],
-  [Permissions.CLUB_MEMBER]: ['/', '/protected', '/auth/verify_email'],
+  [Permissions.CLUB_MEMBER]: ['/', '/auth/verify_email'],
   [Permissions.SERVICE_IC]: ['/'],
   [Permissions.MENTORSHIP_IC]: ['/'],
-  [Permissions.EXCO]: ['/'],
+  [Permissions.EXCO]: ['/', '/exco'],
   [Permissions.ATTENDANCE_MANAGER]: ['/'],
-  [Permissions.ADMIN]: ['/'],
+  [Permissions.ADMIN]: ['/', '/admin'],
 };

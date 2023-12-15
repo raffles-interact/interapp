@@ -130,10 +130,17 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
     category: 'Authentication',
   },
   {
-    name: 'Admin',
+    name: 'Admin Dashboard',
     callback: () => goTo('/admin'),
     icon: IconTableOptions,
     show: !!user && user.permissions.includes(Permissions.ADMIN),
+    category: 'Administration',
+  },
+  {
+    name: 'EXCO Dashboard',
+    callback: () => goTo('/exco'),
+    icon: IconTableOptions,
+    show: !!user && user.permissions.includes(Permissions.EXCO),
     category: 'Administration',
   },
   {
