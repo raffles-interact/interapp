@@ -66,6 +66,7 @@ export class UserModel {
     }
 
     user.email = new_email;
+    user.verified = false;
     await appDataSource.manager.update(User, { username: username }, user);
   }
   public static async changePassword(username: string, old_password: string, new_password: string) {

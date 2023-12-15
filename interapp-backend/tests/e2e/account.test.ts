@@ -123,6 +123,18 @@ describe('API (account)', async () => {
       .getMany();
   });
 
+  test('change email (admin)', async () => {
+    const res = await fetch(`${API_URL}/user/change_email`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser',
+        new_email: 'new_email@new_email.com',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
   test('create a new user', async () => {
     await fetch(`${API_URL}/auth/signup`, {
       method: 'POST',
