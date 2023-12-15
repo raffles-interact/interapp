@@ -160,6 +160,48 @@ describe('API (account)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('get all users', async () => {
+    const res = await fetch(`${API_URL}/user`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const response_as_json = (await res.json()) as Object;
+    expect(response_as_json).toBeArray();
+    expect(response_as_json).toHaveLength(2);
+  });
+
+  test('get user permissions', async () => {
+    const res = await fetch(`${API_URL}/user/permissions?username=testuser`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      testuser: [0, 6],
+    });
+  });
+
+  test('get user permissions (non-existant)', async () => {
+    const res = await fetch(`${API_URL}/user/permissions?username=nonexistant`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(404);
+  });
+
+  test('get all user permissions', async () => {
+    const res = await fetch(`${API_URL}/user/permissions`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      testuser: [0, 6],
+      testuser2: [0, 6],
+    });
+  });
+
   //test logout
   test('logout', async () => {
     const res = await fetch(`${API_URL}/auth/signout`, {
