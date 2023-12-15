@@ -155,4 +155,15 @@ userRouter.delete(
     res.status(204).send();
   },
 );
+
+userRouter.patch(
+  '/service_hours',
+  verifyJWT,
+  verifyRequiredRole(Permissions.ADMIN),
+  validateRequiredFields(['username', 'hours']),
+  async (req, res) => {
+    await UserModel.updateServiceHours(req.body.username, req.body.hours);
+    res.status(204).send();
+  },
+);
 export default userRouter;

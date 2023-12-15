@@ -420,4 +420,20 @@ export class UserModel {
   public static async removeServiceUser(service_id: number, username: string) {
     await appDataSource.manager.delete(UserService, { service_id, username });
   }
+  public static async updateServiceHours(username: string, hours: number) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!user)
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    user.service_hours = hours;
+    await appDataSource.manager.update(User, { username }, user);
+  }
 }

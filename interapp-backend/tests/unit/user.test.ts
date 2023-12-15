@@ -181,6 +181,17 @@ describe('Unit (user)', () => {
     });
   });
 
+  test('add service hours', async () => {
+    await UserModel.updateServiceHours('testuser', 10);
+    const user = await UserModel.getUser('testuser');
+    expect(user.service_hours).toBe(10);
+  });
+
+  test('add service hours with invalid user', async () => {
+    await expect(async () => await UserModel.updateServiceHours('invaliduser', 10)).toThrow(
+      'The user with username invaliduser was not found in the database',
+    );
+  });
   afterAll(async () => {
     await recreateDB();
   });
