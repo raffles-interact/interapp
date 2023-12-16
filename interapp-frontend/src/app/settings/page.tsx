@@ -1,5 +1,6 @@
 import { Text, Title } from '@mantine/core';
-
+import ChangeEmail from './ChangeEmail/ChangeEmail';
+import ChangePassword from './ChangePassword/ChangePassword';
 import './styles.css';
 
 export default function SettingsPage() {
@@ -11,17 +12,15 @@ export default function SettingsPage() {
       </div>
 
       <hr className='settings-divider' />
-      <section className='account' id='account'>
+      <section className='settings-account'>
         <div>
           <Title order={2}>Account</Title>
-          <Text>Update your account details here!</Text>
+          <Text>Update your account.</Text>
         </div>
 
         <div className='account-container'>
-          <Text className='description bold'>Change Email</Text>
-          <p>Not Implemented</p> {/*TODO*/}
-          <Text className='description bold'>Change Password</Text>
-          <p>Not Implemented</p> {/*TODO*/}
+          <ChangeEmail />
+          <ChangePassword />
         </div>
       </section>
     </div>

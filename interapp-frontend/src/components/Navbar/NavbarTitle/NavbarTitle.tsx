@@ -56,10 +56,10 @@ export const getNavbarTitle = (pathname: string) => {
         Icon: IconSettings,
       };
     case '/admin':
-        return {
-          title: 'Admin Page',
-          Icon: IconRadioactive,
-        };
+      return {
+        title: 'Admin Page',
+        Icon: IconRadioactive,
+      };
     default:
       return {
         title: 'Page Not Found',

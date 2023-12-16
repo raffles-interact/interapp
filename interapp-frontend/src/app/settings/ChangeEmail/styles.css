@@ -1,0 +1,38 @@
+.change-email-container {
+  overflow-x: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.change-email-container::-webkit-scrollbar {
+  display: none;
+}
+.change-email-form {
+  margin: 1rem 0;
+  display: grid;
+  grid-template-columns: 0.2fr auto;
+  row-gap: 1rem;
+  column-gap: 0.7rem;
+  align-items: center;
+}
+
+.change-email-form-label {
+  font-weight: bold;
+}
+
+.change-email-verified {
+  color: green;
+}
+
+.change-email-unverified {
+  color: red;
+}
+
+.change-email-email {
+  text-overflow: ellipsis;
+}
+
+.change-email-button-container {
+  display: flex;
+  justify-content: center;
+}
