@@ -11,6 +11,17 @@ userRouter.get('/', verifyJWT, verifyRequiredRole(Permissions.ADMIN), async (req
   res.status(200).send(users);
 });
 
+userRouter.delete(
+  '/',
+  validateRequiredFields(['username']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.ADMIN),
+  async (req, res) => {
+    await UserModel.deleteUser(req.body.username as string);
+    res.status(204).send();
+  },
+);
+
 userRouter.patch(
   '/password/change',
   validateRequiredFields(['old_password', 'new_password']),

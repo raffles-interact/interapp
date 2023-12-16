@@ -192,6 +192,13 @@ describe('Unit (user)', () => {
       'The user with username invaliduser was not found in the database',
     );
   });
+
+  test('delete user', async () => {
+    await UserModel.deleteUser('testuser');
+    await expect(async () => await UserModel.getUser('testuser')).toThrow(
+      'The user with username testuser was not found in the database',
+    );
+  });
   afterAll(async () => {
     await recreateDB();
   });

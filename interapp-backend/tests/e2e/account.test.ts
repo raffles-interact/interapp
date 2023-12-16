@@ -238,6 +238,17 @@ describe('API (account)', async () => {
     });
   });
 
+  test('delete user', async () => {
+    const res = await fetch(`${API_URL}/user`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        username: 'testuser2',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
   //test logout
   test('logout', async () => {
     const res = await fetch(`${API_URL}/auth/signout`, {
