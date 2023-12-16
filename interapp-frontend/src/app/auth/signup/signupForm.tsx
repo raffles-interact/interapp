@@ -1,6 +1,6 @@
 'use client';
 import { TextInput, NumberInput, PasswordInput, Button, Group } from '@mantine/core';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -16,6 +16,7 @@ interface SignUpFormProps {
 
 export default function SignUpForm() {
   const { registerUserAccount } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const form = useForm<SignUpFormProps>({
     initialValues: {
@@ -78,12 +79,14 @@ export default function SignUpForm() {
   };
 
   const handleSubmit = async (values: SignUpFormProps) => {
+    setLoading(true);
     registerUserAccount({
       user_id: Number(values.user_id),
       email: values.email,
       username: values.username,
       password: values.password,
     }).then(handleSubmitStatus);
+    setLoading(false);
   };
 
   return (
@@ -127,7 +130,7 @@ export default function SignUpForm() {
         />
 
         <Group justify='center'>
-          <Button type='submit' mt='sm'>
+          <Button type='submit' mt='sm' loading={loading}>
             Submit
           </Button>
         </Group>
