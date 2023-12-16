@@ -1,0 +1,26 @@
+.edit-modal {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-modal-form {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+.edit-modal-form > * {
+  width: 100%;
+}
+
+.edit-modal-form-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-icon {
+  padding: 0.2rem;
+}

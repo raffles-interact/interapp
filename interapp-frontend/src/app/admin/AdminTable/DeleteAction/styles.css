@@ -1,0 +1,19 @@
+.delete-modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.delete-modal-username {
+  font-weight: bold;
+}
+.delete-modal-buttons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-icon {
+  padding: 0.2rem;
+}
