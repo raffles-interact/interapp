@@ -1,0 +1,29 @@
+.change-password-container {
+  overflow-x: scroll;
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
+.change-password-container::-webkit-scrollbar {
+  display: none;
+}
+.change-password-form {
+  margin: 1rem 0;
+  display: grid;
+  grid-template-columns: 0.2fr auto;
+  row-gap: 1rem;
+  column-gap: 0.7rem;
+  align-items: center;
+}
+
+.change-password-form-label {
+  font-weight: bold;
+}
+
+.change-password-button-container {
+  display: flex;
+  justify-content: center;
+}
+
+
+

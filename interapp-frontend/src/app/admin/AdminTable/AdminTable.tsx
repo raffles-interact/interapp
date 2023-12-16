@@ -8,7 +8,7 @@ import { permissionsMap } from './PermissionsInput/PermissionsInput';
 import EditAction from './EditAction/EditAction';
 import DeleteAction from './DeleteAction/DeleteAction';
 import PageController, { paginateItems } from '@/components/PageController/PageController';
-import {IconSearch} from '@tabler/icons-react';
+import { IconSearch } from '@tabler/icons-react';
 import './styles.css';
 
 const fetchUserData = async () => {
@@ -25,8 +25,12 @@ const fetchUserData = async () => {
 };
 
 const computeSearchItems = (search: string, users: User[]) => {
-  return users.filter((user) => user.username.toLowerCase().includes(search.toLowerCase()) || user.email.toLocaleLowerCase().includes(search.toLowerCase()));
-}
+  return users.filter(
+    (user) =>
+      user.username.toLowerCase().includes(search.toLowerCase()) ||
+      user.email.toLocaleLowerCase().includes(search.toLowerCase()),
+  );
+};
 
 const AdminTable = () => {
   const [userData, setUserData] = useState<User[]>([]);
@@ -52,7 +56,12 @@ const AdminTable = () => {
         <Loader />
       ) : (
         <>
-          <TextInput label='Search for username or email...' value={search} onChange={(e) => setSearch(e.currentTarget.value)} rightSection={<IconSearch/>}/>
+          <TextInput
+            label='Search for username or email...'
+            value={search}
+            onChange={(e) => setSearch(e.currentTarget.value)}
+            rightSection={<IconSearch />}
+          />
           <Table.ScrollContainer minWidth={1000}>
             <Table stickyHeader>
               <Table.Thead>
@@ -67,34 +76,36 @@ const AdminTable = () => {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {paginateItems(computeSearchItems(search, userData), page, usersPerPage).map((user) => (
-                  <Table.Tr key={user.username}>
-                    <Table.Td>{user.user_id}</Table.Td>
-                    <Table.Td>{user.username}</Table.Td>
-                    <Table.Td>{user.email}</Table.Td>
-                    <Table.Td>
-                      {user.verified ? (
-                        <span className='admin-table-verified'>Verified</span>
-                      ) : (
-                        <span className='admin-table-unverified'>Unverified</span>
-                      )}
-                    </Table.Td>
-                    <Table.Td>
-                      <div className='admin-table-permissions'>
-                        {user.permissions.map((perm) => (
-                          <Pill key={perm} className='admin-table-permission'>
-                            {permissionsMap[perm]}
-                          </Pill>
-                        ))}
-                      </div>
-                    </Table.Td>
-                    <Table.Td>{user.service_hours}</Table.Td>
-                    <Table.Td className='admin-table-actions'>
-                      <EditAction user={user} refreshData={refreshData} />
-                      <DeleteAction username={user.username} refreshData={refreshData} />
-                    </Table.Td>
-                  </Table.Tr>
-                ))}
+                {paginateItems(computeSearchItems(search, userData), page, usersPerPage).map(
+                  (user) => (
+                    <Table.Tr key={user.username}>
+                      <Table.Td>{user.user_id}</Table.Td>
+                      <Table.Td>{user.username}</Table.Td>
+                      <Table.Td>{user.email}</Table.Td>
+                      <Table.Td>
+                        {user.verified ? (
+                          <span className='admin-table-verified'>Verified</span>
+                        ) : (
+                          <span className='admin-table-unverified'>Unverified</span>
+                        )}
+                      </Table.Td>
+                      <Table.Td>
+                        <div className='admin-table-permissions'>
+                          {user.permissions.map((perm) => (
+                            <Pill key={perm} className='admin-table-permission'>
+                              {permissionsMap[perm]}
+                            </Pill>
+                          ))}
+                        </div>
+                      </Table.Td>
+                      <Table.Td>{user.service_hours}</Table.Td>
+                      <Table.Td className='admin-table-actions'>
+                        <EditAction user={user} refreshData={refreshData} />
+                        <DeleteAction username={user.username} refreshData={refreshData} />
+                      </Table.Td>
+                    </Table.Tr>
+                  ),
+                )}
               </Table.Tbody>
             </Table>
           </Table.ScrollContainer>
