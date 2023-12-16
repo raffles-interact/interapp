@@ -57,6 +57,7 @@ function EditAction({ user, refreshData }: { user: User; refreshData: () => void
         closeOnClickOutside={false}
         closeOnEscape={false}
         withCloseButton={false}
+        zIndex={999}
       >
         <Text>Warning: Do not misuse this feature.</Text>
         <form onSubmit={form.onSubmit(handleSubmit)} className='edit-modal-form'>
