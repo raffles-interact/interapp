@@ -62,7 +62,7 @@ export class Service {
   @OneToMany(() => ServiceSession, (service_session) => service_session.service, { cascade: true })
   service_sessions: Relation<ServiceSession[]>;
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn()
   service_ic: Relation<User>;
 }

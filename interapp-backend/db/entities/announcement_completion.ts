@@ -18,6 +18,6 @@ export class AnnouncementCompletion {
   })
   announcement: Relation<Announcement>;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   user: Relation<User>;
 }

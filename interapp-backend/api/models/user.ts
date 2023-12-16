@@ -28,6 +28,9 @@ export class UserModel {
     }
     return user;
   }
+  public static async deleteUser(username: string) {
+    await appDataSource.manager.delete(User, { username });
+  }
   public static async getAllUsers() {
     const users = await appDataSource.manager
       .createQueryBuilder()
