@@ -115,7 +115,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = useCallback(async () => {
     const status = (await apiClient.delete('/auth/signout')).status;
-    if (status !== 204) return status;
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
@@ -130,8 +129,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const registerUserAccount = useCallback(async (accountDetails: AccountDetails) => {
-    const status = (await apiClient.post('/auth/signup', JSON.stringify(accountDetails)))
-      .status;
+    const status = (await apiClient.post('/auth/signup', JSON.stringify(accountDetails))).status;
     return status;
   }, []);
 
