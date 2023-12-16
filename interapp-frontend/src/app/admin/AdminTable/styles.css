@@ -1,0 +1,25 @@
+.admin-table-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+.admin-table-verified {
+  color: green;
+}
+
+.admin-table-unverified {
+  color: red;
+}
+
+.admin-table-permissions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.2rem;
+}
+
+.admin-table-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 0.5rem;
+}
