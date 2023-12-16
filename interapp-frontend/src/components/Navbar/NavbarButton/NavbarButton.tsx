@@ -126,7 +126,7 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
       }
     },
     icon: IconMail,
-    show: !!user && !user.verified && user.permissions.includes(Permissions.CLUB_MEMBER),
+    show: !!user && !user.verified,
     category: 'Authentication',
   },
   {
@@ -154,14 +154,14 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
     name: 'Profile',
     callback: () => goTo('/profile'),
     icon: IconUserSquare,
-    show: !!user,
+    show: !!user && user.permissions.includes(Permissions.CLUB_MEMBER),
     category: 'Settings',
   },
   {
     name: 'Announcements',
     callback: () => goTo('/announcements'),
     icon: IconSpeakerphone,
-    show: !!user,
+    show: !!user && user.permissions.includes(Permissions.CLUB_MEMBER),
     category: 'General',
   },
   {

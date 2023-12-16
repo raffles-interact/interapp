@@ -1,13 +1,13 @@
 'use client';
 
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { usePathname } from 'next/navigation';
 import {
   IconHome,
   IconLogin,
   IconCheck,
   IconPasswordUser,
-  IconLogin2,
+  IconRadioactive,
   IconSettings,
   IconUserSquare,
   IconTableOptions,
@@ -55,6 +55,11 @@ export const getNavbarTitle = (pathname: string) => {
         title: 'Settings',
         Icon: IconSettings,
       };
+    case '/admin':
+        return {
+          title: 'Admin Page',
+          Icon: IconRadioactive,
+        };
     default:
       return {
         title: 'Page Not Found',
