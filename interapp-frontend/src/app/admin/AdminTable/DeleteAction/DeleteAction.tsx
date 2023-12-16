@@ -32,6 +32,7 @@ function DeleteAction({ username, refreshData }: { username: string; refreshData
         closeOnClickOutside={false}
         closeOnEscape={false}
         withCloseButton={false}
+        zIndex={999}
       >
         <div className='delete-modal'>
           <Text>
