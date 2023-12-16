@@ -1,4 +1,4 @@
-name: API Tests
+name: Pipeline
 
 on:
   push:
@@ -7,12 +7,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  test-backend:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup test environment
         run: docker compose -f docker-compose.test.yml up -d --build
@@ -25,7 +25,20 @@ jobs:
       - name: Install dependencies
         run: cd interapp-backend && bun install
       - name: Test with bun
-        run: cd interapp-backend && bun test --env-file tests/config/.env.test --coverage --timeout 10000
+        run: cd interapp-backend && bun run test
 
       - name: Tear down test environment
         run: docker compose -f docker-compose.test.yml down
+  
+  build-application:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup prod environment
+        run: docker compose -f docker-compose.prod.yml up -d --build
+
+      - name: Tear down prod environment
+        run: docker compose -f docker-compose.prod.yml down

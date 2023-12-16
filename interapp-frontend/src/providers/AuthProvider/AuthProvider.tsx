@@ -1,6 +1,13 @@
 import { createContext, useEffect, useMemo, useState, useCallback } from 'react';
-import { AuthProviderProps, LogInDetails, AccountDetails, User, AuthContextType } from './types';
-import axiosClient from '@api/api_client';
+import {
+  AuthProviderProps,
+  LogInDetails,
+  AccountDetails,
+  User,
+  AuthContextType,
+  UserWithJWT,
+} from './types';
+import APIClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
 import { RoutePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
@@ -16,12 +23,18 @@ export const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [justLoggedIn, setJustLoggedIn] = useState(false); // used to prevent redirecting to home page after login
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const apiClient = useMemo(() => new APIClient().instance, []);
 
   useEffect(() => {
     if (loading) return; // we dont know if user is logged in or not yet
+    if (justLoggedIn) {
+      setJustLoggedIn(false);
+      return;
+    }
 
     if (!user) {
       if (!noLoginRequiredRoutes.includes(pathname)) {
@@ -39,7 +52,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         message: 'You are already logged in. Redirecting to home page.',
         color: 'red',
       });
-      return router.replace('/');
+      router.replace('/');
+      return;
     }
 
     const userPermissions = user.permissions;
@@ -54,7 +68,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       message: 'You do not have permission to access this page',
       color: 'red',
     });
-    return router.replace('/');
+    router.replace('/');
+    return;
   }, [user, loading]);
 
   useEffect(() => {
@@ -66,10 +81,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const expired = Number(localStorage.getItem('access_token_expire')) < Date.now();
 
     if (expired && access_token) {
-      axiosClient
-        .refreshAccessToken()
+      apiClient
+        .post('/auth/refresh')
         .then((res) => {
-          localStorage.setItem('access_token', res.access_token);
+          localStorage.setItem(
+            'access_token',
+            (res.data as Omit<UserWithJWT, 'user'>).access_token,
+          );
         })
         .catch(logout);
     }
@@ -78,7 +96,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const login = useCallback(async (details: LogInDetails) => {
-    const { data, status } = await axiosClient.signIn(details);
+    const { data, status }: { data: UserWithJWT; status: number } = await apiClient.post(
+      '/auth/signin',
+      JSON.stringify({ ...details }),
+    );
     const { access_token, expire, user } = data;
 
     if (status !== 200) return status;
@@ -87,12 +108,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     localStorage.setItem('access_token', access_token);
     localStorage.setItem('user', JSON.stringify(user));
     setUser(user);
+    setJustLoggedIn(true);
     router.refresh(); // invalidate browser cache
     return status;
   }, []);
 
   const logout = useCallback(async () => {
-    const status = await axiosClient.signOut();
+    const status = (await apiClient.delete('/auth/signout')).status;
     setUser(null);
     localStorage.removeItem('user');
     localStorage.removeItem('access_token');
@@ -107,7 +129,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   }, []);
 
   const registerUserAccount = useCallback(async (accountDetails: AccountDetails) => {
-    const status = await axiosClient.signUp(accountDetails);
+    const status = (await apiClient.post('/auth/signup', JSON.stringify(accountDetails))).status;
     return status;
   }, []);
 

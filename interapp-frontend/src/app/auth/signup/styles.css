@@ -35,6 +35,14 @@
   align-self: center;
 }
 
+.signup-form-userid {
+  flex-grow: 1;
+}
+
+.signup-form-username {
+  flex-grow: 4;
+}
+
 @media screen and (max-width: 48em) {
   .signup-page {
     margin: 3%;

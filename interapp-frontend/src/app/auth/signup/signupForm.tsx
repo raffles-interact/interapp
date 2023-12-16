@@ -1,6 +1,6 @@
 'use client';
 import { TextInput, NumberInput, PasswordInput, Button, Group } from '@mantine/core';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -16,6 +16,7 @@ interface SignUpFormProps {
 
 export default function SignUpForm() {
   const { registerUserAccount } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const form = useForm<SignUpFormProps>({
     initialValues: {
@@ -78,18 +79,39 @@ export default function SignUpForm() {
   };
 
   const handleSubmit = async (values: SignUpFormProps) => {
+    setLoading(true);
     registerUserAccount({
       user_id: Number(values.user_id),
       email: values.email,
       username: values.username,
       password: values.password,
     }).then(handleSubmitStatus);
+    setLoading(false);
   };
 
   return (
     <div>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <TextInput label='Name' placeholder='Name' {...form.getInputProps('username')} />
+        <Group className='signup-form-toprow'>
+          <NumberInput
+            mt='sm'
+            label='User ID'
+            placeholder='User ID'
+            allowDecimal={false}
+            allowNegative={false}
+            hideControls
+            className='signup-form-userid'
+            {...form.getInputProps('user_id')}
+          />
+          <TextInput
+            className='signup-form-username'
+            mt='sm'
+            label='Username'
+            placeholder='Username'
+            {...form.getInputProps('username')}
+          />
+        </Group>
+
         <TextInput mt='sm' label='Email' placeholder='Email' {...form.getInputProps('email')} />
         <PasswordInput
           mt='sm'
@@ -106,17 +128,9 @@ export default function SignUpForm() {
           disabled={!form.values.password}
           {...form.getInputProps('confirmPassword')}
         />
-        <NumberInput
-          mt='sm'
-          label='User ID'
-          placeholder='User ID'
-          allowDecimal={false}
-          allowNegative={false}
-          hideControls
-          {...form.getInputProps('user_id')}
-        />
+
         <Group justify='center'>
-          <Button type='submit' mt='sm'>
+          <Button type='submit' mt='sm' loading={loading}>
             Submit
           </Button>
         </Group>

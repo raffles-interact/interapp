@@ -34,6 +34,9 @@
 .login-form-already-member {
   align-self: center;
 }
+.login-form-forgot-password {
+  align-self: center;
+}
 
 @media screen and (max-width: 48em) {
   .login-page {

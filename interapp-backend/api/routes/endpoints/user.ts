@@ -6,6 +6,22 @@ import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
+userRouter.get('/', verifyJWT, verifyRequiredRole(Permissions.ADMIN), async (req, res) => {
+  const users = await UserModel.getAllUsers();
+  res.status(200).send(users);
+});
+
+userRouter.delete(
+  '/',
+  validateRequiredFields(['username']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.ADMIN),
+  async (req, res) => {
+    await UserModel.deleteUser(req.body.username as string);
+    res.status(204).send();
+  },
+);
+
 userRouter.patch(
   '/password/change',
   validateRequiredFields(['old_password', 'new_password']),
@@ -32,6 +48,36 @@ userRouter.patch('/password/reset', validateRequiredFields(['token']), async (re
     temp_password: newPw,
   });
 });
+
+userRouter.patch(
+  '/change_email',
+  validateRequiredFields(['new_email'], ['username']),
+  verifyJWT,
+  async (req, res) => {
+    if (req.body.username) {
+      // we are changing someone else's email
+      const perms = await UserModel.checkPermissions(req.headers.username as string);
+      if (!perms.includes(Permissions.ADMIN)) {
+        throw new HTTPError(
+          'Insufficient permissions',
+          "Only admins can change other users' emails",
+          HTTPErrorCode.UNAUTHORIZED_ERROR,
+        );
+      }
+    }
+    const username = req.body.username ?? req.headers.username;
+    const emailRegex = new RegExp(process.env.SCHOOL_EMAIL_REGEX as string);
+    if (emailRegex.test(req.body.new_email)) {
+      throw new HTTPError(
+        'Invalid email',
+        'Email cannot be a valid school email',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    await UserModel.changeEmail(username, req.body.new_email);
+    res.status(204).send();
+  },
+);
 
 userRouter.post(
   '/verify_email',
@@ -78,6 +124,18 @@ userRouter.patch(
 );
 
 userRouter.get(
+  '/permissions',
+  validateRequiredFields([], ['username']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.ADMIN),
+  async (req, res) => {
+    const username = req.query.username as string | undefined;
+    const permissions = await UserModel.getPermissions(username);
+    res.status(200).send(permissions);
+  },
+);
+
+userRouter.get(
   '/userservices',
   verifyJWT,
   validateRequiredFields(['username']),
@@ -105,6 +163,17 @@ userRouter.delete(
   validateRequiredFields(['username', 'service_id']),
   async (req, res) => {
     await UserModel.removeServiceUser(req.body.service_id, req.body.username);
+    res.status(204).send();
+  },
+);
+
+userRouter.patch(
+  '/service_hours',
+  verifyJWT,
+  verifyRequiredRole(Permissions.ADMIN),
+  validateRequiredFields(['username', 'hours']),
+  async (req, res) => {
+    await UserModel.updateServiceHours(req.body.username, req.body.hours);
     res.status(204).send();
   },
 );

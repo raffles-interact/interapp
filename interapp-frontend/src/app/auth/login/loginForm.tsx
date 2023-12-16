@@ -1,6 +1,6 @@
 'use client';
 import { TextInput, PasswordInput, Button, Group } from '@mantine/core';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
@@ -13,6 +13,7 @@ interface LoginFormProps {
 
 export default function LoginForm() {
   const { login } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const form = useForm<LoginFormProps>({
     initialValues: {
@@ -60,16 +61,18 @@ export default function LoginForm() {
   };
 
   const handleSubmit = async (values: LoginFormProps) => {
+    setLoading(true);
     login({
       username: values.username,
       password: values.password,
     }).then(handleSubmitStatus);
+    setLoading(false);
   };
 
   return (
     <div>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <TextInput label='Name' placeholder='Name' {...form.getInputProps('username')} />
+        <TextInput label='Username' placeholder='Username' {...form.getInputProps('username')} />
         <PasswordInput
           mt='sm'
           label='Password'
@@ -79,7 +82,7 @@ export default function LoginForm() {
         />
 
         <Group justify='center'>
-          <Button type='submit' mt='sm'>
+          <Button type='submit' mt='sm' loading={loading}>
             Let's Go!
           </Button>
         </Group>

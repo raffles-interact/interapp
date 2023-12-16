@@ -1,10 +1,11 @@
 {
   "name": "interapp-backend",
+  "version": "0.1.0",
   "module": "index.ts",
   "type": "module",
   "scripts": {
     "prettier": "prettier --write . '!./pgdata'",
-    "test": "NODE_ENV=test bun test --env-file tests/config/.env.test --coverage",
+    "test": "NODE_ENV=test bun test --env-file tests/config/.env.test --coverage --timeout 10000",
     "typeorm": "typeorm-ts-node-esm",
     "typeorm:generate": "sh ./scripts/typeorm_generate.sh",
     "typeorm:run": "typeorm-ts-node-esm migration:run -d db/data-source.ts",

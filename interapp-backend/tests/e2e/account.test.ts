@@ -45,6 +45,28 @@ describe('API (account)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('change email', async () => {
+    const res = await fetch(`${API_URL}/user/change_email`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        new_email: 'new_email@new_email.com',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('change email to school email', async () => {
+    const res = await fetch(`${API_URL}/user/change_email`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        new_email: 'new_email@rafflesgirlssch.edu.sg',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(400);
+  });
+
   test('attempt to bypass role restrictions', async () => {
     // testuser should not have admin permissions
     const res = await fetch(`${API_URL}/user/permissions`, {
@@ -70,8 +92,9 @@ describe('API (account)', async () => {
         .leftJoinAndSelect('user.user_permissions', 'user_permissions')
         .where('user.username = :username', { username: 'testuser' })
         .getOne();
+      if (!user) throw new Error('User not found');
       await appDataSource.manager.insert(UserPermission, {
-        user: user!,
+        user: user,
         username: 'testuser',
         permission_id: 6,
       });
@@ -98,6 +121,42 @@ describe('API (account)', async () => {
       .from(UserPermission, 'user_permissions')
       .where('user_permissions.username = :username', { username: 'testuser' })
       .getMany();
+  });
+
+  test('change email (admin)', async () => {
+    const res = await fetch(`${API_URL}/user/change_email`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser',
+        new_email: 'new_email@new_email.com',
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('add service hours', async () => {
+    const res = await fetch(`${API_URL}/user/service_hours`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'testuser',
+        hours: 10,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('add service hours (non-existant)', async () => {
+    const res = await fetch(`${API_URL}/user/service_hours`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        username: 'nonexistant',
+        hours: 10,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(404);
   });
 
   test('create a new user', async () => {
@@ -131,6 +190,59 @@ describe('API (account)', async () => {
       body: JSON.stringify({
         username: 'testuser2',
         permissions: [0, 6],
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('get all users', async () => {
+    const res = await fetch(`${API_URL}/user`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const response_as_json = (await res.json()) as Object;
+    expect(response_as_json).toBeArray();
+    expect(response_as_json).toHaveLength(2);
+  });
+
+  test('get user permissions', async () => {
+    const res = await fetch(`${API_URL}/user/permissions?username=testuser`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      testuser: [0, 6],
+    });
+  });
+
+  test('get user permissions (non-existant)', async () => {
+    const res = await fetch(`${API_URL}/user/permissions?username=nonexistant`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(404);
+  });
+
+  test('get all user permissions', async () => {
+    const res = await fetch(`${API_URL}/user/permissions`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      testuser: [0, 6],
+      testuser2: [0, 6],
+    });
+  });
+
+  test('delete user', async () => {
+    const res = await fetch(`${API_URL}/user`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        username: 'testuser2',
       }),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -174,9 +286,9 @@ describe('API (account)', async () => {
       user: {
         user_id: 1,
         username: 'testuser',
-        email: 'test@example.com',
+        email: 'new_email@new_email.com',
         verified: false,
-        service_hours: 0,
+        service_hours: 10,
         permissions: [0, 6],
       },
       expire: expect.any(Number),

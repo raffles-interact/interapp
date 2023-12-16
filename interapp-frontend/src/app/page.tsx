@@ -2,15 +2,14 @@
 import { useContext } from 'react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import { useRouter } from 'next/navigation';
+import UnderConstruction from '@/components/UnderConstruction/UnderContruction';
 
 export default function Home() {
   const router = useRouter();
   const { user, logout } = useContext(AuthContext);
   return (
     <>
-      <button onClick={() => router.push('/auth/login')}>Login</button>
-      <button onClick={() => router.push('/auth/signup')}>Sign Up</button>
-      <button onClick={() => router.push('/protected')}>protec</button>
+      <UnderConstruction />
       {user && (
         <>
           <h1>{user.username}</h1>
@@ -19,8 +18,6 @@ export default function Home() {
           <h2>{user.permissions}</h2>
           <h3>{user.verified}</h3>
           <h3>{user.service_hours}</h3>
-
-          <button onClick={logout}>Logout</button>
         </>
       )}
     </>

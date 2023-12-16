@@ -1,0 +1,19 @@
+.navbar-button {
+  padding: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.navbar-button:hover {
+  cursor: pointer;
+  background-color: var(--mantine-color-default-hover);
+  border-radius: 7px;
+}
+
+.navbar-icon {
+  width: 1rem;
+  height: 1rem;
+  border-radius: var(--mantine-radius-sm);
+  font-weight: lighter;
+  color: var(--mantine-color-teal-6);
+}

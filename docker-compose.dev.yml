@@ -20,6 +20,11 @@ services:
       timeout: 2s
       retries: 5
       start_period: 60s
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.5'
+          memory: 2G
   
   redis:
     container_name: interapp-redis
@@ -100,6 +105,12 @@ services:
     depends_on:
       - backend
       - postgres
+    deploy:
+      resources:
+        reservations:
+          cpus: '0.5'
+          memory: 3G
+        
 
 networks:
   interapp-network:

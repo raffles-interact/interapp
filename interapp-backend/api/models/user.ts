@@ -28,6 +28,50 @@ export class UserModel {
     }
     return user;
   }
+  public static async deleteUser(username: string) {
+    await appDataSource.manager.delete(User, { username });
+  }
+  public static async getAllUsers() {
+    const users = await appDataSource.manager
+      .createQueryBuilder()
+      .select([
+        'user.username',
+        'user.email',
+        'user.verified',
+        'user.user_id',
+        'user.service_hours',
+      ])
+      .from(User, 'user')
+      .getMany();
+    return users as Omit<
+      User,
+      | 'password_hash'
+      | 'refresh_token'
+      | 'user_permissions'
+      | 'user_services'
+      | 'service_session_users'
+    >[];
+  }
+  public static async changeEmail(username: string, new_email: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user.username', 'user.email'])
+      .from(User, 'user')
+      .where('user.username = :username', { username: username })
+      .getOne();
+
+    if (!user) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    user.email = new_email;
+    user.verified = false;
+    await appDataSource.manager.update(User, { username: username }, user);
+  }
   public static async changePassword(username: string, old_password: string, new_password: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
@@ -125,9 +169,8 @@ export class UserModel {
       subject: 'Reset Password from Interapp',
       template: 'reset_password',
       context: {
-        token: token,
         username: username,
-        url: 'localhost:3000', //TODO
+        url: (process.env.FRONTEND_URL as string) + '/auth/forgot_password_verify?token=' + token,
       },
     };
 
@@ -205,9 +248,8 @@ export class UserModel {
       subject: 'Verify Email from Interapp',
       template: 'verify_email',
       context: {
-        token: token,
         username: username,
-        url: 'localhost:3000', //TODO
+        url: (process.env.FRONTEND_URL as string) + '/auth/verify_email?token=' + token,
       },
     };
 
@@ -255,6 +297,29 @@ export class UserModel {
     await appDataSource.manager.insert(
       UserPermission,
       permissions.map((perm) => ({ username, permission_id: perm, user })),
+    );
+  }
+  public static async getPermissions(username?: string) {
+    const perms = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user_permissions'])
+      .from(UserPermission, 'user_permissions')
+      .where(username ? 'user_permissions.username = :username' : '1=1', { username })
+      .getMany();
+    if (perms.length === 0) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return perms.reduce(
+      (acc, perm) => {
+        if (!acc[perm.username]) acc[perm.username] = [];
+        acc[perm.username].push(perm.permission_id);
+        return acc;
+      },
+      {} as Record<string, number[]>,
     );
   }
   public static async getAllServicesByUser(username: string) {
@@ -357,5 +422,21 @@ export class UserModel {
   }
   public static async removeServiceUser(service_id: number, username: string) {
     await appDataSource.manager.delete(UserService, { service_id, username });
+  }
+  public static async updateServiceHours(username: string, hours: number) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!user)
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    user.service_hours = hours;
+    await appDataSource.manager.update(User, { username }, user);
   }
 }

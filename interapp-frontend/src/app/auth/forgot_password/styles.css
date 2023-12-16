@@ -1,0 +1,59 @@
+.forgot-password-page {
+  margin: 7%;
+}
+
+.forgot-password-headers {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2%;
+  padding: 0 3rem;
+  gap: 2rem;
+}
+.forgot-password-headers-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.forgot-password-logo {
+  width: min(20%, 7rem);
+  position: relative;
+  aspect-ratio: 1/1;
+}
+
+.forgot-password-form-container {
+  display: flex;
+  flex-direction: column;
+  margin: 0 3rem;
+  padding: 2%;
+  gap: 1rem;
+}
+.forgot-password-form-already-member {
+  align-self: center;
+}
+.forgot-password-form-forgot-password {
+  align-self: center;
+}
+
+@media screen and (max-width: 48em) {
+  .forgot-password-page {
+    margin: 3%;
+  }
+  .forgot-password-headers {
+    flex-direction: column;
+    margin: 0;
+    padding: 0 1rem;
+  }
+  .forgot-password-headers-text {
+    margin-bottom: 2%;
+  }
+  .forgot-password-logo {
+    margin-bottom: 2%;
+  }
+  .forgot-password-form-container {
+    margin: 0;
+  }
+}

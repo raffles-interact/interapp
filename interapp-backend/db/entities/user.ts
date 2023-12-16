@@ -26,12 +26,14 @@ export class User {
   @Column()
   service_hours: number;
 
-  @OneToMany(() => UserPermission, (user_permission) => user_permission.user)
+  @OneToMany(() => UserPermission, (user_permission) => user_permission.user, { cascade: true })
   user_permissions: Relation<UserPermission[]>;
 
-  @OneToMany(() => UserService, (user_service) => user_service.user)
+  @OneToMany(() => UserService, (user_service) => user_service.user, { cascade: true })
   user_services: Relation<UserService[]>;
 
-  @OneToMany(() => ServiceSessionUser, (service_session_user) => service_session_user.user)
+  @OneToMany(() => ServiceSessionUser, (service_session_user) => service_session_user.user, {
+    cascade: true,
+  })
   service_session_users: Relation<ServiceSessionUser[]>;
 }

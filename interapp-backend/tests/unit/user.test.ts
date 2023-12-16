@@ -36,6 +36,12 @@ describe('Unit (user)', () => {
     expect(user).toMatchObject(User);
   });
 
+  test('change email', async () => {
+    await UserModel.changeEmail('testuser', 'newemail@newemail');
+    const user = await UserModel.getUser('testuser');
+    expect(user.email).toBe('newemail@newemail');
+  });
+
   test('change password', async () => {
     await UserModel.changePassword('testuser', 'password', 'newpassword');
     // attempt to sign in with old password
@@ -123,7 +129,7 @@ describe('Unit (user)', () => {
     expect((await UserModel.getAllUsersByService(1))[0]).toMatchObject({
       user_id: 1,
       username: 'testuser',
-      email: 'safjsakdj@jfkljlfa',
+      email: 'newemail@newemail',
       verified: true,
       service_hours: 0,
     });
@@ -154,6 +160,45 @@ describe('Unit (user)', () => {
     );
   });
 
+  test('get all users', async () => {
+    const users = await UserModel.getAllUsers();
+    expect(users).toBeArray();
+    expect(users).toHaveLength(2);
+  });
+
+  test('get permissions of all users', async () => {
+    const perms = await UserModel.getPermissions();
+    expect(perms).toMatchObject({
+      testuser: [0, 1],
+      testuser2: [0],
+    });
+  });
+
+  test('get permissions of user', async () => {
+    const perms = await UserModel.getPermissions('testuser');
+    expect(perms).toMatchObject({
+      testuser: [0, 1],
+    });
+  });
+
+  test('add service hours', async () => {
+    await UserModel.updateServiceHours('testuser', 10);
+    const user = await UserModel.getUser('testuser');
+    expect(user.service_hours).toBe(10);
+  });
+
+  test('add service hours with invalid user', async () => {
+    await expect(async () => await UserModel.updateServiceHours('invaliduser', 10)).toThrow(
+      'The user with username invaliduser was not found in the database',
+    );
+  });
+
+  test('delete user', async () => {
+    await UserModel.deleteUser('testuser');
+    await expect(async () => await UserModel.getUser('testuser')).toThrow(
+      'The user with username testuser was not found in the database',
+    );
+  });
   afterAll(async () => {
     await recreateDB();
   });
