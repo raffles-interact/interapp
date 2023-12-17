@@ -373,20 +373,13 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-    const users: Pick<User, 'username' | 'user_id' | 'email' | 'verified' | 'service_hours'>[] =
-      await appDataSource.manager
-        .createQueryBuilder()
-        .select([
-          'user.username',
-          'user.user_id',
-          'user.email',
-          'user.verified',
-          'user.service_hours',
-        ])
-        .from(User, 'user')
-        .where('user.username IN (:...usernames)', { usernames })
-        .getMany();
-
+    const users: Pick<User, 'username' | 'user_id' | 'email' | 'verified' | 'service_hours'>[] = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user.username', 'user.user_id', 'user.email', 'user.verified', 'user.service_hours'])
+      .from(User, 'user')
+      .where('user.username IN (:...usernames)', { usernames })
+      .getMany();
+    
     return users;
   }
   public static async addServiceUser(service_id: number, username: string) {
