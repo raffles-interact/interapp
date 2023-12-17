@@ -4,6 +4,7 @@ import { ServiceModel } from '@models/service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
 import { AttendanceStatus } from '@db/entities';
+import { UserModel } from '@models/user';
 
 const serviceRouter = Router();
 
@@ -144,6 +145,20 @@ serviceRouter.get('/get_all', async (req, res) => {
     services,
   });
 });
+
+serviceRouter.get(
+  '/get_users_by_service',
+  validateRequiredFields(['service_id']),
+  verifyJWT,
+  verifyRequiredRole(Permissions.EXCO),
+  async (req, res) => {
+    const users = await UserModel.getAllUsersByService(Number(req.query.service_id));
+
+    res.status(200).send({
+      users,
+    });
+  },
+);
 
 serviceRouter.post(
   '/session',
