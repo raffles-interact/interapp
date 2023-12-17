@@ -39,8 +39,7 @@ const ChangePassword = () => {
     const res = await apiClient.patch('/user/password/change', {
       old_password: values.currentPassword,
       new_password: values.newPassword,
-    
-    })
+    });
     switch (res.status) {
       case 204:
         notifications.show({
