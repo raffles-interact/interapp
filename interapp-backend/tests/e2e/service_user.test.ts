@@ -211,6 +211,25 @@ describe('API (user service)', async () => {
     expect(res2.status).toBe(204);
   });
 
+  test('get users by service', async () => {
+    const res = await fetch(`${API_URL}/service/get_users_by_service?service_id=1`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      users: [
+        {
+          user_id: 1,
+          username: 'testuser',
+          email: 'test@example.com',
+          verified: false,
+          service_hours: 0,
+        },
+      ],
+    });
+  });
+
   afterAll(async () => {
     await recreateDB();
   });
