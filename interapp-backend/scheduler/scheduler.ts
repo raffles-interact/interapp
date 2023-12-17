@@ -49,7 +49,7 @@ schedule(
 
       const service_session_id = await ServiceModel.createServiceSession(detail);
 
-      let users: User[] = [];
+      let users: Pick<User, 'username' | 'user_id' | 'email' | 'verified' | 'service_hours'>[] = [];
       try {
         users = await UserModel.getAllUsersByService(service.service_id);
       } catch (err) {

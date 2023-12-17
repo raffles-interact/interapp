@@ -373,16 +373,13 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-    const users: Partial<User>[] = await appDataSource.manager
+    const users: Pick<User, 'username' | 'user_id' | 'email' | 'verified' | 'service_hours'>[] = await appDataSource.manager
       .createQueryBuilder()
-      .select(['user'])
+      .select(['user.username', 'user.user_id', 'user.email', 'user.verified', 'user.service_hours'])
       .from(User, 'user')
       .where('user.username IN (:...usernames)', { usernames })
       .getMany();
-    users.forEach((user) => {
-      delete user.password_hash;
-      delete user.refresh_token;
-    });
+    
     return users;
   }
   public static async addServiceUser(service_id: number, username: string) {
