@@ -26,6 +26,14 @@ const ChangeEmail = () => {
   };
 
   const handleEmailChange = async () => {
+    if (error) {
+      notifications.show({ title: 'Error', message: error, color: 'red' });
+      return;
+    }
+    if (newEmail.length === 0) {
+      notifications.show({ title: 'Error', message: 'Email cannot be empty', color: 'red' });
+      return;
+    }
     setLoading(true);
 
     const res = await apiClient.patch('/user/change_email', { new_email: newEmail });
