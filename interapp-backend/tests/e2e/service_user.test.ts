@@ -266,7 +266,7 @@ describe('API (user service)', async () => {
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    console.log(await res.json())
+    console.log(await res.json());
     expect(res.status).toBe(204);
   });
 
@@ -275,7 +275,10 @@ describe('API (user service)', async () => {
       method: 'PATCH',
       body: JSON.stringify({
         service_id: 1,
-        data: [{ action: 'remfsdfsfsadfasfsae', username: 'testuser2' }, { action: 'add', username: 'testuser' }],
+        data: [
+          { action: 'remfsdfsfsadfasfsae', username: 'testuser2' },
+          { action: 'add', username: 'testuser' },
+        ],
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -284,7 +287,10 @@ describe('API (user service)', async () => {
       method: 'PATCH',
       body: JSON.stringify({
         service_id: 9,
-        data: [{ action: 'remove', username: 'testuser2' }, { action: 'add', username: 'testuser' }],
+        data: [
+          { action: 'remove', username: 'testuser2' },
+          { action: 'add', username: 'testuser' },
+        ],
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });

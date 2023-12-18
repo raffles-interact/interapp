@@ -16,13 +16,13 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
     `/service/get_users_by_service?service_id=${service_id}`,
   );
   const users: Omit<User, 'permissions'>[] = get_users_by_service.data.users;
-  const serviceUsers = users !== undefined ? users.map((user) => user.username): [];
+  const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
 
   const get_all_users = await apiClient.get(`/user`);
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
-  const all_users_names = all_users !== undefined ? all_users.map((user) => user.username): [];
+  const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
 
-  return [serviceUsers, all_users_names];
+  return [serviceUsers, allUsersNames];
 };
 
 interface ServiceBoxUsersProps {
@@ -40,11 +40,9 @@ const ServiceBoxUsers = ({
 }: ServiceBoxUsersProps) => {
   const apiClient = new APIClient().instance;
   const { user } = useContext(AuthContext);
-  if (!user) return null;
-  if (!user.permissions.includes(Permissions.EXCO)) return null;
 
-  const [serviceUsers, setUsers] = useState<string[]>([]);
-  const [all_users_names, setAllUsersNames] = useState<string[]>([]);
+  const [serviceUsers, setServiceUsers] = useState<string[]>([]);
+  const [allUsersNames, setAllUsersNames] = useState<string[]>([]);
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -54,14 +52,14 @@ const ServiceBoxUsers = ({
 
   useEffect(() => {
     if (!open) return;
-    handleGetUsers(service_id, apiClient).then(([serviceUsers, all_users_names]) => {
-      setUsers(serviceUsers);
-      setAllUsersNames(all_users_names);
+    handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsersNames]) => {
+      setServiceUsers(serviceUsers);
+      setAllUsersNames(allUsersNames);
     });
   }, [open]);
 
-  
-
+  if (!user) return null;
+  if (!user.permissions.includes(Permissions.EXCO)) return null;
 
   const handleSave = () => {
     setLoading(true);
@@ -69,19 +67,22 @@ const ServiceBoxUsers = ({
     if (newServiceUsers !== serviceUsers) handleChangeServiceUsers(serviceUsers, newServiceUsers);
     setOpen(false);
     setLoading(false);
-
-  }
+  };
 
   return (
     <>
       <Modal opened={open} onClose={() => setOpen(false)} title='Manage Users'>
         <div className='service-box-users'>
-          <Text>Edit assigned services for Interact's members. You must assign 1 service IC to every service which cannot be managing another service. Please ensure that the regular participating users includes the service IC.</Text>
+          <Text>
+            Edit assigned services for Interact's members. You must assign 1 service IC to every
+            service which cannot be managing another service. Please ensure that the regular
+            participating users includes the service IC.
+          </Text>
           <div>
             <Text>Service IC</Text>
             <SearchableSelect
               defaultValue={newServiceIc}
-              allValues={all_users_names}
+              allValues={allUsersNames}
               onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
             />
           </div>
@@ -89,7 +90,7 @@ const ServiceBoxUsers = ({
             <Text>Regular service participants</Text>
             <PillsInputWithSearch
               defaultValues={serviceUsers}
-              allValues={all_users_names}
+              allValues={allUsersNames}
               onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
             />
           </div>
@@ -101,11 +102,7 @@ const ServiceBoxUsers = ({
             <Button onClick={handleSave} variant='outline' color='green' loading={loading}>
               Save
             </Button>
-
           </div>
-          
-
-          
         </div>
       </Modal>
 

@@ -1,7 +1,7 @@
 import APIClient from '@api/api_client';
 import './styles.css';
 import { Title, Text, Code } from '@mantine/core';
-import GoHomeButton from '@components/GoHomeButton/GoHomeButton';
+import GoHomeButton from '@/components/GoHomeButton/GoHomeButton';
 
 export default async function ForgotPasswordVerifyPage({
   searchParams,

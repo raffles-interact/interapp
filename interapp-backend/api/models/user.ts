@@ -461,8 +461,21 @@ export class UserModel {
       .filter(({ action, username }) => action === 'remove')
       .map((data) => data.username);
 
-    if (toAdd.length !== 0) await appDataSource.manager.insert(UserService, (await findUsers(toAdd)).map((user) => ({ service_id, username: user.username, service, user })));
-    if (toRemove.length !== 0) await appDataSource.manager.delete(UserService, toRemove.map((username) => ({ service_id, username })));
+    if (toAdd.length !== 0)
+      await appDataSource.manager.insert(
+        UserService,
+        (await findUsers(toAdd)).map((user) => ({
+          service_id,
+          username: user.username,
+          service,
+          user,
+        })),
+      );
+    if (toRemove.length !== 0)
+      await appDataSource.manager.delete(
+        UserService,
+        toRemove.map((username) => ({ service_id, username })),
+      );
   }
   public static async updateServiceHours(username: string, hours: number) {
     const user = await appDataSource.manager
