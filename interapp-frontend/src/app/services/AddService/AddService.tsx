@@ -3,19 +3,21 @@ import { ActionIcon, Group, Modal, NumberInput, TextInput, Textarea, Button } fr
 import { TimeInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
-import { useEffect, useContext, useState } from 'react';
-import { AuthContext } from '@providers/AuthProvider/AuthProvider';
+import { useEffect, useContext, useState, useMemo } from 'react';
+import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import { Service } from '../page';
 import { notifications } from '@mantine/notifications';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
-import APIClient from '@api/api_client';
+import { convertToBase64 } from '@/components/UploadImage/UploadImage';
+import APIClient from '@/api/api_client';
 
-import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
-import UploadImage, { convertToBase64 } from '@components/UploadImage/UploadImage';
+import SearchableSelect from '@/components/SearchableSelect/SearchableSelect';
+import UploadImage from '@/components/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
-import { User } from '@providers/AuthProvider/types';
-import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
+import { User } from '@/providers/AuthProvider/types';
+import { AxiosInstance } from 'axios';
+import PillsInputWithSearch from '@/components/PillsInputWithSearch/PillsInputWithSearch';
 import { useRouter } from 'next/navigation';
 
 export type ServiceWithUsers = Service & { usernames: string[] };
@@ -23,9 +25,7 @@ export type CreateServiceWithUsers = Omit<ServiceWithUsers, 'service_id'>;
 
 const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
-const getAllUsers = async () => {
-  const apiClient = new APIClient().instance;
-
+const getAllUsers = async (apiClient: AxiosInstance) => {
   const get_all_users = await apiClient.get(`/user`);
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
   const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
@@ -41,7 +41,7 @@ const AddService = () => {
   const router = useRouter();
 
   useEffect(() => {
-    getAllUsers().then((allUsersNames) => setAllUsersNames(allUsersNames));
+    getAllUsers(apiClient).then((allUsersNames) => setAllUsersNames(allUsersNames));
   }, []);
   const form = useForm<CreateServiceWithUsers>({
     initialValues: {
@@ -74,16 +74,18 @@ const AddService = () => {
   });
 
   const handleSubmit = async (data: CreateServiceWithUsers) => {
+    console.log(data);
+
     setLoading(true);
     const serviceUsers = data.usernames;
 
     // nullify empty fields
     const nulledData = {
       ...data,
-      description: data.description ? data.description : null,
-      contact_number: data.contact_number ? data.contact_number : null,
-      website: data.website ? data.website : null,
-      promotional_image: data.promotional_image ? data.promotional_image : null,
+      description: !!data.description ? data.description : null,
+      contact_number: !!data.contact_number ? data.contact_number : null,
+      website: !!data.website ? data.website : null,
+      promotional_image: !!data.promotional_image ? data.promotional_image : null,
     };
     const res = await apiClient.post('/service', nulledData);
 
@@ -152,7 +154,7 @@ const AddService = () => {
   if (!user.permissions.includes(Permissions.EXCO)) return null;
   return (
     <>
-      <Modal opened={opened} onClose={() => setOpened(false)} title='Add Service'>
+      <Modal opened={opened} onClose={() => setOpened(false)}>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <div className='add-service'>
             <UploadImage
@@ -193,6 +195,7 @@ const AddService = () => {
             />
             <PillsInputWithSearch
               label='Service Users'
+              defaultValues={useMemo(() => [], [])}
               allValues={allUsersNames}
               onChange={(newServiceUsers) => form.setFieldValue('usernames', newServiceUsers)}
               required
@@ -208,7 +211,7 @@ const AddService = () => {
           </div>
         </form>
       </Modal>
-      <ActionIcon size={36} color='blue' onClick={() => setOpened(true)} className='action-icon'>
+      <ActionIcon color='blue' onClick={() => setOpened(true)}>
         <IconPlus />
       </ActionIcon>
     </>
