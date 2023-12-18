@@ -64,7 +64,7 @@ export const getNavbarTitle = (pathname: string) => {
     case '/services':
       return {
         title: 'Services',
-        Icon: IconHeart,
+        Icon: IconRadioactive,
       };
     default:
       return {
