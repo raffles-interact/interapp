@@ -11,6 +11,7 @@ import {
   IconPlaylistAdd,
   IconMenu2,
   IconMail,
+  IconHeart,
   type TablerIconsProps,
 } from '@tabler/icons-react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
@@ -137,10 +138,10 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
     category: 'Administration',
   },
   {
-    name: 'Manage services',
+    name: 'Services',
     callback: () => goTo('/services'),
-    icon: IconTableOptions,
-    show: !!user && user.permissions.includes(Permissions.EXCO),
+    icon: IconHeart,
+    show: !!user && user.permissions.includes(Permissions.CLUB_MEMBER),
     category: 'Administration',
   },
   {
