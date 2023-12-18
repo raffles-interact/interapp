@@ -84,6 +84,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       apiClient
         .post('/auth/refresh')
         .then((res) => {
+          if (res.status !== 200) {
+            logout();
+            return;
+          }
           localStorage.setItem(
             'access_token',
             (res.data as Omit<UserWithJWT, 'user'>).access_token,

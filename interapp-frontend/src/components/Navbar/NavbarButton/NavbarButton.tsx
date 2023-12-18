@@ -137,8 +137,8 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
     category: 'Administration',
   },
   {
-    name: 'EXCO Dashboard',
-    callback: () => goTo('/exco'),
+    name: 'Manage services',
+    callback: () => goTo('/services'),
     icon: IconTableOptions,
     show: !!user && user.permissions.includes(Permissions.EXCO),
     category: 'Administration',
