@@ -3,16 +3,15 @@ import { ActionIcon, Group, Modal, NumberInput, TextInput, Textarea, Button } fr
 import { TimeInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
-import { useEffect, useContext, useState, useMemo } from 'react';
+import { useEffect, useContext, useState } from 'react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import { Service } from '../page';
 import { notifications } from '@mantine/notifications';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
-import { convertToBase64 } from '@/components/UploadImage/UploadImage';
 import APIClient from '@/api/api_client';
 
 import SearchableSelect from '@/components/SearchableSelect/SearchableSelect';
-import UploadImage from '@/components/UploadImage/UploadImage';
+import UploadImage, { convertToBase64 } from '@/components/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
 import { User } from '@/providers/AuthProvider/types';
@@ -82,10 +81,10 @@ const AddService = () => {
     // nullify empty fields
     const nulledData = {
       ...data,
-      description: !!data.description ? data.description : null,
-      contact_number: !!data.contact_number ? data.contact_number : null,
-      website: !!data.website ? data.website : null,
-      promotional_image: !!data.promotional_image ? data.promotional_image : null,
+      description: data.description ? data.description : null,
+      contact_number: data.contact_number ? data.contact_number : null,
+      website: data.website ? data.website : null,
+      promotional_image: data.promotional_image ? data.promotional_image : null,
     };
     const res = await apiClient.post('/service', nulledData);
 
@@ -195,7 +194,6 @@ const AddService = () => {
             />
             <PillsInputWithSearch
               label='Service Users'
-              defaultValues={useMemo(() => [], [])}
               allValues={allUsersNames}
               onChange={(newServiceUsers) => form.setFieldValue('usernames', newServiceUsers)}
               required
