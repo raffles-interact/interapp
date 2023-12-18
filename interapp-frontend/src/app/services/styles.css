@@ -1,0 +1,6 @@
+.service-boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+  gap: 1rem;
+  margin: 0.7rem;
+}
