@@ -138,10 +138,10 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
     category: 'Administration',
   },
   {
-    name: 'Manage services',
+    name: 'Services',
     callback: () => goTo('/services'),
-    icon: IconTableOptions,
-    show: !!user && user.permissions.includes(Permissions.EXCO),
+    icon: IconHeart,
+    show: !!user && user.permissions.includes(Permissions.CLUB_MEMBER),
     category: 'Administration',
   },
   {
