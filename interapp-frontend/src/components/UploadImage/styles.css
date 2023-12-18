@@ -1,0 +1,18 @@
+.upload-image-file-input {
+  display: none;
+}
+.upload-image-preview {
+  width: 100%;
+  aspect-ratio: 5/3;
+
+  object-fit: scale-down;
+
+  cursor: pointer;
+}
+
+.upload-image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
