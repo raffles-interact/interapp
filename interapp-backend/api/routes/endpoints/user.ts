@@ -176,14 +176,12 @@ userRouter.patch(
     //validate data to be of shape {action: 'add' | 'remove', username: string}[]
     if (
       !Array.isArray(req.body.data) ||
-      !req.body.data.every(
-        (x: any) => x.action === 'add' || x.action === 'remove',
-      ) ||
+      !req.body.data.every((x: any) => x.action === 'add' || x.action === 'remove') ||
       req.body.data.length === 0
     ) {
       throw new HTTPError(
         'Invalid field type',
-        'Data must be an array of objects with action: \'add\' | \'remove\' and username',
+        "Data must be an array of objects with action: 'add' | 'remove' and username",
         HTTPErrorCode.BAD_REQUEST_ERROR,
       );
     }

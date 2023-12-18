@@ -13,15 +13,12 @@ import './styles.css';
 
 const fetchUserData = async () => {
   const apiClient = new APIClient().instance;
-  try {
-    const users: Omit<User, 'permissions'>[] = (await apiClient.get('/user')).data;
-    const perms: { [username: string]: Permissions[] } = (await apiClient.get('/user/permissions'))
-      .data;
-    const usersWithPerms = users.map((user) => ({ ...user, permissions: perms[user.username] }));
-    return usersWithPerms;
-  } catch (e) {
-    throw e;
-  }
+
+  const users: Omit<User, 'permissions'>[] = (await apiClient.get('/user')).data;
+  const perms: { [username: string]: Permissions[] } = (await apiClient.get('/user/permissions'))
+    .data;
+  const usersWithPerms = users.map((user) => ({ ...user, permissions: perms[user.username] }));
+  return usersWithPerms;
 };
 
 const computeSearchItems = (search: string, users: User[]) => {

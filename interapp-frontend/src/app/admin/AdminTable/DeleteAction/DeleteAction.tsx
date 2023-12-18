@@ -6,7 +6,10 @@ import { memo, useState } from 'react';
 import APIClient from '@/api/api_client';
 import './styles.css';
 
-function DeleteAction({ username, refreshData }: { username: string; refreshData: () => void }) {
+function DeleteAction({
+  username,
+  refreshData,
+}: Readonly<{ username: string; refreshData: () => void }>) {
   const apiClient = new APIClient().instance;
   const [opened, { open, close }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);

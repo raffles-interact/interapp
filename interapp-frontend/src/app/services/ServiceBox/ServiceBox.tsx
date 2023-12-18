@@ -16,7 +16,7 @@ const roundTimeToMinutes = (time: string) => {
 
 const ServiceBox = (service: Service) => {
   const apiClient = new APIClient().instance;
-  
+
   const [serviceInfo, setServiceInfo] = useState<Service>(service);
   const handleChangeServiceIc = async (service_ic: string) => {
     const res = await apiClient.patch('/service', {
@@ -47,20 +47,25 @@ const ServiceBox = (service: Service) => {
           color: 'red',
         });
         break;
-      }
-
-    
+    }
   };
   const handleChangeServiceUsers = async (old_service_users: string[], service_users: string[]) => {
     const added_users = service_users.filter((user) => !old_service_users.includes(user));
     const removed_users = old_service_users.filter((user) => !service_users.includes(user));
 
     // sigh... this endpoint was originally not implemented at all, and i just thought to send multiple requests at once
-    // then i have to remind myself that this is not a hackathon and i can't just rush silly things like this 
+    // then i have to remind myself that this is not a hackathon and i can't just rush silly things like this
     // i'm so tired
-    
-    const actions = [...added_users.map((user) => {return {action: 'add', username: user}}), ...removed_users.map((user) => {return {action: 'remove', username: user}})]
-    console.log(added_users, removed_users, actions)
+
+    const actions = [
+      ...added_users.map((user) => {
+        return { action: 'add', username: user };
+      }),
+      ...removed_users.map((user) => {
+        return { action: 'remove', username: user };
+      }),
+    ];
+    console.log(added_users, removed_users, actions);
     const res = await apiClient.patch('/user/userservices', {
       service_id: service.service_id,
       data: actions,
@@ -103,10 +108,8 @@ const ServiceBox = (service: Service) => {
           <div>
             <Text className='service-box-info-title'>Contact Info:</Text>
             <div className='service-box-info-content-inner'>
-              <>
-                <IconMail size={20} />
-                <Text>{serviceInfo.contact_email}</Text>
-              </>
+              <IconMail size={20} />
+              <Text>{serviceInfo.contact_email}</Text>
 
               {serviceInfo.contact_number && (
                 <>
