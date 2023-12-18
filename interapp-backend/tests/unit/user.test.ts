@@ -170,6 +170,7 @@ describe('Unit (user)', () => {
         action: 'add',
         username: 'testuser2',
       },
+
     ]);
     expect(() => UserModel.getAllServicesByUser('testuser')).not.toThrow(
       'The user with username testuser has no services',
@@ -184,11 +185,13 @@ describe('Unit (user)', () => {
       {
         action: 'remove',
         username: 'testuser',
-      },
+      }
+
     ]);
     expect(() => UserModel.getAllServicesByUser('testuser')).toThrow(
       'The user with username testuser has no services',
     );
+    
   });
 
   test('bulk update service users (mixed)', async () => {
