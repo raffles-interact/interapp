@@ -26,34 +26,6 @@ export const convertToBase64 = (file: File): Promise<string> => {
   });
 };
 
-export function getMimeTypeFromArrayBuffer(arrayBuffer: Buffer) {
-  const uint8arr = new Uint8Array(arrayBuffer);
-
-  const len = 4;
-  if (uint8arr.length >= len) {
-    let signatureArr = new Array(len);
-    for (let i = 0; i < len; i++) signatureArr[i] = new Uint8Array(arrayBuffer)[i].toString(16);
-    const signature = signatureArr.join('').toUpperCase();
-
-    switch (signature) {
-      case '89504E47':
-        return 'image/png';
-      case '47494638':
-        return 'image/gif';
-      case '25504446':
-        return 'application/pdf';
-      case 'FFD8FFDB':
-      case 'FFD8FFE0':
-        return 'image/jpeg';
-      case '504B0304':
-        return 'application/zip';
-      default:
-        return null;
-    }
-  }
-  return null;
-}
-
 const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadImageProps) => {
   const [imageURL, setImageURL] = useState(defaultImageURL ?? '');
   const inputRef = useRef<HTMLInputElement>(null);
@@ -88,7 +60,13 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
         className='upload-image-file-input'
       />
       {imageURL === '' ? (
-        <div className='upload-image-placeholder' onClick={() => inputRef.current?.click()}>
+        <div
+          className='upload-image-placeholder'
+          onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === 'F1') inputRef.current?.click();
+          }}
+        >
           <Text>Upload an image</Text>
         </div>
       ) : (
@@ -96,6 +74,9 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
           src={imageURL}
           className='upload-image-preview'
           onClick={() => inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === 'F1') inputRef.current?.click();
+          }}
         />
       )}
     </div>
