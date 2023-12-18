@@ -3,19 +3,15 @@ import { PillsInput, Pill, Combobox, CheckIcon, Group, useCombobox } from '@mant
 import { useEffect, useState } from 'react';
 
 export interface PillsInputWithSearchProps<T> {
-  defaultValues?: T[];
+  defaultValues: T[];
   allValues: T[];
   onChange: (newValues: T[]) => void;
-  label?: string;
-  required?: boolean;
 }
 
 const PillsInputWithSearch = <T extends string>({
   defaultValues,
   allValues,
   onChange,
-  label,
-  required,
 }: PillsInputWithSearchProps<T>) => {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -23,11 +19,9 @@ const PillsInputWithSearch = <T extends string>({
   });
   const [search, setSearch] = useState('');
 
-  const [value, setValue] = useState<T[]>([]);
+  const [value, setValue] = useState<T[]>(defaultValues);
 
-  useEffect(() => {
-    if (defaultValues) setValue(defaultValues);
-  }, [defaultValues]);
+  useEffect(() => setValue(defaultValues), [defaultValues]);
 
   useEffect(() => {
     onChange(value);
@@ -52,38 +46,40 @@ const PillsInputWithSearch = <T extends string>({
       </Combobox.Option>
     ));
   return (
-    <Combobox store={combobox} onOptionSubmit={(v) => handleValueSelect(v as T)}>
-      <Combobox.DropdownTarget>
-        <PillsInput onClick={() => combobox.openDropdown()} label={label} required={required}>
-          <Pill.Group>
-            {value.map((item) => (
-              <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
-                {item}
-              </Pill>
-            ))}
+    <>
+      <Combobox store={combobox} onOptionSubmit={(v) => handleValueSelect(v as T)}>
+        <Combobox.DropdownTarget>
+          <PillsInput onClick={() => combobox.openDropdown()}>
+            <Pill.Group>
+              {value.map((item) => (
+                <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
+                  {item}
+                </Pill>
+              ))}
 
-            <Combobox.EventsTarget>
-              <PillsInput.Field
-                onFocus={() => combobox.openDropdown()}
-                onBlur={() => combobox.closeDropdown()}
-                value={search}
-                placeholder='Search values'
-                onChange={(event) => {
-                  combobox.updateSelectedOptionIndex();
-                  setSearch(event.currentTarget.value);
-                }}
-              />
-            </Combobox.EventsTarget>
-          </Pill.Group>
-        </PillsInput>
-      </Combobox.DropdownTarget>
+              <Combobox.EventsTarget>
+                <PillsInput.Field
+                  onFocus={() => combobox.openDropdown()}
+                  onBlur={() => combobox.closeDropdown()}
+                  value={search}
+                  placeholder='Search values'
+                  onChange={(event) => {
+                    combobox.updateSelectedOptionIndex();
+                    setSearch(event.currentTarget.value);
+                  }}
+                />
+              </Combobox.EventsTarget>
+            </Pill.Group>
+          </PillsInput>
+        </Combobox.DropdownTarget>
 
-      <Combobox.Dropdown>
-        <Combobox.Options>
-          {options.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
-        </Combobox.Options>
-      </Combobox.Dropdown>
-    </Combobox>
+        <Combobox.Dropdown>
+          <Combobox.Options>
+            {options.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
+          </Combobox.Options>
+        </Combobox.Dropdown>
+      </Combobox>
+    </>
   );
 };
 

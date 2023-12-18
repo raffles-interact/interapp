@@ -5,17 +5,9 @@ interface SearchableSelectProps {
   defaultValue: string | null;
   allValues: string[];
   onChange: (newValue: string) => void;
-  label?: string;
-  required?: boolean;
 }
 
-const SearchableSelect = ({
-  defaultValue,
-  allValues,
-  onChange,
-  label,
-  required,
-}: SearchableSelectProps) => {
+const SearchableSelect = ({ defaultValue, allValues, onChange }: SearchableSelectProps) => {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
@@ -53,8 +45,6 @@ const SearchableSelect = ({
     >
       <Combobox.Target>
         <InputBase
-          label={label}
-          required={required}
           rightSection={<Combobox.Chevron />}
           value={search}
           onChange={(event) => {

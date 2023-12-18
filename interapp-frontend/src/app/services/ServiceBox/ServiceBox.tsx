@@ -1,25 +1,22 @@
 'use client';
-import dynamic from 'next/dynamic';
 import { Service } from '../page';
-import { Suspense, memo, useState } from 'react';
-import { Text, Title, Skeleton } from '@mantine/core';
+import { memo, useState } from 'react';
+import { Text, Title } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
-import APIClient from '@api/api_client';
-
-const ServiceBoxUsers = dynamic(() => import('../ServiceBoxUsers/ServiceBoxUsers'));
+import APIClient from '@/api/api_client';
+import ServiceBoxUsers from '../ServiceBoxUsers/ServiceBoxUsers';
 import './styles.css';
 import { notifications } from '@mantine/notifications';
-const DeleteService = dynamic(() => import('../DeleteService/DeleteService'));
 
-export const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-export const roundTimeToMinutes = (time: string) => {
+const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+const roundTimeToMinutes = (time: string) => {
   const [hours, minutes, _] = time.split(':');
   return `${hours}:${minutes}`;
 };
 
 const ServiceBox = (service: Service) => {
   const apiClient = new APIClient().instance;
-
+  
   const [serviceInfo, setServiceInfo] = useState<Service>(service);
   const handleChangeServiceIc = async (service_ic: string) => {
     const res = await apiClient.patch('/service', {
@@ -50,24 +47,20 @@ const ServiceBox = (service: Service) => {
           color: 'red',
         });
         break;
-    }
+      }
+
+    
   };
   const handleChangeServiceUsers = async (old_service_users: string[], service_users: string[]) => {
     const added_users = service_users.filter((user) => !old_service_users.includes(user));
     const removed_users = old_service_users.filter((user) => !service_users.includes(user));
 
     // sigh... this endpoint was originally not implemented at all, and i just thought to send multiple requests at once
-    // then i have to remind myself that this is not a hackathon and i can't just rush silly things like this
+    // then i have to remind myself that this is not a hackathon and i can't just rush silly things like this 
     // i'm so tired
-
-    const actions = [
-      ...added_users.map((user) => {
-        return { action: 'add', username: user };
-      }),
-      ...removed_users.map((user) => {
-        return { action: 'remove', username: user };
-      }),
-    ];
+    
+    const actions = [...added_users.map((user) => {return {action: 'add', username: user}}), ...removed_users.map((user) => {return {action: 'remove', username: user}})]
+    console.log(added_users, removed_users, actions)
     const res = await apiClient.patch('/user/userservices', {
       service_id: service.service_id,
       data: actions,
@@ -93,22 +86,11 @@ const ServiceBox = (service: Service) => {
 
   return (
     <div className='service-box'>
-      <div className='service-box-image-container'>
-        <Suspense fallback={<Skeleton className='service-box-image-skeleton' />}>
-          <img
-            src={serviceInfo.promotional_image ?? '/placeholder-image.jpg'}
-            alt={serviceInfo.name}
-            className='service-box-image'
-          />
-        </Suspense>
-
-        <DeleteService
-          service_id={serviceInfo.service_id}
-          service_name={serviceInfo.name}
-          className='service-box-delete'
-        />
-      </div>
-
+      <img
+        src={serviceInfo.promotional_image ?? '/placeholder-image.jpg'}
+        alt={serviceInfo.name}
+        className='service-box-image'
+      />
       <div className='service-box-info'>
         <div className='service-box-info-headers'>
           <Title order={3} className='service-box-info-title'>
@@ -121,8 +103,10 @@ const ServiceBox = (service: Service) => {
           <div>
             <Text className='service-box-info-title'>Contact Info:</Text>
             <div className='service-box-info-content-inner'>
-              <IconMail size={20} />
-              <Text>{serviceInfo.contact_email}</Text>
+              <>
+                <IconMail size={20} />
+                <Text>{serviceInfo.contact_email}</Text>
+              </>
 
               {serviceInfo.contact_number && (
                 <>
