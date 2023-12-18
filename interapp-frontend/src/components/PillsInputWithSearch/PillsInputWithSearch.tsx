@@ -46,40 +46,38 @@ const PillsInputWithSearch = <T extends string>({
       </Combobox.Option>
     ));
   return (
-    <>
-      <Combobox store={combobox} onOptionSubmit={(v) => handleValueSelect(v as T)}>
-        <Combobox.DropdownTarget>
-          <PillsInput onClick={() => combobox.openDropdown()}>
-            <Pill.Group>
-              {value.map((item) => (
-                <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
-                  {item}
-                </Pill>
-              ))}
+    <Combobox store={combobox} onOptionSubmit={(v) => handleValueSelect(v as T)}>
+      <Combobox.DropdownTarget>
+        <PillsInput onClick={() => combobox.openDropdown()}>
+          <Pill.Group>
+            {value.map((item) => (
+              <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
+                {item}
+              </Pill>
+            ))}
 
-              <Combobox.EventsTarget>
-                <PillsInput.Field
-                  onFocus={() => combobox.openDropdown()}
-                  onBlur={() => combobox.closeDropdown()}
-                  value={search}
-                  placeholder='Search values'
-                  onChange={(event) => {
-                    combobox.updateSelectedOptionIndex();
-                    setSearch(event.currentTarget.value);
-                  }}
-                />
-              </Combobox.EventsTarget>
-            </Pill.Group>
-          </PillsInput>
-        </Combobox.DropdownTarget>
+            <Combobox.EventsTarget>
+              <PillsInput.Field
+                onFocus={() => combobox.openDropdown()}
+                onBlur={() => combobox.closeDropdown()}
+                value={search}
+                placeholder='Search values'
+                onChange={(event) => {
+                  combobox.updateSelectedOptionIndex();
+                  setSearch(event.currentTarget.value);
+                }}
+              />
+            </Combobox.EventsTarget>
+          </Pill.Group>
+        </PillsInput>
+      </Combobox.DropdownTarget>
 
-        <Combobox.Dropdown>
-          <Combobox.Options>
-            {options.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
-    </>
+      <Combobox.Dropdown>
+        <Combobox.Options>
+          {options.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
   );
 };
 
