@@ -2,6 +2,8 @@ export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
 
 import APIClient from '@/api/api_client';
 import ServiceBox from './ServiceBox/ServiceBox';
+import AddService from './AddService/AddService';
+import { Title } from '@mantine/core';
 import './styles.css';
 
 export interface Service {
@@ -11,7 +13,7 @@ export interface Service {
   contact_email: string;
   contact_number: number | null;
   website: string | null;
-  promotional_image: string | null;
+  promotional_image: string | { type: 'Buffer'; data: Array<number> } | null;
   day_of_week: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   start_time: string;
   end_time: string;
@@ -28,8 +30,12 @@ export default async function ServicesPage() {
   const allServices: Service[] = (await apiClient.get('/service/get_all')).data.services;
 
   return (
-    <div>
-      <h1>Services</h1>
+    <div className='service-page'>
+      <div className='service-headers'>
+        <Title>Services</Title>
+        <AddService />
+      </div>
+
       <div className='service-boxes'>
         {allServices.map((service) => (
           <ServiceBox
