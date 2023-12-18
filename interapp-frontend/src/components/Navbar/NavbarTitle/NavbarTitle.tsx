@@ -14,6 +14,7 @@ import {
   IconSpeakerphone,
   IconPlaylistAdd,
   IconMenu2,
+  IconHeart,
   IconQuestionMark,
 } from '@tabler/icons-react';
 import { Group, Text } from '@mantine/core';
@@ -58,6 +59,11 @@ export const getNavbarTitle = (pathname: string) => {
     case '/admin':
       return {
         title: 'Admin Page',
+        Icon: IconRadioactive,
+      };
+    case '/services':
+      return {
+        title: 'Services',
         Icon: IconRadioactive,
       };
     default:
