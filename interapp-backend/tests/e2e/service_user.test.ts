@@ -230,6 +230,67 @@ describe('API (user service)', async () => {
     });
   });
 
+  test('bulk update service users (add)', async () => {
+    const res = await fetch(`${API_URL}/user/userservices`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_id: 1,
+        data: [{ action: 'add', username: 'testuser2' }],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('bulk update service users (remove)', async () => {
+    const res = await fetch(`${API_URL}/user/userservices`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_id: 1,
+        data: [{ action: 'remove', username: 'testuser2' }],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
+  test('bulk update service users (mixed)', async () => {
+    const res = await fetch(`${API_URL}/user/userservices`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_id: 2,
+        data: [
+          { action: 'remove', username: 'testuser2' },
+          { action: 'add', username: 'testuser' },
+        ],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    console.log(await res.json())
+    expect(res.status).toBe(204);
+  });
+
+  test('invalid bulk update service users', async () => {
+    const res = await fetch(`${API_URL}/user/userservices`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_id: 1,
+        data: [{ action: 'remfsdfsfsadfasfsae', username: 'testuser2' }, { action: 'add', username: 'testuser' }],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(400);
+    const res2 = await fetch(`${API_URL}/user/userservices`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_id: 9,
+        data: [{ action: 'remove', username: 'testuser2' }, { action: 'add', username: 'testuser' }],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(404);
+  });
+
   afterAll(async () => {
     await recreateDB();
   });
