@@ -1,12 +1,12 @@
 'use client';
-import APIClient from '@api/api_client';
-import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
-import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
-import { User } from '@providers/AuthProvider/types';
+import APIClient from '@/api/api_client';
+import PillsInputWithSearch from '@/components/PillsInputWithSearch/PillsInputWithSearch';
+import SearchableSelect from '@/components/SearchableSelect/SearchableSelect';
+import { User } from '@/providers/AuthProvider/types';
 import { AxiosInstance } from 'axios';
 import { useState, useEffect, useContext } from 'react';
 import { Modal, Button, Text } from '@mantine/core';
-import { AuthContext } from '@providers/AuthProvider/AuthProvider';
+import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
@@ -16,13 +16,13 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
     `/service/get_users_by_service?service_id=${service_id}`,
   );
   const users: Omit<User, 'permissions'>[] = get_users_by_service.data.users;
-  const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
+  const serviceUsers = users !== undefined ? users.map((user) => user.username): [];
 
   const get_all_users = await apiClient.get(`/user`);
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
-  const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
+  const all_users_names = all_users !== undefined ? all_users.map((user) => user.username): [];
 
-  return [serviceUsers, allUsersNames];
+  return [serviceUsers, all_users_names];
 };
 
 interface ServiceBoxUsersProps {
@@ -40,9 +40,11 @@ const ServiceBoxUsers = ({
 }: ServiceBoxUsersProps) => {
   const apiClient = new APIClient().instance;
   const { user } = useContext(AuthContext);
+  if (!user) return null;
+  if (!user.permissions.includes(Permissions.EXCO)) return null;
 
-  const [serviceUsers, setServiceUsers] = useState<string[]>([]);
-  const [allUsersNames, setAllUsersNames] = useState<string[]>([]);
+  const [serviceUsers, setUsers] = useState<string[]>([]);
+  const [all_users_names, setAllUsersNames] = useState<string[]>([]);
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,14 +54,14 @@ const ServiceBoxUsers = ({
 
   useEffect(() => {
     if (!open) return;
-    handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsersNames]) => {
-      setServiceUsers(serviceUsers);
-      setAllUsersNames(allUsersNames);
+    handleGetUsers(service_id, apiClient).then(([serviceUsers, all_users_names]) => {
+      setUsers(serviceUsers);
+      setAllUsersNames(all_users_names);
     });
   }, [open]);
 
-  if (!user) return null;
-  if (!user.permissions.includes(Permissions.EXCO)) return null;
+  
+
 
   const handleSave = () => {
     setLoading(true);
@@ -67,31 +69,30 @@ const ServiceBoxUsers = ({
     if (newServiceUsers !== serviceUsers) handleChangeServiceUsers(serviceUsers, newServiceUsers);
     setOpen(false);
     setLoading(false);
-  };
+
+  }
 
   return (
     <>
       <Modal opened={open} onClose={() => setOpen(false)} title='Manage Users'>
         <div className='service-box-users'>
-          <Text>
-            Edit assigned services for Interact's members. You must assign 1 service IC to every
-            service which cannot be managing another service. Please ensure that the regular
-            participating users includes the service IC.
-          </Text>
-
-          <SearchableSelect
-            defaultValue={newServiceIc}
-            allValues={allUsersNames}
-            onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
-            label='Service IC'
-          />
-
-          <PillsInputWithSearch
-            defaultValues={serviceUsers}
-            allValues={allUsersNames}
-            onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
-            label='Regular service participants'
-          />
+          <Text>Edit assigned services for Interact's members. You must assign 1 service IC to every service which cannot be managing another service. Please ensure that the regular participating users includes the service IC.</Text>
+          <div>
+            <Text>Service IC</Text>
+            <SearchableSelect
+              defaultValue={newServiceIc}
+              allValues={all_users_names}
+              onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
+            />
+          </div>
+          <div>
+            <Text>Regular service participants</Text>
+            <PillsInputWithSearch
+              defaultValues={serviceUsers}
+              allValues={all_users_names}
+              onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
+            />
+          </div>
 
           <div className='service-box-users-actions'>
             <Button onClick={() => setOpen(false)} variant='outline' color='red'>
@@ -100,7 +101,11 @@ const ServiceBoxUsers = ({
             <Button onClick={handleSave} variant='outline' color='green' loading={loading}>
               Save
             </Button>
+
           </div>
+          
+
+          
         </div>
       </Modal>
 
