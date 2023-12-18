@@ -427,6 +427,43 @@ export class UserModel {
   public static async removeServiceUser(service_id: number, username: string) {
     await appDataSource.manager.delete(UserService, { service_id, username });
   }
+  public static async updateServiceUserBulk(
+    service_id: number,
+    data: { action: 'add' | 'remove'; username: string }[],
+  ) {
+    const service = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['service'])
+      .from(Service, 'service')
+      .where('service.service_id = :service_id', { service_id })
+      .getOne();
+    if (!service)
+      throw new HTTPError(
+        'Service not found',
+        `Service with id ${service_id} was not found`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+
+    const findUsers = async (usernames: string[]) => {
+      if (findUsers.length === 0) return [];
+      return await appDataSource.manager
+        .createQueryBuilder()
+        .select(['user'])
+        .from(User, 'user')
+        .where('user.username IN (:...usernames)', { usernames })
+        .getMany();
+    };
+
+    const toAdd = data
+      .filter(({ action, username }) => action === 'add')
+      .map((data) => data.username);
+    const toRemove = data
+      .filter(({ action, username }) => action === 'remove')
+      .map((data) => data.username);
+
+    if (toAdd.length !== 0) await appDataSource.manager.insert(UserService, (await findUsers(toAdd)).map((user) => ({ service_id, username: user.username, service, user })));
+    if (toRemove.length !== 0) await appDataSource.manager.delete(UserService, toRemove.map((username) => ({ service_id, username })));
+  }
   public static async updateServiceHours(username: string, hours: number) {
     const user = await appDataSource.manager
       .createQueryBuilder()
