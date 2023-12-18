@@ -3,7 +3,6 @@ import { Service } from '../page';
 import { memo, useState } from 'react';
 import { Text, Title } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
-import { arrayBufferToBlob } from 'blob-util';
 import APIClient from '@/api/api_client';
 import ServiceBoxUsers from '../ServiceBoxUsers/ServiceBoxUsers';
 import './styles.css';
