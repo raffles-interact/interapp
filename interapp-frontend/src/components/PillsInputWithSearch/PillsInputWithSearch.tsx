@@ -3,7 +3,7 @@ import { PillsInput, Pill, Combobox, CheckIcon, Group, useCombobox } from '@mant
 import { useEffect, useState } from 'react';
 
 export interface PillsInputWithSearchProps<T> {
-  defaultValues: T[];
+  defaultValues?: T[];
   allValues: T[];
   onChange: (newValues: T[]) => void;
   label?: string;
@@ -23,9 +23,11 @@ const PillsInputWithSearch = <T extends string>({
   });
   const [search, setSearch] = useState('');
 
-  const [value, setValue] = useState<T[]>(defaultValues);
+  const [value, setValue] = useState<T[]>([]);
 
-  useEffect(() => setValue(defaultValues), [defaultValues]);
+  useEffect(() => {
+    if (defaultValues) setValue(defaultValues);
+  }, [defaultValues]);
 
   useEffect(() => {
     onChange(value);
