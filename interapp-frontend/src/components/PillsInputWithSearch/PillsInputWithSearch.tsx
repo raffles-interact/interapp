@@ -6,12 +6,16 @@ export interface PillsInputWithSearchProps<T> {
   defaultValues: T[];
   allValues: T[];
   onChange: (newValues: T[]) => void;
+  label?: string;
+  required?: boolean;
 }
 
 const PillsInputWithSearch = <T extends string>({
   defaultValues,
   allValues,
   onChange,
+  label,
+  required,
 }: PillsInputWithSearchProps<T>) => {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -48,7 +52,7 @@ const PillsInputWithSearch = <T extends string>({
   return (
     <Combobox store={combobox} onOptionSubmit={(v) => handleValueSelect(v as T)}>
       <Combobox.DropdownTarget>
-        <PillsInput onClick={() => combobox.openDropdown()}>
+        <PillsInput onClick={() => combobox.openDropdown()} label={label} required={required}>
           <Pill.Group>
             {value.map((item) => (
               <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>

@@ -3,13 +3,14 @@ import { Service } from '../page';
 import { memo, useState } from 'react';
 import { Text, Title } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
+import { arrayBufferToBlob } from 'blob-util';
 import APIClient from '@/api/api_client';
 import ServiceBoxUsers from '../ServiceBoxUsers/ServiceBoxUsers';
 import './styles.css';
 import { notifications } from '@mantine/notifications';
 
-const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-const roundTimeToMinutes = (time: string) => {
+export const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const roundTimeToMinutes = (time: string) => {
   const [hours, minutes, _] = time.split(':');
   return `${hours}:${minutes}`;
 };
@@ -65,7 +66,6 @@ const ServiceBox = (service: Service) => {
         return { action: 'remove', username: user };
       }),
     ];
-    console.log(added_users, removed_users, actions);
     const res = await apiClient.patch('/user/userservices', {
       service_id: service.service_id,
       data: actions,
@@ -89,13 +89,19 @@ const ServiceBox = (service: Service) => {
     }
   };
 
+  const parsedPromotionalImage = () => {
+    if (typeof serviceInfo.promotional_image === 'string') {
+      return serviceInfo.promotional_image;
+    } else if (serviceInfo.promotional_image !== null) {
+      return Buffer.from(serviceInfo.promotional_image.data).toString();
+    } else {
+      return '/placeholder-image.jpg';
+    }
+  };
+
   return (
     <div className='service-box'>
-      <img
-        src={serviceInfo.promotional_image ?? '/placeholder-image.jpg'}
-        alt={serviceInfo.name}
-        className='service-box-image'
-      />
+      <img src={parsedPromotionalImage()} alt={serviceInfo.name} className='service-box-image' />
       <div className='service-box-info'>
         <div className='service-box-info-headers'>
           <Title order={3} className='service-box-info-title'>
