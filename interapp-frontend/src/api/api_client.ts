@@ -13,9 +13,11 @@ export class APIClient {
       useClient: true,
     };
     this.instance = axios.create({
-      timeout: 10000,
+      timeout: 60000,
       withCredentials: true,
       validateStatus: (status) => status < 500,
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
     });
     this.instance.interceptors.request.use((req) => {
       req.headers['Content-Type'] = 'application/json';

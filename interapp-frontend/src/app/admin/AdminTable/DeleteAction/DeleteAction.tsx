@@ -35,7 +35,6 @@ function DeleteAction({
         closeOnClickOutside={false}
         closeOnEscape={false}
         withCloseButton={false}
-        zIndex={999}
       >
         <div className='delete-modal'>
           <Text>

@@ -15,7 +15,6 @@ import UploadImage, { convertToBase64 } from '@/components/UploadImage/UploadIma
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
 import { User } from '@/providers/AuthProvider/types';
-import { AxiosInstance } from 'axios';
 import PillsInputWithSearch from '@/components/PillsInputWithSearch/PillsInputWithSearch';
 import { useRouter } from 'next/navigation';
 
@@ -24,7 +23,9 @@ export type CreateServiceWithUsers = Omit<ServiceWithUsers, 'service_id'>;
 
 const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
-const getAllUsers = async (apiClient: AxiosInstance) => {
+const getAllUsers = async () => {
+  const apiClient = new APIClient().instance;
+
   const get_all_users = await apiClient.get(`/user`);
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
   const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
@@ -38,9 +39,10 @@ const AddService = () => {
   const [loading, setLoading] = useState(false);
   const apiClient = new APIClient().instance;
   const router = useRouter();
+  
 
   useEffect(() => {
-    getAllUsers(apiClient).then((allUsersNames) => setAllUsersNames(allUsersNames));
+    getAllUsers().then((allUsersNames) => setAllUsersNames(allUsersNames));
   }, []);
   const form = useForm<CreateServiceWithUsers>({
     initialValues: {
@@ -73,8 +75,6 @@ const AddService = () => {
   });
 
   const handleSubmit = async (data: CreateServiceWithUsers) => {
-    console.log(data);
-
     setLoading(true);
     const serviceUsers = data.usernames;
 
@@ -153,7 +153,7 @@ const AddService = () => {
   if (!user.permissions.includes(Permissions.EXCO)) return null;
   return (
     <>
-      <Modal opened={opened} onClose={() => setOpened(false)}>
+      <Modal opened={opened} onClose={() => setOpened(false)} title='Add Service'>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <div className='add-service'>
             <UploadImage
@@ -209,7 +209,7 @@ const AddService = () => {
           </div>
         </form>
       </Modal>
-      <ActionIcon color='blue' onClick={() => setOpened(true)}>
+      <ActionIcon size={36} color='blue' onClick={() => setOpened(true)} className='action-icon'>
         <IconPlus />
       </ActionIcon>
     </>
