@@ -1,9 +1,10 @@
 export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
 
+import { Suspense, lazy } from 'react';
 import APIClient from '@/api/api_client';
-import ServiceBox from './ServiceBox/ServiceBox';
+const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
-import { Title } from '@mantine/core';
+import { Title, Skeleton } from '@mantine/core';
 import './styles.css';
 
 export interface Service {
@@ -25,35 +26,60 @@ export interface ServiceWithUsers {
   usernames: string[];
 }
 
+const fetchAllServices = async () => {
+  const apiClient = new APIClient({useClient: false}).instance;
+  try {
+    
+    const res = await apiClient.get('/service/get_all');
+
+    switch (res.status) {
+      case 200:
+        break;
+      case 400:
+        throw new Error('Bad Request');
+      default:
+        throw new Error('Unknown error');
+    }
+
+    const allServices: Service[] = res.data.services;
+
+    return allServices;
+  } catch (e) {
+    console.error(e);
+    return [];
+  }
+};
+
 export default async function ServicesPage() {
-  const apiClient = new APIClient({ useClient: false }).instance;
-  const allServices: Service[] = (await apiClient.get('/service/get_all')).data.services;
+  const allServices: Service[] = await fetchAllServices();
 
   return (
     <div className='service-page'>
       <div className='service-headers'>
-        <Title>Services</Title>
-        <AddService />
-      </div>
+            <Title>Services</Title>
+            <AddService />
+          </div>
+          <div className='service-boxes'>
+            <Suspense fallback={<Skeleton className='service-skeleton'/>}>
+            {allServices.map((service) => (
+              <ServiceBox
+                key={service.service_id}
+                name={service.name}
+                description={service.description}
+                contact_email={service.contact_email}
+                contact_number={service.contact_number}
+                website={service.website}
+                promotional_image={service.promotional_image}
+                day_of_week={service.day_of_week}
+                start_time={service.start_time}
+                end_time={service.end_time}
+                service_ic_username={service.service_ic_username}
+                service_id={service.service_id}
 
-      <div className='service-boxes'>
-        {allServices.map((service) => (
-          <ServiceBox
-            key={service.service_id}
-            service_id={service.service_id}
-            name={service.name}
-            description={service.description}
-            contact_email={service.contact_email}
-            contact_number={service.contact_number}
-            website={service.website}
-            promotional_image={service.promotional_image}
-            day_of_week={service.day_of_week}
-            start_time={service.start_time}
-            end_time={service.end_time}
-            service_ic_username={service.service_ic_username}
-          />
-        ))}
-      </div>
+              />
+            ))}
+            </Suspense>
+          </div>
     </div>
   );
 }

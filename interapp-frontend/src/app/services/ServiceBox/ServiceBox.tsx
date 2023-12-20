@@ -1,12 +1,15 @@
 'use client';
+import dynamic from 'next/dynamic';
 import { Service } from '../page';
 import { memo, useState } from 'react';
 import { Text, Title } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
 import APIClient from '@/api/api_client';
-import ServiceBoxUsers from '../ServiceBoxUsers/ServiceBoxUsers';
+
+const ServiceBoxUsers = dynamic(() => import('../ServiceBoxUsers/ServiceBoxUsers'));
 import './styles.css';
 import { notifications } from '@mantine/notifications';
+const DeleteService = dynamic(() => import('../DeleteService/DeleteService'));
 
 export const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const roundTimeToMinutes = (time: string) => {
@@ -100,7 +103,16 @@ const ServiceBox = (service: Service) => {
 
   return (
     <div className='service-box'>
-      <img src={parsedPromotionalImage()} alt={serviceInfo.name} className='service-box-image' />
+      <div className='service-box-image-container'>
+        <img src={parsedPromotionalImage()} alt={serviceInfo.name} className='service-box-image' loading='lazy'/>
+        <DeleteService
+          service_id={serviceInfo.service_id}
+          service_name={serviceInfo.name}
+          className='service-box-delete'
+          
+        />
+      </div>
+
       <div className='service-box-info'>
         <div className='service-box-info-headers'>
           <Title order={3} className='service-box-info-title'>
