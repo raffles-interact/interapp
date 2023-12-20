@@ -27,13 +27,16 @@ const nextConfig = {
     ];
   },
   experimental: {
-    optimizePackageImports: process.env.NODE_ENV === 'production' && [
-      '@mantine/core',
-      '@mantine/hooks',
-      '@mantine/form',
-      '@mantine/dates',
-      '@mantine/notifications',
-    ],
+    optimizePackageImports:
+      process.env.NODE_ENV === 'production'
+        ? [
+            '@mantine/core',
+            '@mantine/hooks',
+            '@mantine/form',
+            '@mantine/dates',
+            '@mantine/notifications',
+          ]
+        : null,
   },
 };
 

@@ -1,8 +1,8 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { Service } from '../page';
-import { memo, useState } from 'react';
-import { Text, Title } from '@mantine/core';
+import { Suspense, memo, useState } from 'react';
+import { Text, Title, Skeleton } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
 import APIClient from '@/api/api_client';
 
@@ -104,12 +104,14 @@ const ServiceBox = (service: Service) => {
   return (
     <div className='service-box'>
       <div className='service-box-image-container'>
-        <img
-          src={parsedPromotionalImage()}
-          alt={serviceInfo.name}
-          className='service-box-image'
-          loading='lazy'
-        />
+        <Suspense fallback={<Skeleton className='service-box-image-skeleton' />}>
+          <img
+            src={parsedPromotionalImage()}
+            alt={serviceInfo.name}
+            className='service-box-image'
+          />
+        </Suspense>
+
         <DeleteService
           service_id={serviceInfo.service_id}
           service_name={serviceInfo.name}
