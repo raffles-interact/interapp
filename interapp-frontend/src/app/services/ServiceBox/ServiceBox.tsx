@@ -104,12 +104,16 @@ const ServiceBox = (service: Service) => {
   return (
     <div className='service-box'>
       <div className='service-box-image-container'>
-        <img src={parsedPromotionalImage()} alt={serviceInfo.name} className='service-box-image' loading='lazy'/>
+        <img
+          src={parsedPromotionalImage()}
+          alt={serviceInfo.name}
+          className='service-box-image'
+          loading='lazy'
+        />
         <DeleteService
           service_id={serviceInfo.service_id}
           service_name={serviceInfo.name}
           className='service-box-delete'
-          
         />
       </div>
 
