@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
-
 import { Suspense, lazy } from 'react';
 import APIClient from '@/api/api_client';
 const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
