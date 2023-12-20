@@ -288,20 +288,29 @@ export class ServiceModel {
   public static async deleteServiceSessionUser(service_session_id: number, username: string) {
     await appDataSource.manager.delete(ServiceSessionUser, { service_session_id, username });
   }
-  public static async getAllServiceSessions(service_id: number, page: number, perPage: number) {
-    console.log(service_id, page, perPage);
+  public static async getAllServiceSessions(page: number, perPage: number, service_id?: number) {
+    const parseRes = (res: Partial<ServiceSession>[]) =>
+      res.map((session) => {
+        const service_name = session.service?.name;
+        delete session.service;
+        return { ...session, service_name };
+      });
+    const condition = service_id ? 'service_session.service_id = :service_id' : '1 = 1';
+
     const res = await appDataSource.manager
       .createQueryBuilder()
       .select('service_session')
       .from(ServiceSession, 'service_session')
-      .where('service_session.service_id = :service_id', { service_id })
-      .orderBy('service_session.start_time', 'ASC')
-      .limit(perPage)
-      .offset((page - 1) * perPage)
+      .where(condition, { service_id })
+
       .leftJoinAndSelect('service_session.service_session_users', 'service_session_users')
       .leftJoin('service_session.service', 'service')
       .addSelect('service.name')
+      .take(perPage)
+      .skip((page - 1) * perPage)
+      .orderBy('service_session.start_time', 'ASC')
       .getMany();
-    return res;
+
+    return parseRes(res);
   }
 }

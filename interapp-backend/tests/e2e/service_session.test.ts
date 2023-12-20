@@ -29,6 +29,16 @@ describe('API (service session)', async () => {
       }),
       headers: { 'Content-Type': 'application/json' },
     });
+    await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 2,
+        username: 'testuser3',
+        email: 'test@example.com',
+        password: 'testpasswordhhhjh',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
 
     const res = await fetch(`${API_URL}/auth/signin`, {
       method: 'POST',
@@ -418,14 +428,134 @@ describe('API (service session)', async () => {
     expect(res2.status).toBe(201);
   });
 
+  test('create more services and service sessions', async () => {
+    // create 1 service
+
+    const res3 = await fetch(`${API_URL}/service`, {
+      method: 'POST',
+      body: JSON.stringify({
+        name: 'test sedsfdsfdsrvice3',
+        contact_email: 'fksalfjasklf@fkjkdsjglk',
+        day_of_week: 2,
+        start_time: '09:00',
+        end_time: '10:00',
+        service_ic_username: 'testuser3',
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res3.status).toBe(200);
+    expect(await res3.json()).toMatchObject({
+      service_id: 3,
+    });
+
+    // create 4 service sessions
+    const res4 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 2,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res4.status).toBe(200);
+    expect(await res4.json()).toMatchObject({
+      service_session_id: 4,
+    });
+
+    const res5 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 2,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res5.status).toBe(200);
+    expect(await res5.json()).toMatchObject({
+      service_session_id: 5,
+    });
+
+    const res6 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 3,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res6.status).toBe(200);
+    expect(await res6.json()).toMatchObject({
+      service_session_id: 6,
+    });
+
+    const res7 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 3,
+        start_time: '2023-11-27T16:42Z',
+        end_time: '2023-11-27T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res7.status).toBe(200);
+    expect(await res7.json()).toMatchObject({
+      service_session_id: 7,
+    });
+  });
+
+  test('get newly created service session', async () => {
+    const res = await fetch(`${API_URL}/service/session?service_session_id=4`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      service_session_id: 4,
+      service_id: 2,
+      start_time: '2023-11-27T16:42:00.000Z',
+      end_time: '2023-11-27T17:42:00.000Z',
+      ad_hoc_enabled: true,
+    });
+  });
+
   test('get all service sessions', async () => {
-    const res = await fetch(`${API_URL}/service/session/get_all?service_id=1&page=1&page_size=5`, {
+    const res = await fetch(`${API_URL}/service/session/get_all?page=1&page_size=5`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(200);
     const res_json = await res.json();
-    expect(res_json).toBeArrayOfSize(2);
+    expect(res_json).toBeArrayOfSize(5);
+
+    const res2 = await fetch(`${API_URL}/service/session/get_all?page=2&page_size=5`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(200);
+    const res2_json = await res2.json();
+    expect(res2_json).toBeArrayOfSize(2);
+  });
+
+  test('get all service sessions for service', async () => {
+    const res = await fetch(`${API_URL}/service/session/get_all?service_id=1&page=1&page_size=5`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const res_json = (await res.json()) as Record<string, unknown>[];
+    expect(res_json).toBeArrayOfSize(3);
+    res_json.forEach((service_session) => {
+      expect(service_session).toMatchObject({
+        service_id: 1,
+      });
+    });
   });
 
   afterAll(async () => {
