@@ -219,6 +219,19 @@ serviceRouter.delete(
   },
 );
 
+serviceRouter.get(
+  '/session/get_all',
+  validateRequiredFields(['service_id', 'page', 'page_size']),
+  async (req, res) => {
+    const sessions = await ServiceModel.getAllServiceSessions(
+      Number(req.query.service_id),
+      Number(req.query.page),
+      Number(req.query.page_size),
+    );
+    res.status(200).send(sessions);
+  },
+);
+
 serviceRouter.post(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username', 'ad_hoc', 'attended', 'is_ic']),

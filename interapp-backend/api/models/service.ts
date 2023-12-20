@@ -288,4 +288,20 @@ export class ServiceModel {
   public static async deleteServiceSessionUser(service_session_id: number, username: string) {
     await appDataSource.manager.delete(ServiceSessionUser, { service_session_id, username });
   }
+  public static async getAllServiceSessions(service_id: number, page: number, perPage: number) {
+    console.log(service_id, page, perPage);
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where('service_session.service_id = :service_id', { service_id })
+      .orderBy('service_session.start_time', 'ASC')
+      .limit(perPage)
+      .offset((page - 1) * perPage)
+      .leftJoinAndSelect('service_session.service_session_users', 'service_session_users')
+      .leftJoin('service_session.service', 'service')
+      .addSelect('service.name')
+      .getMany();
+    return res;
+  }
 }

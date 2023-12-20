@@ -249,6 +249,11 @@ describe('Unit (service)', () => {
       'Service session user with service_session_id 1 and username testuser does not exist',
     );
   });
+
+  test('get all service sessions', async () => {
+    const serviceSessions = await ServiceModel.getAllServiceSessions(1, 1, 5);
+    expect(serviceSessions).toBeArrayOfSize(1);
+  });
   afterAll(async () => {
     await recreateDB();
   });

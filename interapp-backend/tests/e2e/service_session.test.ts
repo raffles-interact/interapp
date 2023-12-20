@@ -418,6 +418,16 @@ describe('API (service session)', async () => {
     expect(res2.status).toBe(201);
   });
 
+  test('get all service sessions', async () => {
+    const res = await fetch(`${API_URL}/service/session/get_all?service_id=1&page=1&page_size=5`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const res_json = await res.json();
+    expect(res_json).toBeArrayOfSize(2);
+  });
+
   afterAll(async () => {
     await recreateDB();
   });
