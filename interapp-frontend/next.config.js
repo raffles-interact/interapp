@@ -15,7 +15,7 @@ const nextConfig = {
       '@api': path.resolve('./src/api'),
       '@components': path.resolve('./src/components'),
       '@providers': path.resolve('./src/providers'),
-    };
+    }
     return config;
   },
   rewrites: async () => {
@@ -31,7 +31,8 @@ const nextConfig = {
     ];
   },
   experimental: {
-    optimizePackageImports: [
+    
+    optimizePackageImports: process.env.NODE_ENV === 'production' && [
         '@mantine/core',
         '@mantine/hooks',
         '@mantine/form',
