@@ -13,3 +13,9 @@
   justify-content: space-between;
   align-items: center;
 }
+
+.service-skeleton {
+  width: 100%;
+  border-radius: 7px;
+  height: 15rem;
+}
