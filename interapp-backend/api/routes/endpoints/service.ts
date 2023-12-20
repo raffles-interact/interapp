@@ -221,13 +221,21 @@ serviceRouter.delete(
 
 serviceRouter.get(
   '/session/get_all',
-  validateRequiredFields(['service_id', 'page', 'page_size']),
+  validateRequiredFields(['page', 'page_size'], ['service_id']),
   async (req, res) => {
-    const sessions = await ServiceModel.getAllServiceSessions(
-      Number(req.query.service_id),
-      Number(req.query.page),
-      Number(req.query.page_size),
-    );
+    let sessions;
+    if (req.query.service_id) {
+      sessions = await ServiceModel.getAllServiceSessions(
+        Number(req.query.page),
+        Number(req.query.page_size),
+        Number(req.query.service_id),
+      );
+    } else {
+      sessions = await ServiceModel.getAllServiceSessions(
+        Number(req.query.page),
+        Number(req.query.page_size),
+      );
+    }
     res.status(200).send(sessions);
   },
 );
