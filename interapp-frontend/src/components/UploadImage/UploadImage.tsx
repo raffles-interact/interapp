@@ -60,13 +60,7 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
         className='upload-image-file-input'
       />
       {imageURL === '' ? (
-        <div
-          className='upload-image-placeholder'
-          onClick={() => inputRef.current?.click()}
-          onKeyDown={(e) => {
-            if (e.key === 'F1') inputRef.current?.click();
-          }}
-        >
+        <div className='upload-image-placeholder' onClick={() => inputRef.current?.click()}>
           <Text>Upload an image</Text>
         </div>
       ) : (
@@ -74,9 +68,7 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
           src={imageURL}
           className='upload-image-preview'
           onClick={() => inputRef.current?.click()}
-          onKeyDown={(e) => {
-            if (e.key === 'F1') inputRef.current?.click();
-          }}
+          alt='upload-image-preview'
         />
       )}
     </div>
