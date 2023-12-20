@@ -2,10 +2,11 @@
 import { useDisclosure } from '@mantine/hooks';
 import { Modal, ActionIcon, Text, Button } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
-import { memo, useState, useContext } from 'react';
-import APIClient from '@api/api_client';
+import { memo, useState } from 'react';
+import APIClient from '@/api/api_client';
 import { useRouter } from 'next/navigation';
-import { AuthContext } from '@providers/AuthProvider/AuthProvider';
+import { useContext } from 'react';
+import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import { Permissions } from '@/app/route_permissions';
 import './styles.css';
 
@@ -13,7 +14,8 @@ function DeleteService({
   service_id,
   service_name,
   className,
-}: Readonly<{ service_id: number; service_name: string; className?: string }>) {
+  
+}: Readonly<{ service_id: number; service_name: string; className?: string,}>) {
   const { user } = useContext(AuthContext);
   const apiClient = new APIClient().instance;
   const [opened, { open, close }] = useDisclosure(false);

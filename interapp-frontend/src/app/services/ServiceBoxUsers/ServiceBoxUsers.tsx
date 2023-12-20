@@ -78,22 +78,20 @@ const ServiceBoxUsers = ({
             service which cannot be managing another service. Please ensure that the regular
             participating users includes the service IC.
           </Text>
-          <div>
-            <Text>Service IC</Text>
-            <SearchableSelect
-              defaultValue={newServiceIc}
-              allValues={allUsersNames}
-              onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
-            />
-          </div>
-          <div>
-            <Text>Regular service participants</Text>
-            <PillsInputWithSearch
-              defaultValues={serviceUsers}
-              allValues={allUsersNames}
-              onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
-            />
-          </div>
+
+          <SearchableSelect
+            defaultValue={newServiceIc}
+            allValues={allUsersNames}
+            onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
+            label='Service IC'
+          />
+
+          <PillsInputWithSearch
+            defaultValues={serviceUsers}
+            allValues={allUsersNames}
+            onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
+            label='Regular service participants'
+          />
 
           <div className='service-box-users-actions'>
             <Button onClick={() => setOpen(false)} variant='outline' color='red'>
