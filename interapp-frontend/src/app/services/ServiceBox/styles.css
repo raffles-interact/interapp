@@ -63,3 +63,8 @@
 .service-box-info-content-inner > svg {
   color: var(--mantine-color-teal-6);
 }
+
+.service-box-image-skeleton {
+  width: 100%;
+  height: 100%;
+}
