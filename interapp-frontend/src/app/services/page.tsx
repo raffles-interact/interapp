@@ -4,7 +4,7 @@ import { Suspense, lazy } from 'react';
 import APIClient from '@/api/api_client';
 const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
-import { Title, Skeleton } from '@mantine/core';
+import { Title, Skeleton, Text } from '@mantine/core';
 import './styles.css';
 
 export interface Service {
@@ -27,9 +27,8 @@ export interface ServiceWithUsers {
 }
 
 const fetchAllServices = async () => {
-  const apiClient = new APIClient({useClient: false}).instance;
+  const apiClient = new APIClient({ useClient: false }).instance;
   try {
-    
     const res = await apiClient.get('/service/get_all');
 
     switch (res.status) {
@@ -55,31 +54,35 @@ export default async function ServicesPage() {
 
   return (
     <div className='service-page'>
-      <div className='service-headers'>
-            <Title>Services</Title>
-            <AddService />
-          </div>
-          <div className='service-boxes'>
-            <Suspense fallback={<Skeleton className='service-skeleton'/>}>
-            {allServices.map((service) => (
-              <ServiceBox
-                key={service.service_id}
-                name={service.name}
-                description={service.description}
-                contact_email={service.contact_email}
-                contact_number={service.contact_number}
-                website={service.website}
-                promotional_image={service.promotional_image}
-                day_of_week={service.day_of_week}
-                start_time={service.start_time}
-                end_time={service.end_time}
-                service_ic_username={service.service_ic_username}
-                service_id={service.service_id}
+      <div className='service-headers-container'>
+        <div className='service-headers'>
+          <Title order={1}>Services</Title>
 
-              />
-            ))}
-            </Suspense>
-          </div>
+          <AddService />
+        </div>
+        <Text>View the list of Interact Club's services here!</Text>
+      </div>
+
+      <div className='service-boxes'>
+        <Suspense fallback={<Skeleton className='service-skeleton' />}>
+          {allServices.map((service) => (
+            <ServiceBox
+              key={service.service_id}
+              name={service.name}
+              description={service.description}
+              contact_email={service.contact_email}
+              contact_number={service.contact_number}
+              website={service.website}
+              promotional_image={service.promotional_image}
+              day_of_week={service.day_of_week}
+              start_time={service.start_time}
+              end_time={service.end_time}
+              service_ic_username={service.service_ic_username}
+              service_id={service.service_id}
+            />
+          ))}
+        </Suspense>
+      </div>
     </div>
   );
 }

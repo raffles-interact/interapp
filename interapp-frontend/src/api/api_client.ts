@@ -17,7 +17,7 @@ export class APIClient {
       withCredentials: true,
       validateStatus: (status) => status < 500,
       maxContentLength: Infinity,
-      maxBodyLength: Infinity
+      maxBodyLength: Infinity,
     });
     this.instance.interceptors.request.use((req) => {
       req.headers['Content-Type'] = 'application/json';

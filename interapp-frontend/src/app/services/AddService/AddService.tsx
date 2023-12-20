@@ -39,7 +39,6 @@ const AddService = () => {
   const [loading, setLoading] = useState(false);
   const apiClient = new APIClient().instance;
   const router = useRouter();
-  
 
   useEffect(() => {
     getAllUsers().then((allUsersNames) => setAllUsersNames(allUsersNames));

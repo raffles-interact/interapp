@@ -14,8 +14,7 @@ function DeleteService({
   service_id,
   service_name,
   className,
-  
-}: Readonly<{ service_id: number; service_name: string; className?: string,}>) {
+}: Readonly<{ service_id: number; service_name: string; className?: string }>) {
   const { user } = useContext(AuthContext);
   const apiClient = new APIClient().instance;
   const [opened, { open, close }] = useDisclosure(false);
