@@ -63,6 +63,33 @@ services:
       redis:
         condition: service_healthy
 
+  minio:
+    container_name: interapp-minio
+    image: minio/minio
+    restart: on-failure
+    command: minio server /data
+    env_file:
+      - ./interapp-backend/.env.development
+      - ./interapp-backend/.env.local
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./interapp-backend/minio_data:/data
+    networks:
+      - interapp-network
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+    
+
   backend:
     container_name: interapp-backend
     restart: on-failure
@@ -88,6 +115,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      minio:
+        condition: service_healthy
 
   frontend:
     container_name: interapp-frontend
@@ -104,7 +133,6 @@ services:
       - interapp-network
     depends_on:
       - backend
-      - postgres
     deploy:
       resources:
         reservations:

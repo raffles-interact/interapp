@@ -54,6 +54,31 @@ services:
       retries: 7
       start_period: 60s
 
+  minio:
+    container_name: interapp-minio
+    image: minio/minio
+    restart: on-failure
+    command: minio server /data
+    env_file:
+      - ./interapp-backend/.env.development
+      - ./interapp-backend/.env.local
+    ports:
+      - 9000:9000
+      - 9001:9001
+    volumes:
+      - ./interapp-backend/minio_data:/data
+    networks:
+      - interapp-network
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 2s
+      timeout: 2s
+      retries: 5
+      start_period: 60s
+    depends_on:
+      postgres:
+        condition: service_healthy
+
   backend:
     container_name: interapp-backend-test
     restart: on-failure

@@ -15,11 +15,25 @@ Ensure that you have the docker daemon running, along with ``bun``, ``make`` and
 
 Clone with ``git clone https://github.com/raffles-interact/interapp.git``
 
+### First time setup
+
+1. Run ``touch ./interapp-backend/.env.local`` and paste the contents of the file that the maintainers gave you. 
+
+2. Navigate to ``./interapp-backend/`` and ``./interapp-frontend/`` and run ``bun i`` in both directories.
+
+3. Run ``make build`` and ``docker compose -f docker-compose.dev.yml start minio``. You need to set up a minio user.
+
+4. Go to http://localhost:9001. Login with ``MINIO_ROOT_USER`` and ``MINIO_ROOT_PASSWORD`` found in the environment files in ``./interapp-backend``
+
+5. Go to Identity > Users. Create a new user with ``MINIO_ACCESSKEY`` and ``MINIO_SECRETKEY`` found in the environment files in ``./interapp-backend`` with the read and write permissions. Save and close the browser tab.
+
+6. Run ``make run``. Everything should be working. Check that the server is running on ``interapp-backend`` and ``interapp-frontend``.
+
+7. (Optional) To give yourself all the permissions on the website, ssh into the ``interapp-postgres`` container and run an SQL query that gives your account permissions from 0 - 6.
+
 ### Running
 
-Ensure you are in the root of the project, and that ``.env.local`` exists. Run ``make build`` and ``make watch`` (for HMR). 
-
-If your IDE is giving you import errors, run ``bun i`` in the terminal.
+Run ``make build`` and ``make run`` for the development server. If needed, add ``version=(test|prod)`` for test and production servers respectively.
 
 Go to ``localhost:3000`` for frontend and ``localhost:3000/api`` for api routes
 
