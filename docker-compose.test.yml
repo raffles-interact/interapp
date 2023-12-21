@@ -60,10 +60,13 @@ services:
     restart: on-failure
     command: minio server /data
     env_file:
-      - ./interapp-backend/tests/config/.env.docker
+      - ./interapp-backend/.env.development
+      - ./interapp-backend/.env.local
     ports:
       - 9000:9000
       - 9001:9001
+    volumes:
+      - ./interapp-backend/minio_data:/data
     networks:
       - interapp-network
     healthcheck:

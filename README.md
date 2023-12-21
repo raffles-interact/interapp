@@ -21,12 +21,15 @@ Clone with ``git clone https://github.com/raffles-interact/interapp.git``
 
 2. Navigate to ``./interapp-backend/`` and ``./interapp-frontend/`` and run ``bun i`` in both directories.
 
-3. Run ``make build`` and ``make run``.
+3. Run ``make build`` and ``docker compose -f docker-compose.dev.yml start minio``. You need to set up a minio user.
 
-4. (Optional) To give yourself all the permissions on the website, ssh into the ``interapp-postgres`` container and run an SQL query that gives your account permissions from 0 - 6. This should look like:
-```sql 
-INSERT INTO user_permission (username, permission_id, "userUsername") VALUES (‘<username>’, 1, ‘<username>’), (‘<username>’, 2, ‘<username>’), (‘<username>’, 3, ‘<username>’), (‘<username>’, 4, ‘<username>’), (‘<username>’, 5, ‘<username>’), (‘<username>’, 6, ‘<username>’); 
-```
+4. Go to http://localhost:9001. Login with ``MINIO_ROOT_USER`` and ``MINIO_ROOT_PASSWORD`` found in the environment files in ``./interapp-backend``
+
+5. Go to Identity > Users. Create a new user with ``MINIO_ACCESSKEY`` and ``MINIO_SECRETKEY`` found in the environment files in ``./interapp-backend`` with the read and write permissions. Save and close the browser tab.
+
+6. Run ``make run``. Everything should be working. Check that the server is running on ``interapp-backend`` and ``interapp-frontend``.
+
+7. (Optional) To give yourself all the permissions on the website, ssh into the ``interapp-postgres`` container and run an SQL query that gives your account permissions from 0 - 6.
 
 ### Running
 
