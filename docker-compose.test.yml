@@ -64,8 +64,6 @@ services:
     ports:
       - 9000:9000
       - 9001:9001
-    volumes:
-      - ./interapp-backend/minio_data:/data
     networks:
       - interapp-network
     healthcheck:
@@ -94,6 +92,8 @@ services:
       postgres:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      minio:
         condition: service_healthy
 
   
