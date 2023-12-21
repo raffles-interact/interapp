@@ -266,7 +266,6 @@ describe('API (user service)', async () => {
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    console.log(await res.json());
     expect(res.status).toBe(204);
   });
 

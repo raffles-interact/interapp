@@ -91,22 +91,12 @@ const ServiceBox = (service: Service) => {
     }
   };
 
-  const parsedPromotionalImage = () => {
-    if (typeof serviceInfo.promotional_image === 'string') {
-      return serviceInfo.promotional_image;
-    } else if (serviceInfo.promotional_image !== null) {
-      return Buffer.from(serviceInfo.promotional_image.data).toString();
-    } else {
-      return '/placeholder-image.jpg';
-    }
-  };
-
   return (
     <div className='service-box'>
       <div className='service-box-image-container'>
         <Suspense fallback={<Skeleton className='service-box-image-skeleton' />}>
           <img
-            src={parsedPromotionalImage()}
+            src={serviceInfo.promotional_image ?? '/placeholder-image.png'}
             alt={serviceInfo.name}
             className='service-box-image'
           />
