@@ -41,7 +41,7 @@ export class Service {
   @Column({ nullable: true })
   website?: string | null;
 
-  @Column({ type: 'bytea', nullable: true })
+  @Column({ nullable: true })
   promotional_image?: string | null;
 
   @Column({ type: 'smallint' })

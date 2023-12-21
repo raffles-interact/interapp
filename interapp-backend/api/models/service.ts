@@ -1,5 +1,7 @@
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
+import minioClient from '@utils/init_minio';
+import dataUrlToBuffer from '@utils/dataUrlToBuffer';
 import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
 import { UserModel } from './user';
 
@@ -13,7 +15,25 @@ export class ServiceModel {
     newService.contact_email = service.contact_email;
     newService.contact_number = service.contact_number;
     newService.website = service.website;
-    newService.promotional_image = service.promotional_image;
+
+    if (!service.promotional_image) newService.promotional_image = null;
+    else {
+      const convertedFile = dataUrlToBuffer(service.promotional_image);
+      if (!convertedFile) {
+        throw new HTTPError(
+          'Invalid promotional image',
+          'Promotional image is not a valid data URL',
+          HTTPErrorCode.BAD_REQUEST_ERROR,
+        );
+      }
+      await minioClient.putObject(
+        process.env.MINIO_BUCKETNAME as string,
+        'service/' + service.name,
+        convertedFile.buffer,
+        { 'Content-Type': convertedFile.mimetype },
+      );
+      newService.promotional_image = 'service/' + service.name;
+    }
 
     newService.day_of_week = service.day_of_week;
     newService.start_time = service.start_time;
@@ -48,10 +68,33 @@ export class ServiceModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
+    if (service.promotional_image)
+      service.promotional_image = await minioClient.presignedGetObject(
+        process.env.MINIO_BUCKETNAME as string,
+        service.promotional_image as string,
+      );
     return service;
   }
   public static async updateService(service: Service) {
     const service_ic = await UserModel.getUser(service.service_ic_username);
+    if (!service.promotional_image) service.promotional_image = null;
+    else {
+      const convertedFile = dataUrlToBuffer(service.promotional_image);
+      if (!convertedFile) {
+        throw new HTTPError(
+          'Invalid promotional image',
+          'Promotional image is not a valid data URL',
+          HTTPErrorCode.BAD_REQUEST_ERROR,
+        );
+      }
+      await minioClient.putObject(
+        process.env.MINIO_BUCKETNAME as string,
+        'service/' + service.name,
+        convertedFile.buffer,
+      );
+      service.promotional_image = 'service/' + service.name;
+    }
+
     service.service_ic = service_ic;
     try {
       await appDataSource.manager.update(Service, { service_id: service.service_id }, service);
@@ -69,6 +112,13 @@ export class ServiceModel {
       .select('service')
       .from(Service, 'service')
       .getMany();
+    for (const service of services) {
+      if (service.promotional_image)
+        service.promotional_image = await minioClient.presignedGetObject(
+          process.env.MINIO_BUCKETNAME as string,
+          service.promotional_image as string,
+        );
+    }
     return services;
   }
   public static async createServiceSession(

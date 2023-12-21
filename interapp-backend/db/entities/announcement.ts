@@ -23,7 +23,7 @@ export class Announcement {
   @Column()
   description: string;
 
-  @Column({ type: 'bytea', nullable: true })
+  @Column({ nullable: true })
   attachment?: string;
 
   @Column()
