@@ -21,7 +21,7 @@ Clone with ``git clone https://github.com/raffles-interact/interapp.git``
 
 2. Navigate to ``./interapp-backend/`` and ``./interapp-frontend/`` and run ``bun i`` in both directories.
 
-3. Run ``make build`` and ``docker compose -f docker-compose.dev.yml start minio``. You need to set up a minio user.
+3. Run ``make build`` and ``docker compose -f docker-compose.dev.yml up minio``. You need to set up a minio user.
 
 4. Go to http://localhost:9001. Login with ``MINIO_ROOT_USER`` and ``MINIO_ROOT_PASSWORD`` found in the environment files in ``./interapp-backend``
 
@@ -29,7 +29,9 @@ Clone with ``git clone https://github.com/raffles-interact/interapp.git``
 
 6. Run ``make run``. Everything should be working. Check that the server is running on ``interapp-backend`` and ``interapp-frontend``.
 
-7. (Optional) To give yourself all the permissions on the website, ssh into the ``interapp-postgres`` container and run an SQL query that gives your account permissions from 0 - 6.
+7. Go back to http://localhost:9001 and set the bucket created to public.
+
+8. (Optional) To give yourself all the permissions on the website, ssh into the ``interapp-postgres`` container and run an SQL query that gives your account permissions from 0 - 6.
 
 ### Running
 

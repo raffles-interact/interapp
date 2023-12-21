@@ -59,8 +59,7 @@ services:
     restart: on-failure
     command: minio server /data
     env_file:
-      - ./interapp-backend/.env.development
-      - ./interapp-backend/.env.local
+      - ./interapp-backend/.env.production
     ports:
       - 9000:9000
       - 9001:9001

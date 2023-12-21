@@ -4,6 +4,7 @@ const config = {
   accessKey: process.env.MINIO_ACCESSKEY,
   secretKey: process.env.MINIO_SECRETKEY,
   bucketName: process.env.MINIO_BUCKETNAME,
+  endpoint: process.env.MINIO_ENDPOINT,
 };
 
 if (Object.values(config).some((x) => x === undefined)) {
@@ -12,7 +13,7 @@ if (Object.values(config).some((x) => x === undefined)) {
 }
 
 const minioClient = new Client({
-  endPoint: 'localhost',
+  endPoint: config.endpoint as string,
   port: 9000,
   accessKey: config.accessKey as string,
   secretKey: config.secretKey as string,
@@ -21,7 +22,7 @@ const minioClient = new Client({
 
 const exists = await minioClient.bucketExists(config.bucketName as string);
 if (!exists) {
-  await minioClient.makeBucket(config.bucketName as string);
+  await minioClient.makeBucket(config.bucketName as string, 'ap-southeast-1');
 }
 
 export default minioClient;

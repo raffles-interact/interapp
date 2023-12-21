@@ -24,6 +24,10 @@ const nextConfig = {
         source: '/api/:path*',
         destination: `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api/:path*`,
       },
+      {
+        source: '/assets/:path*',
+        destination: `http://${process.env.MINIO_HOST}:${process.env.MINIO_PORT}/interapp-minio/:path*`,
+      },
     ];
   },
   experimental: {
