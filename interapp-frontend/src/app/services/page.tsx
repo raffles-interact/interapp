@@ -14,7 +14,7 @@ export interface Service {
   contact_email: string;
   contact_number: number | null;
   website: string | null;
-  promotional_image: string | { type: 'Buffer'; data: Array<number> } | null;
+  promotional_image: string | null;
   day_of_week: 0 | 1 | 2 | 3 | 4 | 5 | 6;
   start_time: string;
   end_time: string;
@@ -41,6 +41,18 @@ const fetchAllServices = async () => {
     }
 
     const allServices: Service[] = res.data.services;
+    // promotional image url will look like this:
+    // http://interapp-minio:9000/interapp-minio/service/yes677?X-Amz-Algorithm=...
+    // we need to remove the bit before the 'service' part
+    // and remap it to localhost:3000/assets/service/yes677?....
+
+    allServices.forEach((service) => {
+      if (service.promotional_image) {
+        const url = new URL(service.promotional_image);
+        const path = url.pathname.split('/').slice(2).join('/');
+        service.promotional_image = `http://localhost:3000/assets/${path}`;
+      }
+    });
 
     return allServices;
   } catch (e) {
