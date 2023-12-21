@@ -33,3 +33,15 @@ jobs:
       - name: Tear down test environment
         run: docker compose -f docker-compose.test.yml down
   
+  build-application:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup prod environment
+        run: docker compose -f docker-compose.prod.yml up -d --build
+
+      - name: Tear down prod environment
+        run: docker compose -f docker-compose.prod.yml down
