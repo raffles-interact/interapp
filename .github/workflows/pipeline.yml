@@ -14,8 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup test environment
-        run: docker compose -f docker-compose.test.yml up -d --build
+      - name: Build test environment
+        run: docker compose -f docker-compose.test.yml build --no-cache
+
+      - name: Run test environment
+        run: docker compose -f docker-compose.test.yml up -d
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v1
@@ -30,15 +33,3 @@ jobs:
       - name: Tear down test environment
         run: docker compose -f docker-compose.test.yml down
   
-  build-application:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup prod environment
-        run: docker compose -f docker-compose.prod.yml up -d --build
-
-      - name: Tear down prod environment
-        run: docker compose -f docker-compose.prod.yml down
