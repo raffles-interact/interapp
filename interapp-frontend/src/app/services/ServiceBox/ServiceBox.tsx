@@ -96,7 +96,7 @@ const ServiceBox = (service: Service) => {
       <div className='service-box-image-container'>
         <Suspense fallback={<Skeleton className='service-box-image-skeleton' />}>
           <img
-            src={serviceInfo.promotional_image ?? '/placeholder-image.png'}
+            src={serviceInfo.promotional_image ?? '/placeholder-image.jpg'}
             alt={serviceInfo.name}
             className='service-box-image'
           />
