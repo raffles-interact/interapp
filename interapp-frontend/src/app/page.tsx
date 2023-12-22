@@ -2,7 +2,7 @@
 import { useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { useRouter } from 'next/navigation';
-import UnderConstruction from '@providers/UnderConstruction/UnderContruction';
+import UnderConstruction from '@components/UnderConstruction/UnderContruction';
 
 export default function Home() {
   const router = useRouter();
