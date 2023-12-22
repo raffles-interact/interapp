@@ -1,7 +1,7 @@
 'use client';
 import APIClient from '@api/api_client';
-import PillsInputWithSearch from '@providers/PillsInputWithSearch/PillsInputWithSearch';
-import SearchableSelect from '@providers/SearchableSelect/SearchableSelect';
+import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
+import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import { User } from '@providers/AuthProvider/types';
 import { AxiosInstance } from 'axios';
 import { useState, useEffect, useContext } from 'react';
