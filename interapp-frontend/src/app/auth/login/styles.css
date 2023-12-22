@@ -1,5 +1,8 @@
 .login-page {
   margin: 7%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .login-headers {
@@ -8,8 +11,8 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 2%;
-  padding: 0 3rem;
   gap: 2rem;
+  width: 80%;
 }
 .login-headers-text {
   display: flex;
@@ -27,8 +30,8 @@
 .login-form-container {
   display: flex;
   flex-direction: column;
-  margin: 0 3rem;
   padding: 2%;
+  width: 60%;
   gap: 1rem;
 }
 .login-form-already-member {
@@ -55,5 +58,6 @@
   }
   .login-form-container {
     margin: 0;
+    width: 100%;
   }
 }
