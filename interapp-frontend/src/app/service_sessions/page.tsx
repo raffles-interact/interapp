@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
+
 import APIClient from '@api/api_client';
 import { Service } from '../services/page';
 import ServiceSessionContent from './ServiceSessionContent/ServiceSessionContent';
