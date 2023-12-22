@@ -4,7 +4,7 @@ import { Service } from '../page';
 import { Suspense, memo, useState } from 'react';
 import { Text, Title, Skeleton } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 
 const ServiceBoxUsers = dynamic(() => import('../ServiceBoxUsers/ServiceBoxUsers'));
 import './styles.css';
