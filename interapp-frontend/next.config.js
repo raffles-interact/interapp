@@ -40,7 +40,7 @@ const nextConfig = {
             '@mantine/dates',
             '@mantine/notifications',
           ]
-        : null,
+        : [],
   },
 };
 

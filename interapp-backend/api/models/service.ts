@@ -310,7 +310,7 @@ export class ServiceModel {
       .addSelect('service.name')
       .take(perPage)
       .skip((page - 1) * perPage)
-      .orderBy('service_session.start_time', 'ASC')
+      .orderBy('service_session.start_time', 'DESC')
       .getMany()
 
     return {data: parseRes(res), total_entries, length_of_page: res.length};

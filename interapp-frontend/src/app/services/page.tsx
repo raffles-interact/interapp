@@ -5,6 +5,7 @@ import APIClient from '@api/api_client';
 const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
 import { Title, Skeleton, Text } from '@mantine/core';
+import { remapAssetUrl } from '@api/utils';
 import './styles.css';
 
 export interface Service {
@@ -48,9 +49,7 @@ const fetchAllServices = async () => {
 
     allServices.forEach((service) => {
       if (service.promotional_image) {
-        const url = new URL(service.promotional_image);
-        const path = url.pathname.split('/').slice(2).join('/');
-        service.promotional_image = `http://localhost:3000/assets/${path}`;
+        service.promotional_image = remapAssetUrl(service.promotional_image);
       }
     });
 

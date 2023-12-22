@@ -167,9 +167,12 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
   },
   {
     name: 'Service Sessions',
-    callback: () => goTo('/service-sessions'),
+    callback: () => goTo('/service_sessions'),
     icon: IconPlaylistAdd,
-    show: !!user && user.permissions.includes(Permissions.SERVICE_IC),
+    show:
+      !!user &&
+      (user.permissions.includes(Permissions.SERVICE_IC) ||
+        user.permissions.includes(Permissions.MENTORSHIP_IC)),
     category: 'Administration',
   },
 ];

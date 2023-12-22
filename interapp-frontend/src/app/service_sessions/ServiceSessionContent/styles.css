@@ -1,0 +1,8 @@
+.service-sessions-page-content {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-sessions-page-controller {
+  align-self: center;
+}
