@@ -18,9 +18,9 @@ export const noLoginRequiredRoutes = [
 
 export const RoutePermissions = {
   [Permissions.VISTOR]: ['/', '/auth/verify_email', '/settings'],
-  [Permissions.CLUB_MEMBER]: ['/', '/announcements', '/services'],
-  [Permissions.SERVICE_IC]: ['/'],
-  [Permissions.MENTORSHIP_IC]: ['/'],
+  [Permissions.CLUB_MEMBER]: ['/', '/announcements', '/services', '/profile'],
+  [Permissions.SERVICE_IC]: ['/', '/service_sessions'],
+  [Permissions.MENTORSHIP_IC]: ['/', '/service_sessions'],
   [Permissions.EXCO]: ['/'],
   [Permissions.ATTENDANCE_MANAGER]: ['/'],
   [Permissions.ADMIN]: ['/', '/admin'],
