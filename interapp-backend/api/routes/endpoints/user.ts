@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { validateRequiredFields, verifyJWT, verifyRequiredRole } from '../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
 import { UserModel } from '@models/user';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
-userRouter.get('/', verifyJWT, verifyRequiredRole(Permissions.ADMIN), async (req, res) => {
+userRouter.get('/', verifyJWT, verifyRequiredPermission(Permissions.ADMIN), async (req, res) => {
   const users = await UserModel.getAllUsers();
   res.status(200).send(users);
 });
@@ -15,7 +15,7 @@ userRouter.delete(
   '/',
   validateRequiredFields(['username']),
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
+  verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
     await UserModel.deleteUser(req.body.username as string);
     res.status(204).send();
@@ -98,7 +98,7 @@ userRouter.patch(
   '/permissions',
   validateRequiredFields(['username', 'permissions']),
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
+  verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
     if (
       !Array.isArray(req.body.permissions) ||
@@ -127,7 +127,7 @@ userRouter.get(
   '/permissions',
   validateRequiredFields([], ['username']),
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
+  verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
     const username = req.query.username as string | undefined;
     const permissions = await UserModel.getPermissions(username);
@@ -148,7 +148,7 @@ userRouter.get(
 userRouter.post(
   '/userservices',
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(['username', 'service_id']),
   async (req, res) => {
     await UserModel.addServiceUser(req.body.service_id, req.body.username);
@@ -159,7 +159,7 @@ userRouter.post(
 userRouter.delete(
   '/userservices',
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(['username', 'service_id']),
   async (req, res) => {
     await UserModel.removeServiceUser(req.body.service_id, req.body.username);
@@ -170,7 +170,7 @@ userRouter.delete(
 userRouter.patch(
   '/userservices',
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(['service_id', 'data']),
   async (req, res) => {
     //validate data to be of shape {action: 'add' | 'remove', username: string}[]
@@ -194,7 +194,7 @@ userRouter.patch(
 userRouter.patch(
   '/service_hours',
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
+  verifyRequiredPermission(Permissions.ADMIN),
   validateRequiredFields(['username', 'hours']),
   async (req, res) => {
     await UserModel.updateServiceHours(req.body.username, req.body.hours);

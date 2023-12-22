@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateRequiredFields, verifyJWT, verifyRequiredRole } from '../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
 import { ServiceModel } from '@models/service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
@@ -15,7 +15,7 @@ serviceRouter.post(
     ['description', 'contact_number', 'website', 'promotional_image'],
   ),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     if (req.body.contact_number) {
       if (typeof req.body.contact_number !== 'number') {
@@ -103,7 +103,7 @@ serviceRouter.patch(
     ],
   ),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     if (Number.isNaN(req.body.service_id)) {
       throw new HTTPError(
@@ -123,7 +123,7 @@ serviceRouter.delete(
   '/',
   validateRequiredFields(['service_id']),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     if (Number.isNaN(req.body.service_id)) {
       throw new HTTPError(
@@ -150,7 +150,7 @@ serviceRouter.get(
   '/get_users_by_service',
   validateRequiredFields(['service_id']),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     const users = await UserModel.getAllUsersByService(Number(req.query.service_id));
 
@@ -164,7 +164,7 @@ serviceRouter.post(
   '/session',
   validateRequiredFields(['service_id', 'start_time', 'end_time', 'ad_hoc_enabled']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     const ISO8601Regex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)/;
     if (!ISO8601Regex.test(req.body.start_time) || !ISO8601Regex.test(req.body.end_time)) {
@@ -202,7 +202,7 @@ serviceRouter.patch(
     ['service_id', 'start_time', 'end_time', 'ad_hoc_enabled'],
   ),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     const session = await ServiceModel.getServiceSession(Number(req.body.service_session_id));
     const updated = await ServiceModel.updateServiceSession({ ...session, ...req.body });
@@ -213,6 +213,8 @@ serviceRouter.patch(
 serviceRouter.delete(
   '/session',
   validateRequiredFields(['service_session_id']),
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     await ServiceModel.deleteServiceSession(Number(req.body.service_session_id));
     res.status(204).send();
@@ -244,7 +246,7 @@ serviceRouter.post(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username', 'ad_hoc', 'attended', 'is_ic']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     if (!(req.body.attended in AttendanceStatus)) {
       throw new HTTPError(
@@ -262,7 +264,7 @@ serviceRouter.post(
   '/session_user_bulk',
   validateRequiredFields(['service_session_id', 'users']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     if (!Array.isArray(req.body.users)) {
       throw new HTTPError(
@@ -324,7 +326,7 @@ serviceRouter.patch(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username'], ['ad_hoc', 'attended', 'is_ic']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC),
   async (req, res) => {
     if (req.body.attended && !(req.body.attended in AttendanceStatus)) {
       throw new HTTPError(
@@ -346,7 +348,7 @@ serviceRouter.delete(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC),
   async (req, res) => {
     await ServiceModel.deleteServiceSessionUser(
       Number(req.body.service_session_id),
