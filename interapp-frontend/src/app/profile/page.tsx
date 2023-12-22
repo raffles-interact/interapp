@@ -1,4 +1,4 @@
-import UnderConstruction from '@/components/UnderConstruction/UnderContruction';
+import UnderConstruction from '@components/UnderConstruction/UnderContruction';
 
 export default function Profile() {
   return (

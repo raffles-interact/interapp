@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Table, Select } from '@mantine/core';
 import { ServiceSessionsWithMeta, ServiceMeta } from '../types';
 import { useMediaQuery } from '@mantine/hooks';
-import PageController from '@/components/PageController/PageController';
+import PageController from '@components/PageController/PageController';
 import ServiceSession from './ServiceSession/ServiceSession';
 import './styles.css';
 
