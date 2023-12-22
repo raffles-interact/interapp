@@ -532,7 +532,8 @@ describe('API (service session)', async () => {
     });
     expect(res.status).toBe(200);
     const res_json = await res.json();
-    expect(res_json).toBeArrayOfSize(5);
+    expect(res_json).toHaveProperty('data');
+    expect((res_json as Record<string, unknown>).data).toBeArrayOfSize(5);
 
     const res2 = await fetch(`${API_URL}/service/session/get_all?page=2&page_size=5`, {
       method: 'GET',
@@ -540,7 +541,14 @@ describe('API (service session)', async () => {
     });
     expect(res2.status).toBe(200);
     const res2_json = await res2.json();
-    expect(res2_json).toBeArrayOfSize(2);
+    expect(res2_json).toHaveProperty('data');
+    expect((res2_json as Record<string, unknown>).data).toBeArrayOfSize(2);
+
+    expect(res_json).toHaveProperty('total_entries');
+    expect(res_json).toHaveProperty('length_of_page');
+
+    expect((res_json as Record<string, unknown>).total_entries).toBe(7);
+    expect((res_json as Record<string, unknown>).length_of_page).toBe(5);
   });
 
   test('get all service sessions for service', async () => {
@@ -549,9 +557,10 @@ describe('API (service session)', async () => {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(200);
-    const res_json = (await res.json()) as Record<string, unknown>[];
-    expect(res_json).toBeArrayOfSize(3);
-    res_json.forEach((service_session) => {
+    const res_json = (await res.json()) as Record<string, unknown>;
+    expect(res_json).toHaveProperty('data');
+    expect(res_json.data).toBeArrayOfSize(3);
+    (res_json.data as Record<string, unknown>[]).forEach((service_session) => {
       expect(service_session).toMatchObject({
         service_id: 1,
       });

@@ -297,6 +297,8 @@ export class ServiceModel {
       });
     const condition = service_id ? 'service_session.service_id = :service_id' : '1 = 1';
 
+    const total_entries = await appDataSource.manager.createQueryBuilder().select('service_session').from(ServiceSession, 'service_session').where(condition, { service_id }).getCount();
+
     const res = await appDataSource.manager
       .createQueryBuilder()
       .select('service_session')
@@ -309,8 +311,8 @@ export class ServiceModel {
       .take(perPage)
       .skip((page - 1) * perPage)
       .orderBy('service_session.start_time', 'ASC')
-      .getMany();
+      .getMany()
 
-    return parseRes(res);
+    return {data: parseRes(res), total_entries, length_of_page: res.length};
   }
 }

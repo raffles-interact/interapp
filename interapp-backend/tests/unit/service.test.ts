@@ -253,12 +253,15 @@ describe('Unit (service)', () => {
   test('get all service sessions', async () => {
     const serviceSessions = await ServiceModel.getAllServiceSessions(1, 5);
 
-    expect(serviceSessions).toBeArrayOfSize(1);
+    expect(serviceSessions.data).toBeArrayOfSize(1);
+    expect(serviceSessions.total_entries).toBe(1);
+    expect(serviceSessions.length_of_page).toBe(1);
+
   });
 
   test('get all service sessions by session id', async () => {
     const serviceSessions = await ServiceModel.getAllServiceSessions(1, 5, 1);
-    expect(serviceSessions).toBeArrayOfSize(1);
+    expect(serviceSessions.data).toBeArrayOfSize(1);
   });
   afterAll(async () => {
     await recreateDB();
