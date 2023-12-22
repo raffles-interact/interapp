@@ -14,13 +14,13 @@ import {
   IconHeart,
   type TablerIconsProps,
 } from '@tabler/icons-react';
-import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
-import { User } from '@/providers/AuthProvider/types';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
+import { User } from '@providers/AuthProvider/types';
 import { Permissions } from '@/app/route_permissions';
 import { Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
 export type NavbarCategories = 'Authentication' | 'Settings' | 'Administration' | 'General';

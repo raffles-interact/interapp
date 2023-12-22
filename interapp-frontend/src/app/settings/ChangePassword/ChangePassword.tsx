@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Text, Title, PasswordInput, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useForm } from '@mantine/form';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
 interface ChangePasswordFormProps {

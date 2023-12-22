@@ -3,9 +3,9 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal, ActionIcon, Text, Button } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { memo, useState, useContext } from 'react';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import { useRouter } from 'next/navigation';
-import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { Permissions } from '@/app/route_permissions';
 import './styles.css';
 

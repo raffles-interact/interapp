@@ -4,18 +4,18 @@ import { TimeInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { useEffect, useContext, useState } from 'react';
-import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { Service } from '../page';
 import { notifications } from '@mantine/notifications';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 
-import SearchableSelect from '@/components/SearchableSelect/SearchableSelect';
-import UploadImage, { convertToBase64 } from '@/components/UploadImage/UploadImage';
+import SearchableSelect from '@providers/SearchableSelect/SearchableSelect';
+import UploadImage, { convertToBase64 } from '@providers/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
-import { User } from '@/providers/AuthProvider/types';
-import PillsInputWithSearch from '@/components/PillsInputWithSearch/PillsInputWithSearch';
+import { User } from '@providers/AuthProvider/types';
+import PillsInputWithSearch from '@providers/PillsInputWithSearch/PillsInputWithSearch';
 import { useRouter } from 'next/navigation';
 
 export type ServiceWithUsers = Service & { usernames: string[] };

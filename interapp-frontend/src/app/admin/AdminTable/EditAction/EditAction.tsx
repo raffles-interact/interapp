@@ -3,10 +3,10 @@ import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { Modal, ActionIcon, Text, Button, TextInput, NumberInput } from '@mantine/core';
 import { IconPencil } from '@tabler/icons-react';
-import { User } from '@/providers/AuthProvider/types';
+import { User } from '@providers/AuthProvider/types';
 import { memo, useState } from 'react';
 import PermissionsInput from '../PermissionsInput/PermissionsInput';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
 function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: () => void }>) {

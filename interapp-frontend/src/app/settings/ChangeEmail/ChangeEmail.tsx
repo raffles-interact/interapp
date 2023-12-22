@@ -1,9 +1,9 @@
 'use client';
 import { useContext, useState } from 'react';
-import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { Text, Title, TextInput, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
 const ChangeEmail = () => {

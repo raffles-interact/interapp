@@ -3,7 +3,7 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal, ActionIcon, Text, Button } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { memo, useState } from 'react';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
 function DeleteAction({

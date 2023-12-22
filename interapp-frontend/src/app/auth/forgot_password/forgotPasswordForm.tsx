@@ -2,7 +2,7 @@
 import { TextInput, Button, Group } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 
 interface ForgotPasswordProps {
   username: string;
