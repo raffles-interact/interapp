@@ -41,25 +41,25 @@ export async function verifyJWT(req: Request, res: Response, next: NextFunction)
 }
 
 // must be used after verifyJWT to get the user_id and username
-export function verifyRequiredRole(role: number) {
+export function verifyRequiredPermission(...required: number[]) {
   return async (req: Request, res: Response, next: NextFunction) => {
     const username = req.headers.username;
 
     if (!username || typeof username !== 'string') {
       throw new HTTPError(
         'Missing username',
-        'Must call verifyJWT before calling verifyRequiredRole',
+        'Must call verifyJWT before calling verifyRequiredPermission',
         HTTPErrorCode.INTERNAL_SERVER_ERROR,
       );
     }
 
     const perms = await UserModel.checkPermissions(username);
 
-    if (!perms.includes(role)) {
+    if (!perms.some((perm) => required.includes(perm))) {
       throw new HTTPError(
         'Insufficient permissions',
         'You do not have sufficient permissions to access this resource. Required role: ' +
-          role.toString() +
+          required.toString() +
           '. Your roles: ' +
           perms.join(', '),
         HTTPErrorCode.FORBIDDEN_ERROR,
