@@ -1,7 +1,7 @@
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import { Service } from '../services/page';
 import ServiceSessionContent from './ServiceSessionContent/ServiceSessionContent';
-import { remapAssetUrl } from '@/api/utils';
+import { remapAssetUrl } from '@api/utils';
 import { ServiceSessionsWithMeta, ServiceMeta } from './types';
 import { Title, Text } from '@mantine/core';
 import './styles.css';
