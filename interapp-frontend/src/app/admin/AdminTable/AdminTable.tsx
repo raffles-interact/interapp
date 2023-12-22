@@ -7,7 +7,7 @@ import { Permissions } from '@/app/route_permissions';
 import { permissionsMap } from './PermissionsInput/PermissionsInput';
 import EditAction from './EditAction/EditAction';
 import DeleteAction from './DeleteAction/DeleteAction';
-import PageController, { paginateItems } from '@providers/PageController/PageController';
+import PageController, { paginateItems } from '@components/PageController/PageController';
 import { IconSearch } from '@tabler/icons-react';
 import './styles.css';
 

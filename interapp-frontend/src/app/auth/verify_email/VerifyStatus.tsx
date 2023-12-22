@@ -4,7 +4,7 @@ import { useContext, useState, useEffect, memo } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import APIClient from '@api/api_client';
 import { Loader, Button } from '@mantine/core';
-import GoHomeButton from '@providers/GoHomeButton/GoHomeButton';
+import GoHomeButton from '@components/GoHomeButton/GoHomeButton';
 
 interface VerifyStatusResult {
   message: string;
