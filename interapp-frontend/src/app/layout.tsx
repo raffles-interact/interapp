@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { ColorSchemeScript } from '@mantine/core';
-import Navbar from '@components/Navbar/Navbar';
+import Navbar from '@providers/Navbar/Navbar';
 
-import { AppProvider } from '@providers/index';
-import Footer from '@components/Footer/Footer';
+import { AppProvider } from '@providers';
+import Footer from '@providers/Footer/Footer';
 
 const inter = Inter({ subsets: ['latin'] });
 

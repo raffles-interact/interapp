@@ -1,7 +1,7 @@
 export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
 
 import { Suspense, lazy } from 'react';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
 import { Title, Skeleton, Text } from '@mantine/core';
