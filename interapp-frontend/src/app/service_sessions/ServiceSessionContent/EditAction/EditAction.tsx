@@ -57,6 +57,10 @@ function EditAction({
       ad_hoc_enabled,
       attendees,
     },
+    validate: {
+      end_time: (value, values) =>
+        value < values.start_time ? 'End time must be after start time' : '',
+    },
   });
 
   const handleSubmit = async (values: typeof form.values) => {
@@ -145,13 +149,11 @@ function EditAction({
         <Group className='edit-modal-form-datetime'>
           <DateTimePicker
             label='Start Date'
-            placeholder='Start Date'
             defaultValue={new Date(start_time)}
             {...form.getInputProps('start_time')}
           />
           <DateTimePicker
             label='End Date'
-            placeholder='End Date'
             defaultValue={new Date(end_time)}
             {...form.getInputProps('end_time')}
           />
