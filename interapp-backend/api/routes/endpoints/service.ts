@@ -326,7 +326,7 @@ serviceRouter.patch(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username'], ['ad_hoc', 'attended', 'is_ic']),
   verifyJWT,
-  verifyRequiredPermission(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     if (req.body.attended && !(req.body.attended in AttendanceStatus)) {
       throw new HTTPError(
@@ -348,12 +348,23 @@ serviceRouter.delete(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username']),
   verifyJWT,
-  verifyRequiredPermission(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     await ServiceModel.deleteServiceSessionUser(
       Number(req.body.service_session_id),
       String(req.body.username),
     );
+    res.status(204).send();
+  },
+);
+
+serviceRouter.delete(
+  '/session_user_bulk',
+  validateRequiredFields(['service_session_id', 'usernames']),
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
+  async (req, res) => {
+    await ServiceModel.deleteServiceSessionUsers(Number(req.body.service_session_id), req.body.usernames);
     res.status(204).send();
   },
 );

@@ -234,6 +234,17 @@ describe('API (service session user)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('delete service session users', async () => {
+    const res = await fetch(`${API_URL}/service/session_user_bulk`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        service_session_id: 1,
+        usernames: ['testuser2'],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
   afterAll(async () => {
     await recreateDB();
   });

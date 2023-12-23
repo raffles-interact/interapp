@@ -288,6 +288,9 @@ export class ServiceModel {
   public static async deleteServiceSessionUser(service_session_id: number, username: string) {
     await appDataSource.manager.delete(ServiceSessionUser, { service_session_id, username });
   }
+  public static async deleteServiceSessionUsers(service_session_id: number, usernames: string[]) {
+    await appDataSource.manager.createQueryBuilder().delete().from(ServiceSessionUser).where('service_session_id = :service_session_id', { service_session_id }).andWhere('username IN (:...usernames)', { usernames }).execute();
+  }
   public static async getAllServiceSessions(page: number, perPage: number, service_id?: number) {
     const parseRes = (res: Partial<ServiceSession>[]) =>
       res.map((session) => {

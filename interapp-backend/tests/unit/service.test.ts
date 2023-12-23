@@ -250,6 +250,11 @@ describe('Unit (service)', () => {
     );
   });
 
+  test('delete service session users', async () => {
+    await ServiceModel.deleteServiceSessionUsers(1, ['testuser2', 'testuser3']);
+    expect(await ServiceModel.getServiceSessionUsers(1)).toBeArrayOfSize(0);
+  });
+
   test('get all service sessions', async () => {
     const serviceSessions = await ServiceModel.getAllServiceSessions(1, 5);
 
