@@ -2,7 +2,7 @@
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { Button, Group, Checkbox } from '@mantine/core';
-import {notifications} from '@mantine/notifications';
+import { notifications } from '@mantine/notifications';
 import { DateTimePicker } from '@mantine/dates';
 import ServiceSessionUserInput from '../ServiceSessionUserInput/ServiceSessionUserInput';
 import { IconPencil } from '@tabler/icons-react';
@@ -41,7 +41,7 @@ function EditAction({
   attendees,
 
   refreshData,
-}: EditActionProps) {
+}: Readonly<EditActionProps>) {
   const apiClient = new APIClient().instance;
   const { user } = useContext(AuthContext);
   const [opened, { open, close }] = useDisclosure(false);
@@ -77,7 +77,7 @@ function EditAction({
         message: 'Failed to update service session.',
         color: 'red',
       });
-      
+
       refreshData();
       setLoading(false);
       return;
@@ -85,28 +85,30 @@ function EditAction({
     const addedAttendees = values.attendees.filter((attendee) => !attendees.includes(attendee));
     const removedAttendees = attendees.filter((attendee) => !values.attendees.includes(attendee));
 
-    const res1 = await apiClient.delete(`/service/session_user_bulk`, { data: {
-      service_session_id,
-      usernames: removedAttendees.map((attendee) => attendee.username),
-    
-    } });
+    const res1 = await apiClient.delete(`/service/session_user_bulk`, {
+      data: {
+        service_session_id,
+        usernames: removedAttendees.map((attendee) => attendee.username),
+      },
+    });
     const res2 = await apiClient.post(`/service/session_user_bulk`, {
       service_session_id,
-      users: addedAttendees
+      users: addedAttendees,
     });
 
     if (res1.status >= 400 || res2.status >= 400) {
       notifications.show({
         title: 'Error',
-        message: 'Failed to update service session users (attendees). Changes may have been partially applied.',
+        message:
+          'Failed to update service session users (attendees). Changes may have been partially applied.',
         color: 'red',
       });
-      
+
       refreshData();
       setLoading(false);
       return;
     }
-    
+
     refreshData();
     setLoading(false);
     close();
@@ -126,67 +128,65 @@ function EditAction({
   }, [opened]);
 
   return (
-    <>
-      <CRUDModal
-        opened={opened}
-        open={open}
-        close={close}
-        Icon={IconPencil}
-        iconColor='blue'
-        title='Edit Service Session'
-        show={() =>
-          !!user &&
-          (user.permissions.includes(Permissions.SERVICE_IC) ||
-            user.permissions.includes(Permissions.MENTORSHIP_IC))
-        }
-      >
-        <form onSubmit={form.onSubmit(handleSubmit)} className='edit-modal-form'>
-          <Group className='edit-modal-form-datetime'>
-            <DateTimePicker
-              label='Start Date'
-              placeholder='Start Date'
-              defaultValue={new Date(start_time)}
-              {...form.getInputProps('start_time')}
-            />
-            <DateTimePicker
-              label='End Date'
-              placeholder='End Date'
-              defaultValue={new Date(end_time)}
-              {...form.getInputProps('end_time')}
-            />
-          </Group>
-
-          <Checkbox
-            label='Allow Ad Hoc attendees?'
-            {...form.getInputProps('ad_hoc_enabled')}
-            checked={form.values.ad_hoc_enabled}
-            disabled={disableSelectAdHoc}
+    <CRUDModal
+      opened={opened}
+      open={open}
+      close={close}
+      Icon={IconPencil}
+      iconColor='blue'
+      title='Edit Service Session'
+      show={() =>
+        !!user &&
+        (user.permissions.includes(Permissions.SERVICE_IC) ||
+          user.permissions.includes(Permissions.MENTORSHIP_IC))
+      }
+    >
+      <form onSubmit={form.onSubmit(handleSubmit)} className='edit-modal-form'>
+        <Group className='edit-modal-form-datetime'>
+          <DateTimePicker
+            label='Start Date'
+            placeholder='Start Date'
+            defaultValue={new Date(start_time)}
+            {...form.getInputProps('start_time')}
           />
-          <ServiceSessionUserInput
-            service_session_id={service_session_id}
-            service_session_users={attendees}
-            all_users_names={allUsersNames}
-            handle_update={(v) => form.setFieldValue('attendees', v)}
+          <DateTimePicker
+            label='End Date'
+            placeholder='End Date'
+            defaultValue={new Date(end_time)}
+            {...form.getInputProps('end_time')}
           />
+        </Group>
 
-          <div className='edit-modal-form-buttons'>
-            <Button
-              onClick={() => {
-                close();
-                form.reset();
-              }}
-              variant='outline'
-              color='red'
-            >
-              Close
-            </Button>
-            <Button type='submit' variant='outline' color='green' loading={loading}>
-              Save and close
-            </Button>
-          </div>
-        </form>
-      </CRUDModal>
-    </>
+        <Checkbox
+          label='Allow Ad Hoc attendees?'
+          {...form.getInputProps('ad_hoc_enabled')}
+          checked={form.values.ad_hoc_enabled}
+          disabled={disableSelectAdHoc}
+        />
+        <ServiceSessionUserInput
+          service_session_id={service_session_id}
+          service_session_users={attendees}
+          all_users_names={allUsersNames}
+          handle_update={(v) => form.setFieldValue('attendees', v)}
+        />
+
+        <div className='edit-modal-form-buttons'>
+          <Button
+            onClick={() => {
+              close();
+              form.reset();
+            }}
+            variant='outline'
+            color='red'
+          >
+            Close
+          </Button>
+          <Button type='submit' variant='outline' color='green' loading={loading}>
+            Save and close
+          </Button>
+        </div>
+      </form>
+    </CRUDModal>
   );
 }
 
