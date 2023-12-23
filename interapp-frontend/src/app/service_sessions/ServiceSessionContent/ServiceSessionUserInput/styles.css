@@ -1,0 +1,11 @@
+.service-session-user-input {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 1rem;
+}
+.service-session-user-form {
+  width: 100%;
+}

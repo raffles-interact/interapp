@@ -26,7 +26,7 @@ const ServiceSessionContent = ({
   ) => Promise<readonly [ServiceSessionsWithMeta, ServiceMeta[]]>;
 }) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
-  const [serviceId, setServiceId] = useState<number | null>(null);
+  const [serviceId, setServiceId] = useState<number>();
   const [page, setPage] = useState(1);
   const [totalPagesState, setTotalPagesState] = useState(totalPages);
 
@@ -36,13 +36,15 @@ const ServiceSessionContent = ({
 
   const [serviceSessions, setServiceSessions] = useState(serviceSessionsWithMeta.data);
 
-  useEffect(() => {
-    const args: readonly [number, number?] = serviceId !== null ? [page, serviceId] : [page];
+  const refresh = () => {
+    const args: readonly [number, number?] = serviceId !== undefined ? [page, serviceId] : [page];
     refreshData(...args).then(([serviceSessionsWithMeta, _]) => {
       setServiceSessions(serviceSessionsWithMeta.data);
       setTotalPagesState(Math.ceil(serviceSessionsWithMeta.total_entries / perPage));
     });
-  }, [page, serviceId]);
+  }
+
+  useEffect(refresh, [page, serviceId]);
 
   return (
     <div className='service-sessions-page-content'>
@@ -86,6 +88,7 @@ const ServiceSessionContent = ({
                   ad_hoc_enabled={serviceSession.ad_hoc_enabled}
                   service_session_users={serviceSession.service_session_users}
                   isDesktop={isDesktop ?? false}
+                  refreshData={refresh}
                 />
               );
             })}

@@ -1,0 +1,10 @@
+.modal {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.action-icon {
+  padding: 0.2rem;
+}

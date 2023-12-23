@@ -1,6 +1,6 @@
 'use client';
 import { PillsInput, Pill, Combobox, CheckIcon, Group, useCombobox } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 export interface PillsInputWithSearchProps<T> {
   defaultValues?: T[];
@@ -8,6 +8,8 @@ export interface PillsInputWithSearchProps<T> {
   onChange: (newValues: T[]) => void;
   label?: string;
   required?: boolean;
+  disabled?: boolean;
+  className?: string;
 }
 
 const PillsInputWithSearch = <T extends string>({
@@ -16,6 +18,8 @@ const PillsInputWithSearch = <T extends string>({
   onChange,
   label,
   required,
+  disabled,
+  className,
 }: PillsInputWithSearchProps<T>) => {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
@@ -52,12 +56,25 @@ const PillsInputWithSearch = <T extends string>({
       </Combobox.Option>
     ));
   return (
-    <Combobox store={combobox} onOptionSubmit={(v) => handleValueSelect(v as T)}>
+    <Combobox
+      store={combobox}
+      onOptionSubmit={(v) => handleValueSelect(v as T)}
+      disabled={disabled ?? false}
+    >
       <Combobox.DropdownTarget>
-        <PillsInput onClick={() => combobox.openDropdown()} label={label} required={required}>
+        <PillsInput
+          onClick={() => combobox.openDropdown()}
+          label={label}
+          required={required}
+          className={className}
+        >
           <Pill.Group>
             {value.map((item) => (
-              <Pill key={item} withRemoveButton onRemove={() => handleValueRemove(item)}>
+              <Pill
+                key={item}
+                withRemoveButton={!disabled ?? true}
+                onRemove={() => handleValueRemove(item)}
+              >
                 {item}
               </Pill>
             ))}
@@ -72,6 +89,7 @@ const PillsInputWithSearch = <T extends string>({
                   combobox.updateSelectedOptionIndex();
                   setSearch(event.currentTarget.value);
                 }}
+                disabled={disabled ?? false}
               />
             </Combobox.EventsTarget>
           </Pill.Group>
@@ -87,4 +105,4 @@ const PillsInputWithSearch = <T extends string>({
   );
 };
 
-export default PillsInputWithSearch;
+export default memo(PillsInputWithSearch);
