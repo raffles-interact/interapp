@@ -42,7 +42,7 @@ const ServiceSessionContent = ({
       setServiceSessions(serviceSessionsWithMeta.data);
       setTotalPagesState(Math.ceil(serviceSessionsWithMeta.total_entries / perPage));
     });
-  }
+  };
 
   useEffect(refresh, [page, serviceId]);
 

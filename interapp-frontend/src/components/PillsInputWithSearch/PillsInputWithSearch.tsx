@@ -72,7 +72,7 @@ const PillsInputWithSearch = <T extends string>({
             {value.map((item) => (
               <Pill
                 key={item}
-                withRemoveButton={!disabled ?? true}
+                withRemoveButton={!disabled}
                 onRemove={() => handleValueRemove(item)}
               >
                 {item}

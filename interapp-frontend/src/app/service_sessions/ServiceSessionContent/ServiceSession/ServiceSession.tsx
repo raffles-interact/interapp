@@ -31,7 +31,7 @@ const ServiceSession = ({
   ad_hoc_enabled,
   service_session_users,
   isDesktop,
-  refreshData
+  refreshData,
 }: Omit<ServiceSession, 'service_id'> & {
   service_promotional_image?: string | null;
   isDesktop: boolean;

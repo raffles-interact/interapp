@@ -25,7 +25,7 @@ const mantineTheme = createTheme({
   },
 });
 
-export function MantineAppProvider({ children }: { children: ReactNode }) {
+export function MantineAppProvider({ children }: { children: Readonly<ReactNode> }) {
   return (
     <MantineProvider theme={mantineTheme}>
       <DatesProvider settings={{ firstDayOfWeek: 0 }}>
