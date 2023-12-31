@@ -20,9 +20,9 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
 
   const get_all_users = await apiClient.get(`/user`);
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
-  const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
+  const allUsernames = all_users !== undefined ? all_users.map((user) => user.username) : [];
 
-  return [serviceUsers, allUsersNames];
+  return [serviceUsers, allUsernames];
 };
 
 interface ServiceBoxUsersProps {
@@ -42,7 +42,7 @@ const ServiceBoxUsers = ({
   const { user } = useContext(AuthContext);
 
   const [serviceUsers, setServiceUsers] = useState<string[]>([]);
-  const [allUsersNames, setAllUsersNames] = useState<string[]>([]);
+  const [allUsernames, setAllUsernames] = useState<string[]>([]);
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,9 +52,9 @@ const ServiceBoxUsers = ({
 
   useEffect(() => {
     if (!open) return;
-    handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsersNames]) => {
+    handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsernames]) => {
       setServiceUsers(serviceUsers);
-      setAllUsersNames(allUsersNames);
+      setAllUsernames(allUsernames);
     });
   }, [open]);
 
@@ -81,14 +81,14 @@ const ServiceBoxUsers = ({
 
           <SearchableSelect
             defaultValue={newServiceIc}
-            allValues={allUsersNames}
+            allValues={allUsernames}
             onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
             label='Service IC'
           />
 
           <PillsInputWithSearch
             defaultValues={serviceUsers}
-            allValues={allUsersNames}
+            allValues={allUsernames}
             onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
             label='Regular service participants'
           />
