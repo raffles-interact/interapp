@@ -14,7 +14,7 @@ import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import UploadImage, { convertToBase64 } from '@components/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
-import { User } from '@providers/AuthProvider/types';
+import { getAllUsernames } from '@api/utils';
 import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
 import { useRouter } from 'next/navigation';
 
@@ -23,25 +23,18 @@ export type CreateServiceWithUsers = Omit<ServiceWithUsers, 'service_id'>;
 
 const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
-const getAllUsers = async () => {
-  const apiClient = new APIClient().instance;
 
-  const get_all_users = await apiClient.get(`/user`);
-  const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
-  const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
-  return allUsersNames;
-};
 
 const AddService = () => {
   const { user } = useContext(AuthContext);
   const [opened, setOpened] = useState(false);
-  const [allUsersNames, setAllUsersNames] = useState<string[]>([]);
+  const [allUsernames, setAllUsernames] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const apiClient = new APIClient().instance;
   const router = useRouter();
 
   useEffect(() => {
-    getAllUsers().then((allUsersNames) => setAllUsersNames(allUsersNames));
+    getAllUsernames().then((allUsersNames) => setAllUsernames(allUsersNames));
   }, []);
   const form = useForm<CreateServiceWithUsers>({
     initialValues: {
@@ -186,14 +179,14 @@ const AddService = () => {
 
             <SearchableSelect
               defaultValue={''}
-              allValues={allUsersNames}
+              allValues={allUsernames}
               onChange={(newServiceIc) => form.setFieldValue('service_ic_username', newServiceIc)}
               label='Service IC'
               required
             />
             <PillsInputWithSearch
               label='Service Users'
-              allValues={allUsersNames}
+              allValues={allUsernames}
               onChange={(newServiceUsers) => form.setFieldValue('usernames', newServiceUsers)}
               required
             />

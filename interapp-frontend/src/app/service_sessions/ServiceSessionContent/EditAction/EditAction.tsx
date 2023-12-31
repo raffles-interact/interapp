@@ -11,9 +11,9 @@ import { memo, useContext, useEffect, useState } from 'react';
 import APIClient from '@api/api_client';
 import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
-import { User } from '@providers/AuthProvider/types';
 import './styles.css';
 import { ServiceSessionUser } from '../../types';
+import { getAllUsernames } from '@api/utils';
 
 export interface EditActionProps {
   service_session_id: number;
@@ -24,14 +24,7 @@ export interface EditActionProps {
   refreshData: () => void;
 }
 
-const getAllUsers = async () => {
-  const apiClient = new APIClient().instance;
 
-  const get_all_users = await apiClient.get(`/user`);
-  const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
-  const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
-  return allUsersNames;
-};
 
 function EditAction({
   service_session_id,
@@ -47,7 +40,7 @@ function EditAction({
   const [opened, { open, close }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);
 
-  const [allUsersNames, setAllUsersNames] = useState<string[]>([]);
+  const [allUsernames, setAllUsernames] = useState<string[]>([]);
   const [disableSelectAdHoc, setDisableSelectAdHoc] = useState<boolean>(false);
 
   const form = useForm({
@@ -126,9 +119,9 @@ function EditAction({
   }, [form.values.attendees]);
   useEffect(() => {
     if (opened)
-      getAllUsers().then((allUsersNames) => {
-        setAllUsersNames(allUsersNames);
-      });
+      getAllUsernames().then((allUsernames) => 
+        setAllUsernames(allUsernames)
+      );
   }, [opened]);
 
   return (
@@ -168,7 +161,7 @@ function EditAction({
         <ServiceSessionUserInput
           service_session_id={service_session_id}
           service_session_users={attendees}
-          all_users_names={allUsersNames}
+          all_users_names={allUsernames}
           handle_update={(v) => form.setFieldValue('attendees', v)}
         />
 
