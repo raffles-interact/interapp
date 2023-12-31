@@ -8,6 +8,7 @@ import { memo, useState } from 'react';
 import PermissionsInput from '../PermissionsInput/PermissionsInput';
 import APIClient from '@api/api_client';
 import './styles.css';
+import { Permissions } from '@/app/route_permissions';
 
 function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: () => void }>) {
   const apiClient = new APIClient().instance;
@@ -19,6 +20,9 @@ function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: (
       permissions: user.permissions,
       service_hours: user.service_hours,
     },
+    validate: {
+      permissions: (value) => !value.includes(Permissions.VISTOR) && 'Must have visitor permission',
+    }
   });
 
   const handleSubmit = async (values: Pick<User, 'email' | 'permissions' | 'service_hours'>) => {
@@ -64,6 +68,7 @@ function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: (
           <PermissionsInput
             defaultValues={form.values.permissions}
             onChange={(newValues) => form.setFieldValue('permissions', newValues)}
+            error={form.errors.permissions}
           />
 
           <NumberInput

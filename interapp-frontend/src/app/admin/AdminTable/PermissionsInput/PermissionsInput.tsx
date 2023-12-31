@@ -1,7 +1,7 @@
 'use client';
 import { PillsInput, Pill, Combobox, CheckIcon, Group, useCombobox } from '@mantine/core';
 import { Permissions } from '@/app/route_permissions';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 export const permissionsMap: Record<Permissions, string> = {
   [Permissions.VISTOR]: '🛫 Visitor',
@@ -18,9 +18,11 @@ const getKeyByValue = (object: Record<string, string>, value: string) =>
 
 const PermissionsInput = ({
   defaultValues,
+  error,
   onChange,
 }: {
   defaultValues: Permissions[];
+  error: ReactNode;
   onChange: (newValues: Permissions[]) => void;
 }) => {
   const combobox = useCombobox({
@@ -63,9 +65,10 @@ const PermissionsInput = ({
     <Combobox
       store={combobox}
       onOptionSubmit={(perm) => handleValueSelect(Number(getKeyByValue(permissionsMap, perm)))}
+      
     >
       <Combobox.DropdownTarget>
-        <PillsInput onClick={() => combobox.openDropdown()} label='Permissions'>
+        <PillsInput onClick={() => combobox.openDropdown()} label='Permissions' error={error}>
           <Pill.Group>
             {values}
 
@@ -79,6 +82,7 @@ const PermissionsInput = ({
                   combobox.updateSelectedOptionIndex();
                   setSearch(event.currentTarget.value);
                 }}
+                
               />
             </Combobox.EventsTarget>
           </Pill.Group>
