@@ -23,8 +23,6 @@ export type CreateServiceWithUsers = Omit<ServiceWithUsers, 'service_id'>;
 
 const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
-
-
 const AddService = () => {
   const { user } = useContext(AuthContext);
   const [opened, setOpened] = useState(false);

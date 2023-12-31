@@ -15,7 +15,7 @@ import { useState, useEffect } from 'react';
 import './styles.css';
 
 interface ServiceSessionUserInputProps {
-  service_session_id: number;
+  service_session_id: number | null;
   service_session_users: ServiceSessionUser[];
   all_users_names: string[];
   handle_update: (service_session_users: ServiceSessionUser[]) => void;
@@ -25,7 +25,6 @@ const ServiceSessionUserForm = ({
   user,
   submitCallback,
   handleOpen,
-  handleDelete,
 }: {
   user: ServiceSessionUser;
   submitCallback: (
@@ -35,7 +34,6 @@ const ServiceSessionUserForm = ({
     ad_hoc: boolean,
   ) => void;
   handleOpen: (open: boolean) => void;
-  handleDelete: (username: string) => void;
 }) => {
   const [attended, setAttended] = useState(user.attended);
   const [isIC, setIsIC] = useState(user.is_ic);
@@ -53,14 +51,6 @@ const ServiceSessionUserForm = ({
     <Accordion.Item key={user.username} value={user.username}>
       <Center>
         <Accordion.Control onClick={() => setOpened(!opened)}>{user.username}</Accordion.Control>
-        <ActionIcon
-          variant='subtle'
-          color='red'
-          onClick={() => handleDelete(user.username)}
-          size={36}
-        >
-          <IconTrash />
-        </ActionIcon>
       </Center>
 
       <Accordion.Panel>
@@ -121,10 +111,6 @@ const ServiceSessionUserInput = ({
     );
   };
 
-  const handleDeleteServiceSessionUserForm = (username: string) => {
-    setServiceSessionUsers(serviceSessionUsers.filter((user) => user.username !== username));
-  };
-
   const handleAddServiceSessionUserForm = (usernames: string[]) => {
     const newUsers = usernames.filter(
       (username) => !serviceSessionUsers.some((user) => user.username === username),
@@ -161,6 +147,7 @@ const ServiceSessionUserInput = ({
         placeholder='Add Attendees'
         onChange={handleAddServiceSessionUserForm}
         label='Manage Attendees'
+        className='service-session-user-input-select'
       />
       <Accordion multiple variant='contained' className='service-session-user-form' value={opened}>
         {serviceSessionUsers.map((user) => (
@@ -175,7 +162,6 @@ const ServiceSessionUserInput = ({
                   : opened.filter((username) => username !== user.username),
               )
             }
-            handleDelete={handleDeleteServiceSessionUserForm}
           />
         ))}
       </Accordion>

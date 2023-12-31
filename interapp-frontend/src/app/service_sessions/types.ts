@@ -15,7 +15,7 @@ export interface ServiceSessionUser {
   ad_hoc: boolean;
   attended: 'Absent' | 'Attended' | 'Valid Reason';
   is_ic: boolean;
-  service_session_id: number;
+  service_session_id: number | null;
   username: string;
 }
 

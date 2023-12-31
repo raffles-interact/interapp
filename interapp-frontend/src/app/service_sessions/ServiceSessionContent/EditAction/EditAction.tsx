@@ -24,8 +24,6 @@ export interface EditActionProps {
   refreshData: () => void;
 }
 
-
-
 function EditAction({
   service_session_id,
   start_time,
@@ -52,7 +50,7 @@ function EditAction({
     },
     validate: {
       end_time: (value, values) =>
-        value < values.start_time ? 'End time must be after start time' : '',
+        value < values.start_time ? 'End time must be after start time' : null,
     },
   });
 
@@ -106,6 +104,12 @@ function EditAction({
       return;
     }
 
+    notifications.show({
+      title: 'Success',
+      message: 'Successfully updated service session.',
+      color: 'green',
+    });
+
     refreshData();
     setLoading(false);
     close();
@@ -118,10 +122,7 @@ function EditAction({
     if (hasAdHocUser && !form.values.ad_hoc_enabled) form.setFieldValue('ad_hoc_enabled', true);
   }, [form.values.attendees]);
   useEffect(() => {
-    if (opened)
-      getAllUsernames().then((allUsernames) => 
-        setAllUsernames(allUsernames)
-      );
+    if (opened) getAllUsernames().then((allUsernames) => setAllUsernames(allUsernames));
   }, [opened]);
 
   return (

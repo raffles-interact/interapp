@@ -17,8 +17,12 @@ const parseDateAndTime = (startTime: string, endTime: string): readonly [string,
   return [
     `${startDate.getHours()}:${startDate.getMinutes()} - ${endDate.getHours()}:${endDate.getMinutes()}`,
     isSameDay
-      ? `${startDate.getDate()}/${startDate.getMonth()}/${startDate.getFullYear()}`
-      : `${startDate.getDate()}/${startDate.getMonth()}/${startDate.getFullYear()} - ${endDate.getDate()}/${endDate.getMonth()}/${endDate.getFullYear()}`,
+      ? `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}`
+      : `${startDate.getDate()}/${
+          startDate.getMonth() + 1
+        }/${startDate.getFullYear()} - ${endDate.getDate()}/${
+          endDate.getMonth() + 1
+        }/${endDate.getFullYear()}`,
   ];
 };
 
@@ -51,8 +55,9 @@ const ServiceSession = ({
       )}
       <Table.Td>{service_session_id}</Table.Td>
       <Table.Td>{service_name}</Table.Td>
-      <Table.Td>{timeInterval}</Table.Td>
+
       <Table.Td>{date}</Table.Td>
+      <Table.Td>{timeInterval}</Table.Td>
       <Table.Td>{ad_hoc_enabled ? <Text c='green'>Yes</Text> : <Text c='red'>No</Text>}</Table.Td>
       <Table.Td>
         <div className='service-session-users'>

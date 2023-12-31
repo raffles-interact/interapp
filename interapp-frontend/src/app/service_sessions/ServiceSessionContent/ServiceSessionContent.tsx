@@ -1,10 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Table, Select } from '@mantine/core';
+import { Table, Select, Group } from '@mantine/core';
 import { ServiceSessionsWithMeta, ServiceMeta } from '../types';
 import { useMediaQuery } from '@mantine/hooks';
 import PageController from '@components/PageController/PageController';
 import ServiceSession from './ServiceSession/ServiceSession';
+import AddAction from './AddAction/AddAction';
 import './styles.css';
 
 const ServiceSessionContent = ({
@@ -48,15 +49,19 @@ const ServiceSessionContent = ({
 
   return (
     <div className='service-sessions-page-content'>
-      <Select
-        label='Service'
-        placeholder='Filter by service'
-        data={serviceOptions.map((option) => option.name)}
-        onChange={(selected) => {
-          const index = serviceOptions.findIndex((option) => option.name === selected);
-          setServiceId(serviceOptions[index]?.service_id ?? null);
-        }}
-      />
+      <Group justify='space-between'>
+        <Select
+          label='Service'
+          placeholder='Filter by service'
+          data={serviceOptions.map((option) => option.name)}
+          onChange={(selected) => {
+            const index = serviceOptions.findIndex((option) => option.name === selected);
+            setServiceId(serviceOptions[index]?.service_id ?? null);
+          }}
+        />
+        <AddAction refreshData={refresh} />
+      </Group>
+
       <Table.ScrollContainer minWidth={768}>
         <Table stickyHeader>
           <Table.Thead>

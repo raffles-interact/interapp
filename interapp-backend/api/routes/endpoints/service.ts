@@ -166,14 +166,7 @@ serviceRouter.post(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const ISO8601Regex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)/;
-    if (!ISO8601Regex.test(req.body.start_time) || !ISO8601Regex.test(req.body.end_time)) {
-      throw new HTTPError(
-        'Invalid field type',
-        'start_time and end_time must be in the format YYYY-MM-DDTHH:MMZ',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
+    
 
     if (req.body.start_time >= req.body.end_time) {
       throw new HTTPError(

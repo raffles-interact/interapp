@@ -65,7 +65,6 @@ const PermissionsInput = ({
     <Combobox
       store={combobox}
       onOptionSubmit={(perm) => handleValueSelect(Number(getKeyByValue(permissionsMap, perm)))}
-      
     >
       <Combobox.DropdownTarget>
         <PillsInput onClick={() => combobox.openDropdown()} label='Permissions' error={error}>
@@ -82,7 +81,6 @@ const PermissionsInput = ({
                   combobox.updateSelectedOptionIndex();
                   setSearch(event.currentTarget.value);
                 }}
-                
               />
             </Combobox.EventsTarget>
           </Pill.Group>
