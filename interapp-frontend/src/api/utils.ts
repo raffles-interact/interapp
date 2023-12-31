@@ -14,4 +14,4 @@ export async function getAllUsernames() {
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
   const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
   return allUsersNames;
-};
+}
