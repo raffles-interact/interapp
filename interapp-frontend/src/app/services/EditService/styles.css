@@ -1,0 +1,23 @@
+.edit-service-file-display {
+  width: 100%;
+  aspect-ratio: 5/3;
+  cursor: pointer;
+  border: 1px solid var(--mantine-color-dark-6);
+  border-radius: var(--mantine-radius-sm);
+}
+
+.edit-service {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.edit-service-times {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-around;
+}
+
+.edit-service-times > * {
+  width: 100%;
+}
