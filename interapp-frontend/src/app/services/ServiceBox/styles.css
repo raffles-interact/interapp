@@ -55,7 +55,7 @@
 
 .service-box-info-content-inner {
   display: grid;
-  grid-template-columns: 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   column-gap: 0.5rem;
 }
