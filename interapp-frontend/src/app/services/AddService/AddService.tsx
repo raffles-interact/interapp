@@ -1,5 +1,5 @@
 'use client';
-import { ActionIcon, Group, Modal, NumberInput, TextInput, Textarea, Button } from '@mantine/core';
+import { ActionIcon, Group, NumberInput, TextInput, Textarea, Button } from '@mantine/core';
 import { TimeInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
@@ -9,6 +9,7 @@ import { Service } from '../page';
 import { notifications } from '@mantine/notifications';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
 import APIClient from '@api/api_client';
+import CRUDModal from '@components/CRUDModal/CRUDModal';
 
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import UploadImage, { convertToBase64 } from '@components/UploadImage/UploadImage';
@@ -23,17 +24,24 @@ export type CreateServiceWithUsers = Omit<ServiceWithUsers, 'service_id'>;
 
 const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
-const AddService = () => {
+const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: string[] }) => {
   const { user } = useContext(AuthContext);
   const [opened, setOpened] = useState(false);
   const [allUsernames, setAllUsernames] = useState<string[]>([]);
+  const [allValidServiceICUsernames, setAllValidServiceICUsernames] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const apiClient = new APIClient().instance;
   const router = useRouter();
 
   useEffect(() => {
-    getAllUsernames().then((allUsersNames) => setAllUsernames(allUsersNames));
-  }, []);
+    if (!opened) return;
+    getAllUsernames().then((allUsersNames) => {
+      setAllUsernames(allUsersNames);
+      setAllValidServiceICUsernames(
+        allUsersNames.filter((username) => !alreadyServiceICUsernames.includes(username)),
+      );
+    });
+  }, [opened]);
   const form = useForm<CreateServiceWithUsers>({
     initialValues: {
       name: '',
@@ -84,7 +92,7 @@ const AddService = () => {
       case 409:
         notifications.show({
           title: 'Service already exists',
-          message: 'Service already exists, or service IC already is assigned to another service',
+          message: 'Service already exists! Please edit the existing service instead.',
           color: 'red',
         });
         setLoading(false);
@@ -139,70 +147,71 @@ const AddService = () => {
     setOpened(false);
   };
 
-  if (!user) return null;
-  if (!user.permissions.includes(Permissions.EXCO)) return null;
   return (
-    <>
-      <Modal opened={opened} onClose={() => setOpened(false)} title='Add Service'>
-        <form onSubmit={form.onSubmit(handleSubmit)}>
-          <div className='add-service'>
-            <UploadImage
-              onChange={async (_, file) =>
-                form.setFieldValue('promotional_image', await convertToBase64(file))
-              }
-              accept={allowedFormats}
-              className='add-service-file-display'
-            />
-            <TextInput label='Service Name' required {...form.getInputProps('name')} />
-            <Textarea label='Description' {...form.getInputProps('description')} />
-            <TextInput label='Contact Email' required {...form.getInputProps('contact_email')} />
-            <NumberInput label='Contact Number' {...form.getInputProps('contact_number')} />
-            <TextInput label='Website' {...form.getInputProps('website')} />
-            <SearchableSelect
-              defaultValue={'Sun'}
-              allValues={daysOfWeek}
-              onChange={(day_of_week) =>
-                form.setFieldValue(
-                  'day_of_week',
-                  daysOfWeek.indexOf(day_of_week) as 0 | 1 | 2 | 3 | 4 | 5 | 6,
-                )
-              }
-              label='Day of Week'
-              required
-            />
-            <Group>
-              <TimeInput label='Start Time' required {...form.getInputProps('start_time')} />
-              <TimeInput label='End Time' required {...form.getInputProps('end_time')} />
-            </Group>
+    <CRUDModal
+      opened={opened}
+      open={() => setOpened(true)}
+      close={() => setOpened(false)}
+      title='Add Service'
+      Icon={IconPlus}
+      iconColor='green'
+      show={() => !!user && user.permissions.includes(Permissions.EXCO)}
+    >
+      <form onSubmit={form.onSubmit(handleSubmit)}>
+        <div className='add-service'>
+          <UploadImage
+            onChange={async (_, file) =>
+              form.setFieldValue('promotional_image', await convertToBase64(file))
+            }
+            accept={allowedFormats}
+            className='add-service-file-display'
+          />
+          <TextInput label='Service Name' required {...form.getInputProps('name')} />
+          <Textarea label='Description' {...form.getInputProps('description')} />
+          <TextInput label='Contact Email' required {...form.getInputProps('contact_email')} />
+          <NumberInput label='Contact Number' {...form.getInputProps('contact_number')} />
+          <TextInput label='Website' {...form.getInputProps('website')} />
+          <SearchableSelect
+            defaultValue={'Sun'}
+            allValues={daysOfWeek}
+            onChange={(day_of_week) =>
+              form.setFieldValue(
+                'day_of_week',
+                daysOfWeek.indexOf(day_of_week) as 0 | 1 | 2 | 3 | 4 | 5 | 6,
+              )
+            }
+            label='Day of Week'
+            required
+          />
+          <Group>
+            <TimeInput label='Start Time' required {...form.getInputProps('start_time')} />
+            <TimeInput label='End Time' required {...form.getInputProps('end_time')} />
+          </Group>
 
-            <SearchableSelect
-              defaultValue={''}
-              allValues={allUsernames}
-              onChange={(newServiceIc) => form.setFieldValue('service_ic_username', newServiceIc)}
-              label='Service IC'
-              required
-            />
-            <PillsInputWithSearch
-              label='Service Users'
-              allValues={allUsernames}
-              onChange={(newServiceUsers) => form.setFieldValue('usernames', newServiceUsers)}
-              required
-            />
-            <Group gap={3} justify='center'>
-              <Button onClick={() => setOpened(false)} variant='outline' color='red'>
-                Cancel
-              </Button>
-              <Button type='submit' variant='outline' color='green' loading={loading}>
-                Submit
-              </Button>
-            </Group>
-          </div>
-        </form>
-      </Modal>
-      <ActionIcon size={36} color='blue' onClick={() => setOpened(true)} className='action-icon'>
-        <IconPlus />
-      </ActionIcon>
-    </>
+          <SearchableSelect
+            defaultValue={''}
+            allValues={allValidServiceICUsernames}
+            onChange={(newServiceIc) => form.setFieldValue('service_ic_username', newServiceIc)}
+            label='Service IC'
+            required
+          />
+          <PillsInputWithSearch
+            label='Service Users'
+            allValues={allUsernames}
+            onChange={(newServiceUsers) => form.setFieldValue('usernames', newServiceUsers)}
+            required
+          />
+          <Group gap={3} justify='center'>
+            <Button onClick={() => setOpened(false)} variant='outline' color='red'>
+              Cancel
+            </Button>
+            <Button type='submit' variant='outline' color='green' loading={loading}>
+              Submit
+            </Button>
+          </Group>
+        </div>
+      </form>
+    </CRUDModal>
   );
 };
 

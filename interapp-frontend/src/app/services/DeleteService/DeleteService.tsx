@@ -1,6 +1,7 @@
 'use client';
 import { useDisclosure } from '@mantine/hooks';
-import { Modal, ActionIcon, Text, Button } from '@mantine/core';
+import { Text, Button } from '@mantine/core';
+import CRUDModal from '@/components/CRUDModal/CRUDModal';
 import { IconTrash } from '@tabler/icons-react';
 import { memo, useState, useContext } from 'react';
 import APIClient from '@api/api_client';
@@ -33,29 +34,32 @@ function DeleteService({
   if (!user) return null;
   if (!user.permissions.includes(Permissions.EXCO)) return null;
   return (
-    <>
-      <Modal opened={opened} onClose={close} title='Delete Service' withCloseButton={false}>
-        <div className='delete-modal'>
-          <Text>
-            Are you sure you want to delete this service:{' '}
-            <span className='delete-modal-name'>{service_name}</span>? This action cannot be undone.
-            Users will lose all their data related to this service.
-          </Text>
-          <div className='delete-modal-buttons'>
-            <Button onClick={close} variant='outline' color='gray' disabled={loading}>
-              Cancel
-            </Button>
-            <Button onClick={handleConfirm} variant='outline' color='red' loading={loading}>
-              Delete
-            </Button>
-          </div>
+    <CRUDModal
+      opened={opened}
+      open={open}
+      close={close}
+      Icon={IconTrash}
+      iconColor='red'
+      title='Delete Service'
+      show={() => !!user && user.permissions.includes(Permissions.EXCO)}
+      className={className}
+    >
+      <div className='delete-modal'>
+        <Text>
+          Are you sure you want to delete this service:{' '}
+          <span className='delete-modal-name'>{service_name}</span>? This action cannot be undone.
+          Users will lose all their data related to this service.
+        </Text>
+        <div className='delete-modal-buttons'>
+          <Button onClick={close} variant='outline' color='gray' disabled={loading}>
+            Cancel
+          </Button>
+          <Button onClick={handleConfirm} variant='outline' color='red' loading={loading}>
+            Delete
+          </Button>
         </div>
-      </Modal>
-
-      <ActionIcon size={36} onClick={open} color='red' className={`action-icon ${className}`}>
-        <IconTrash />
-      </ActionIcon>
-    </>
+      </div>
+    </CRUDModal>
   );
 }
 
