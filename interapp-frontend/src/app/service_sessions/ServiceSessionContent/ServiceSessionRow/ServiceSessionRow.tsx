@@ -16,7 +16,7 @@ const parseDateAndTime = (startTime: string, endTime: string): readonly [string,
     startDate.getFullYear() === endDate.getFullYear();
 
   return [
-    `${startDate.getHours()}:${startDate.getMinutes()} - ${endDate.getHours()}:${endDate.getMinutes()}`,
+    `${startDate.getHours()}:${(startDate.getMinutes() < 10 ? '0' : '') + startDate.getMinutes()} - ${endDate.getHours()}:${(endDate.getMinutes() < 10 ? '0' : '') + endDate.getMinutes()}`,
     isSameDay
       ? `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}`
       : `${startDate.getDate()}/${

@@ -303,8 +303,8 @@ export class ServiceModel {
       .andWhere('username IN (:...usernames)', { usernames })
       .execute();
   }
-  public static async getAllServiceSessions(page: number, perPage: number, service_id?: number) {
-    const parseRes = (res: Partial<ServiceSession>[]) =>
+  public static async getAllServiceSessions(page?: number, perPage?: number, service_id?: number) {
+    const parseRes = (res: (Omit<ServiceSession, 'service'> & { service?: Service })[]) =>
       res.map((session) => {
         const service_name = session.service?.name;
         delete session.service;
@@ -328,8 +328,8 @@ export class ServiceModel {
       .leftJoinAndSelect('service_session.service_session_users', 'service_session_users')
       .leftJoin('service_session.service', 'service')
       .addSelect('service.name')
-      .take(perPage)
-      .skip((page - 1) * perPage)
+      .take(page && perPage ? perPage : undefined)
+      .skip(page && perPage ? (page - 1) * perPage : undefined)
       .orderBy('service_session.start_time', 'DESC')
       .getMany();
 
