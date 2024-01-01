@@ -45,7 +45,7 @@ export const convertToBase64 = (obj: File | URL): Promise<string> => {
       };
     });
   // this should never happen
-  return new Promise((_, rej) => rej(new Error('Invalid object')));
+  return Promise.reject(new Error('Invalid object'));
 };
 
 const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadImageProps) => {

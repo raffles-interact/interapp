@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { Service } from '../types';
-import { Suspense, memo, useState } from 'react';
+import { Suspense, memo } from 'react';
 import { Text, Title, Skeleton } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
 import APIClient from '@api/api_client';
