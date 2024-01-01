@@ -9,6 +9,7 @@ import APIClient from '@api/api_client';
 const ServiceBoxUsers = dynamic(() => import('../ServiceBoxUsers/ServiceBoxUsers'));
 import './styles.css';
 import { notifications } from '@mantine/notifications';
+import { useRouter } from 'next/navigation';
 const DeleteService = dynamic(() => import('../DeleteService/DeleteService'));
 const EditService = dynamic(() => import('../EditService/EditService'));
 
@@ -18,8 +19,9 @@ export const roundTimeToMinutes = (time: string) => {
   return `${hours}:${minutes}`;
 };
 
-const ServiceBox = (service: Service) => {
+const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) => {
   const apiClient = new APIClient().instance;
+  const router = useRouter();
 
   const [serviceInfo, setServiceInfo] = useState<Service>(service);
   const handleChangeServiceIc = async (service_ic: string) => {
@@ -30,7 +32,8 @@ const ServiceBox = (service: Service) => {
 
     switch (res.status) {
       case 200:
-        setServiceInfo(res.data);
+        router.refresh();
+
         notifications.show({
           title: 'Success',
           message: 'Service IC updated',
@@ -40,7 +43,7 @@ const ServiceBox = (service: Service) => {
       case 400:
         notifications.show({
           title: 'Error',
-          message: 'Service IC must be unique -- they cannot manage multiple services',
+          message: res.data.message,
           color: 'red',
         });
         break;
@@ -166,6 +169,7 @@ const ServiceBox = (service: Service) => {
         <ServiceBoxUsers
           service_id={serviceInfo.service_id}
           service_ic={serviceInfo.service_ic_username}
+          alreadyServiceICUsernames={service.alreadyServiceICUsernames}
           handleChangeServiceIc={handleChangeServiceIc}
           handleChangeServiceUsers={handleChangeServiceUsers}
         />

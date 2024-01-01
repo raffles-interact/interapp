@@ -79,20 +79,22 @@ export class ServiceModel {
     const service_ic = await UserModel.getUser(service.service_ic_username);
     if (!service.promotional_image) service.promotional_image = null;
     else {
-      const convertedFile = dataUrlToBuffer(service.promotional_image);
-      if (!convertedFile) {
-        throw new HTTPError(
-          'Invalid promotional image',
-          'Promotional image is not a valid data URL',
-          HTTPErrorCode.BAD_REQUEST_ERROR,
+      if (service.promotional_image.startsWith('data:')) {
+        const convertedFile = dataUrlToBuffer(service.promotional_image);
+        if (!convertedFile) {
+          throw new HTTPError(
+            'Invalid promotional image',
+            'Promotional image is not a valid data URL',
+            HTTPErrorCode.BAD_REQUEST_ERROR,
+          );
+        }
+        await minioClient.putObject(
+          process.env.MINIO_BUCKETNAME as string,
+          'service/' + service.name,
+          convertedFile.buffer,
         );
+        service.promotional_image = 'service/' + service.name;
       }
-      await minioClient.putObject(
-        process.env.MINIO_BUCKETNAME as string,
-        'service/' + service.name,
-        convertedFile.buffer,
-      );
-      service.promotional_image = 'service/' + service.name;
     }
 
     service.service_ic = service_ic;
