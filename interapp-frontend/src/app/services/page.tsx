@@ -69,7 +69,9 @@ export default async function ServicesPage() {
         <div className='service-headers'>
           <Title order={1}>Services</Title>
 
-          <AddService />
+          <AddService
+            alreadyServiceICUsernames={allServices.map((service) => service.service_ic_username)}
+          />
         </div>
         <Text>View the list of Interact Club's services here!</Text>
       </div>
