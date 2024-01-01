@@ -4,18 +4,11 @@ import { Table, Select, Group } from '@mantine/core';
 import { ServiceSessionsWithMeta, ServiceMeta } from '../types';
 import { useMediaQuery } from '@mantine/hooks';
 import PageController from '@components/PageController/PageController';
-import ServiceSession from './ServiceSession/ServiceSession';
+import ServiceSessionRow from './ServiceSessionRow/ServiceSessionRow';
 import AddAction from './AddAction/AddAction';
 import './styles.css';
 
-const ServiceSessionContent = ({
-  serviceSessionsWithMeta,
-  serviceMetas,
-  totalPages,
-  perPage,
-  serviceOptions,
-  refreshData,
-}: {
+interface ServiceSessionContentProps {
   serviceSessionsWithMeta: ServiceSessionsWithMeta;
   serviceMetas: ServiceMeta[];
   totalPages: number;
@@ -25,7 +18,15 @@ const ServiceSessionContent = ({
     page: number,
     service_id?: number,
   ) => Promise<readonly [ServiceSessionsWithMeta, ServiceMeta[]]>;
-}) => {
+}
+const ServiceSessionContent = ({
+  serviceSessionsWithMeta,
+  serviceMetas,
+  totalPages,
+  perPage,
+  serviceOptions,
+  refreshData,
+}: ServiceSessionContentProps) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [serviceId, setServiceId] = useState<number>();
   const [page, setPage] = useState(1);
@@ -79,7 +80,7 @@ const ServiceSessionContent = ({
           <Table.Tbody>
             {serviceSessions.map((serviceSession) => {
               return (
-                <ServiceSession
+                <ServiceSessionRow
                   key={serviceSession.service_session_id}
                   service_session_id={serviceSession.service_session_id}
                   service_name={serviceSession.service_name}
