@@ -51,7 +51,7 @@ function DeleteService({
           Users will lose all their data related to this service.
         </Text>
         <div className='delete-modal-buttons'>
-          <Button onClick={close} variant='outline' color='gray' disabled={loading}>
+          <Button onClick={close} variant='outline' color='blue' disabled={loading}>
             Cancel
           </Button>
           <Button onClick={handleConfirm} variant='outline' color='red' loading={loading}>

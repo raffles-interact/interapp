@@ -9,21 +9,39 @@ import './styles.css';
 export interface UploadImageProps {
   onChange: (imageURL: string, file: File) => void;
   accept: string[];
-  defaultImageURL?: string;
+  defaultImageURL?: string | null;
   className?: string;
 }
 
-export const convertToBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(file);
-    fileReader.onload = () => {
-      if (fileReader.result !== null) resolve(String(fileReader.result));
-    };
-    fileReader.onerror = (error) => {
-      reject(error);
-    };
-  });
+export const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+
+export const convertToBase64 = (obj: File | URL): Promise<string> => {
+  if (obj instanceof URL)
+    return new Promise(async (resolve, reject) => {
+      const blob = await fetch(obj).then((response) => response.blob());
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(blob);
+      fileReader.onload = () => {
+        if (fileReader.result !== null) resolve(String(fileReader.result));
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+
+  if (obj instanceof File)
+    return new Promise((resolve, reject) => {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(obj);
+      fileReader.onload = () => {
+        if (fileReader.result !== null) resolve(String(fileReader.result));
+      };
+      fileReader.onerror = (error) => {
+        reject(error);
+      };
+    });
+  // this should never happen
+  return Promise.reject('Invalid object');
 };
 
 const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadImageProps) => {

@@ -10,6 +10,7 @@ const ServiceBoxUsers = dynamic(() => import('../ServiceBoxUsers/ServiceBoxUsers
 import './styles.css';
 import { notifications } from '@mantine/notifications';
 const DeleteService = dynamic(() => import('../DeleteService/DeleteService'));
+const EditService = dynamic(() => import('../EditService/EditService'));
 
 export const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const roundTimeToMinutes = (time: string) => {
@@ -102,11 +103,21 @@ const ServiceBox = (service: Service) => {
           />
         </Suspense>
 
-        <DeleteService
-          service_id={serviceInfo.service_id}
-          service_name={serviceInfo.name}
-          className='service-box-delete'
-        />
+        <div className='service-box-actions'>
+          <DeleteService service_id={serviceInfo.service_id} service_name={serviceInfo.name} />
+          <EditService
+            service_id={serviceInfo.service_id}
+            name={serviceInfo.name}
+            description={serviceInfo.description}
+            promotional_image={serviceInfo.promotional_image}
+            contact_email={serviceInfo.contact_email}
+            contact_number={serviceInfo.contact_number}
+            website={serviceInfo.website}
+            start_time={serviceInfo.start_time}
+            end_time={serviceInfo.end_time}
+            day_of_week={serviceInfo.day_of_week}
+          />
+        </div>
       </div>
 
       <div className='service-box-info'>

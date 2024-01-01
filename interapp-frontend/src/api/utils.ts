@@ -15,3 +15,7 @@ export async function getAllUsernames() {
   const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
   return allUsersNames;
 }
+
+export type Nullable<T> = {
+  [P in keyof T]: T[P] | null;
+};

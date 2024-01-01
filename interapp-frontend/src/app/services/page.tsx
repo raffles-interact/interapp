@@ -9,8 +9,6 @@ import { remapAssetUrl } from '@api/utils';
 import { Service } from './types';
 import './styles.css';
 
-
-
 const fetchAllServices = async () => {
   const apiClient = new APIClient({ useClient: false }).instance;
   try {
