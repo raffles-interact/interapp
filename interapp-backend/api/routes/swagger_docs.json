@@ -2,11 +2,11 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Interapp API",
-    "description": "This is the specification for all routes defined in the `api/routes/endpoints/*` directory. All routes should be prefixed with `/api/*`. This spec is not yet fully compliant with openapi >=3.0.0 (DELETE should not have a response body in the newest version)",
+    "description": "This is the specification for all routes defined in the `api/routes/endpoints/*` directory. All routes should be prefixed with `/api/*`. This spec is not yet fully compliant with openapi >=3.0.0 (DELETE should not have a response body in the newest version). Currently undocumented: DELETE /user, PATCH /user/service_hours, GET /service/get_users_by_service",
     "contact": {
       "email": "sebastian.ong@hotmail.com"
     },
-    "version": "0.1.0"
+    "version": "0.1.1"
   },
   "servers": [
     {

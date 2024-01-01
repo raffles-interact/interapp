@@ -1,7 +1,7 @@
 'use client';
-import { PillsInput, Pill, Combobox, CheckIcon, Group, useCombobox, Text } from '@mantine/core';
+import { PillsInput, Pill, Combobox, CheckIcon, Group, useCombobox } from '@mantine/core';
 import { Permissions } from '@/app/route_permissions';
-import { useEffect, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 export const permissionsMap: Record<Permissions, string> = {
   [Permissions.VISTOR]: '🛫 Visitor',
@@ -18,9 +18,11 @@ const getKeyByValue = (object: Record<string, string>, value: string) =>
 
 const PermissionsInput = ({
   defaultValues,
+  error,
   onChange,
 }: {
   defaultValues: Permissions[];
+  error: ReactNode;
   onChange: (newValues: Permissions[]) => void;
 }) => {
   const combobox = useCombobox({
@@ -60,39 +62,39 @@ const PermissionsInput = ({
       </Combobox.Option>
     ));
   return (
-    <>
-      <Combobox
-        store={combobox}
-        onOptionSubmit={(perm) => handleValueSelect(Number(getKeyByValue(permissionsMap, perm)))}
-      >
-        <Combobox.DropdownTarget>
-          <PillsInput onClick={() => combobox.openDropdown()} label='Permissions'>
-            <Pill.Group>
-              {values}
+    <Combobox
+      store={combobox}
+      onOptionSubmit={(perm) => handleValueSelect(Number(getKeyByValue(permissionsMap, perm)))}
+      
+    >
+      <Combobox.DropdownTarget>
+        <PillsInput onClick={() => combobox.openDropdown()} label='Permissions' error={error}>
+          <Pill.Group>
+            {values}
 
-              <Combobox.EventsTarget>
-                <PillsInput.Field
-                  onFocus={() => combobox.openDropdown()}
-                  onBlur={() => combobox.closeDropdown()}
-                  value={search}
-                  placeholder='Search values'
-                  onChange={(event) => {
-                    combobox.updateSelectedOptionIndex();
-                    setSearch(event.currentTarget.value);
-                  }}
-                />
-              </Combobox.EventsTarget>
-            </Pill.Group>
-          </PillsInput>
-        </Combobox.DropdownTarget>
+            <Combobox.EventsTarget>
+              <PillsInput.Field
+                onFocus={() => combobox.openDropdown()}
+                onBlur={() => combobox.closeDropdown()}
+                value={search}
+                placeholder='Search values'
+                onChange={(event) => {
+                  combobox.updateSelectedOptionIndex();
+                  setSearch(event.currentTarget.value);
+                }}
+                
+              />
+            </Combobox.EventsTarget>
+          </Pill.Group>
+        </PillsInput>
+      </Combobox.DropdownTarget>
 
-        <Combobox.Dropdown>
-          <Combobox.Options>
-            {options.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
-    </>
+      <Combobox.Dropdown>
+        <Combobox.Options>
+          {options.length > 0 ? options : <Combobox.Empty>Nothing found...</Combobox.Empty>}
+        </Combobox.Options>
+      </Combobox.Dropdown>
+    </Combobox>
   );
 };
 

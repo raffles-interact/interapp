@@ -1,13 +1,14 @@
-FROM oven/bun:1.0.18
+FROM node:20-alpine
 WORKDIR /app
 
 COPY . .
 
 
 ENV NODE_ENV production
-RUN bun install --frozen-lockfile
-RUN bun run build
+# RUN npm cache clear --force
+RUN npm install --frozen-lockfile
+RUN npm run build
 
 
 EXPOSE 3000
-CMD ["bun", "run", "start"]
+CMD ["npm", "run", "start"]

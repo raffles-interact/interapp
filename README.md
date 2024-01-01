@@ -15,11 +15,22 @@ Ensure that you have the docker daemon running, along with ``bun``, ``make`` and
 
 Clone with ``git clone https://github.com/raffles-interact/interapp.git``
 
+### First time setup
+
+1. Run ``touch ./interapp-backend/.env.local`` and paste the contents of the file that the maintainers gave you. 
+
+2. Navigate to ``./interapp-backend/`` and ``./interapp-frontend/`` and run ``bun i`` in both directories.
+
+3. Run ``make build`` and ``make run``.
+
+4. (Optional) To give yourself all the permissions on the website, ssh into the ``interapp-postgres`` container and run an SQL query that gives your account permissions from 0 - 6. This should look like:
+```sql 
+INSERT INTO user_permission (username, permission_id, "userUsername") VALUES (‘<username>’, 1, ‘<username>’), (‘<username>’, 2, ‘<username>’), (‘<username>’, 3, ‘<username>’), (‘<username>’, 4, ‘<username>’), (‘<username>’, 5, ‘<username>’), (‘<username>’, 6, ‘<username>’); 
+```
+
 ### Running
 
-Ensure you are in the root of the project, and that ``.env.local`` exists. Run ``make build`` and ``make watch`` (for HMR). 
-
-If your IDE is giving you import errors, run ``bun i`` in the terminal.
+Run ``make build`` and ``make run`` for the development server. If needed, add ``version=(test|prod)`` for test and production servers respectively.
 
 Go to ``localhost:3000`` for frontend and ``localhost:3000/api`` for api routes
 

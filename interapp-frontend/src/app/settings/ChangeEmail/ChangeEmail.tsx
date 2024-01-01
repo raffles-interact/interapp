@@ -1,9 +1,9 @@
 'use client';
 import { useContext, useState } from 'react';
-import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { Text, Title, TextInput, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
 const ChangeEmail = () => {
@@ -26,6 +26,14 @@ const ChangeEmail = () => {
   };
 
   const handleEmailChange = async () => {
+    if (error) {
+      notifications.show({ title: 'Error', message: error, color: 'red' });
+      return;
+    }
+    if (newEmail.length === 0) {
+      notifications.show({ title: 'Error', message: 'Email cannot be empty', color: 'red' });
+      return;
+    }
     setLoading(true);
 
     const res = await apiClient.patch('/user/change_email', { new_email: newEmail });

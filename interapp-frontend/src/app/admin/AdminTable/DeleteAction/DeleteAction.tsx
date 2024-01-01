@@ -3,10 +3,13 @@ import { useDisclosure } from '@mantine/hooks';
 import { Modal, ActionIcon, Text, Button } from '@mantine/core';
 import { IconTrash } from '@tabler/icons-react';
 import { memo, useState } from 'react';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
-function DeleteAction({ username, refreshData }: { username: string; refreshData: () => void }) {
+function DeleteAction({
+  username,
+  refreshData,
+}: Readonly<{ username: string; refreshData: () => void }>) {
   const apiClient = new APIClient().instance;
   const [opened, { open, close }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);
@@ -32,7 +35,6 @@ function DeleteAction({ username, refreshData }: { username: string; refreshData
         closeOnClickOutside={false}
         closeOnEscape={false}
         withCloseButton={false}
-        zIndex={999}
       >
         <div className='delete-modal'>
           <Text>

@@ -1,27 +1,24 @@
 'use client';
 import { Table, Loader, Pill, TextInput } from '@mantine/core';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import { memo, useEffect, useState } from 'react';
-import { User } from '@/providers/AuthProvider/types';
+import { User } from '@providers/AuthProvider/types';
 import { Permissions } from '@/app/route_permissions';
 import { permissionsMap } from './PermissionsInput/PermissionsInput';
 import EditAction from './EditAction/EditAction';
 import DeleteAction from './DeleteAction/DeleteAction';
-import PageController, { paginateItems } from '@/components/PageController/PageController';
+import PageController, { paginateItems } from '@components/PageController/PageController';
 import { IconSearch } from '@tabler/icons-react';
 import './styles.css';
 
 const fetchUserData = async () => {
   const apiClient = new APIClient().instance;
-  try {
-    const users: Omit<User, 'permissions'>[] = (await apiClient.get('/user')).data;
-    const perms: { [username: string]: Permissions[] } = (await apiClient.get('/user/permissions'))
-      .data;
-    const usersWithPerms = users.map((user) => ({ ...user, permissions: perms[user.username] }));
-    return usersWithPerms;
-  } catch (e) {
-    throw e;
-  }
+
+  const users: Omit<User, 'permissions'>[] = (await apiClient.get('/user')).data;
+  const perms: { [username: string]: Permissions[] } = (await apiClient.get('/user/permissions'))
+    .data;
+  const usersWithPerms = users.map((user) => ({ ...user, permissions: perms[user.username] }));
+  return usersWithPerms;
 };
 
 const computeSearchItems = (search: string, users: User[]) => {

@@ -1,15 +1,16 @@
 'use client';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
-import { Modal, ActionIcon, Text, Button, TextInput, NumberInput, Checkbox } from '@mantine/core';
+import { Modal, ActionIcon, Text, Button, TextInput, NumberInput } from '@mantine/core';
 import { IconPencil } from '@tabler/icons-react';
-import { User } from '@/providers/AuthProvider/types';
+import { User } from '@providers/AuthProvider/types';
 import { memo, useState } from 'react';
 import PermissionsInput from '../PermissionsInput/PermissionsInput';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
+import { Permissions } from '@/app/route_permissions';
 
-function EditAction({ user, refreshData }: { user: User; refreshData: () => void }) {
+function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: () => void }>) {
   const apiClient = new APIClient().instance;
   const [opened, { open, close }] = useDisclosure(false);
   const [loading, setLoading] = useState(false);
@@ -19,6 +20,9 @@ function EditAction({ user, refreshData }: { user: User; refreshData: () => void
       permissions: user.permissions,
       service_hours: user.service_hours,
     },
+    validate: {
+      permissions: (value) => !value.includes(Permissions.VISTOR) && 'Must have visitor permission',
+    }
   });
 
   const handleSubmit = async (values: Pick<User, 'email' | 'permissions' | 'service_hours'>) => {
@@ -57,7 +61,6 @@ function EditAction({ user, refreshData }: { user: User; refreshData: () => void
         closeOnClickOutside={false}
         closeOnEscape={false}
         withCloseButton={false}
-        zIndex={999}
       >
         <Text>Warning: Do not misuse this feature.</Text>
         <form onSubmit={form.onSubmit(handleSubmit)} className='edit-modal-form'>
@@ -65,6 +68,7 @@ function EditAction({ user, refreshData }: { user: User; refreshData: () => void
           <PermissionsInput
             defaultValues={form.values.permissions}
             onChange={(newValues) => form.setFieldValue('permissions', newValues)}
+            error={form.errors.permissions}
           />
 
           <NumberInput

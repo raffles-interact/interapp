@@ -14,8 +14,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Setup test environment
-        run: docker compose -f docker-compose.test.yml up -d --build
+      - name: Build test environment
+        run: docker compose -f docker-compose.test.yml build --no-cache
+
+      - name: Run test environment
+        run: docker compose -f docker-compose.test.yml up -d
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v1

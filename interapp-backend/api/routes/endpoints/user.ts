@@ -168,6 +168,30 @@ userRouter.delete(
 );
 
 userRouter.patch(
+  '/userservices',
+  verifyJWT,
+  verifyRequiredRole(Permissions.EXCO),
+  validateRequiredFields(['service_id', 'data']),
+  async (req, res) => {
+    //validate data to be of shape {action: 'add' | 'remove', username: string}[]
+    if (
+      !Array.isArray(req.body.data) ||
+      !req.body.data.every((x: any) => x.action === 'add' || x.action === 'remove') ||
+      req.body.data.length === 0
+    ) {
+      throw new HTTPError(
+        'Invalid field type',
+        "Data must be an array of objects with action: 'add' | 'remove' and username",
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+
+    await UserModel.updateServiceUserBulk(req.body.service_id, req.body.data);
+    res.status(204).send();
+  },
+);
+
+userRouter.patch(
   '/service_hours',
   verifyJWT,
   verifyRequiredRole(Permissions.ADMIN),

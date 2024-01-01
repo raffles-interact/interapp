@@ -160,6 +160,56 @@ describe('Unit (user)', () => {
     );
   });
 
+  test('bulk update service users (add)', async () => {
+    await UserModel.updateServiceUserBulk(1, [
+      {
+        action: 'add',
+        username: 'testuser',
+      },
+      {
+        action: 'add',
+        username: 'testuser2',
+      },
+    ]);
+    expect(() => UserModel.getAllServicesByUser('testuser')).not.toThrow(
+      'The user with username testuser has no services',
+    );
+    expect(() => UserModel.getAllServicesByUser('testuser2')).not.toThrow(
+      'The user with username testuser2 has no services',
+    );
+  });
+
+  test('bulk update service users (remove)', async () => {
+    await UserModel.updateServiceUserBulk(1, [
+      {
+        action: 'remove',
+        username: 'testuser',
+      },
+    ]);
+    expect(() => UserModel.getAllServicesByUser('testuser')).toThrow(
+      'The user with username testuser has no services',
+    );
+  });
+
+  test('bulk update service users (mixed)', async () => {
+    await UserModel.updateServiceUserBulk(1, [
+      {
+        action: 'remove',
+        username: 'testuser2',
+      },
+      {
+        action: 'add',
+        username: 'testuser',
+      },
+    ]);
+    expect(() => UserModel.getAllServicesByUser('testuser')).not.toThrow(
+      'The user with username testuser has no services',
+    );
+    expect(() => UserModel.getAllServicesByUser('testuser2')).toThrow(
+      'The user with username testuser2 has no services',
+    );
+  });
+
   test('get all users', async () => {
     const users = await UserModel.getAllUsers();
     expect(users).toBeArray();

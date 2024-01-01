@@ -1,5 +1,8 @@
 .forgot-password-page {
   margin: 7%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .forgot-password-headers {
@@ -8,8 +11,8 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 2%;
-  padding: 0 3rem;
   gap: 2rem;
+  width: 80%;
 }
 .forgot-password-headers-text {
   display: flex;
@@ -27,9 +30,9 @@
 .forgot-password-form-container {
   display: flex;
   flex-direction: column;
-  margin: 0 3rem;
   padding: 2%;
   gap: 1rem;
+  width: 60%;
 }
 .forgot-password-form-already-member {
   align-self: center;
@@ -55,5 +58,6 @@
   }
   .forgot-password-form-container {
     margin: 0;
+    width: 100%;
   }
 }

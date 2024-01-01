@@ -11,15 +11,16 @@ import {
   IconPlaylistAdd,
   IconMenu2,
   IconMail,
+  IconHeart,
   type TablerIconsProps,
 } from '@tabler/icons-react';
-import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
-import { User } from '@/providers/AuthProvider/types';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
+import { User } from '@providers/AuthProvider/types';
 import { Permissions } from '@/app/route_permissions';
 import { Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
-import APIClient from '@/api/api_client';
+import APIClient from '@api/api_client';
 import './styles.css';
 
 export type NavbarCategories = 'Authentication' | 'Settings' | 'Administration' | 'General';
@@ -137,10 +138,10 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
     category: 'Administration',
   },
   {
-    name: 'EXCO Dashboard',
-    callback: () => goTo('/exco'),
-    icon: IconTableOptions,
-    show: !!user && user.permissions.includes(Permissions.EXCO),
+    name: 'Services',
+    callback: () => goTo('/services'),
+    icon: IconHeart,
+    show: !!user && user.permissions.includes(Permissions.CLUB_MEMBER),
     category: 'Administration',
   },
   {

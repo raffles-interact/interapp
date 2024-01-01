@@ -1,0 +1,17 @@
+.service-box-users {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.service-box-users > * {
+  width: 100%;
+}
+
+.service-box-users-actions {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
