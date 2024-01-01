@@ -3,6 +3,8 @@ import { ServiceModel } from '@models/service';
 import { UserModel } from '@models/user';
 import { User } from '@db/entities/user';
 import { AttendanceStatus } from '@db/entities/service_session_user';
+import redisClient from '@utils/init_redis';
+import { randomBytes } from 'crypto';
 
 function constructDate(day_of_week: number, time: string) {
   const d = new Date();
@@ -12,6 +14,10 @@ function constructDate(day_of_week: number, time: string) {
   return d;
 }
 
+function addHours(date: Date, hours: number) {
+  date.setHours(date.getHours() + hours);
+  return date;
+}
 async function getCurrentServices() {
   // get current date and time
   // get service days of week and start and end time
@@ -76,3 +82,45 @@ schedule(
     timezone: 'Asia/Singapore',
   },
 );
+
+schedule('0 */1 * * * *', async () => {
+  // get all service sessions
+  const service_sessions = (await ServiceModel.getAllServiceSessions()).data;
+
+  // check if current time is within start_time and end_time - offset 10 mins
+  const current_time = new Date();
+  const timezone_offset_hours = current_time.getTimezoneOffset() / 60;
+  const local_time = addHours(current_time, timezone_offset_hours);
+
+  // get all hashes from redis and check if service session id is in redis else add it
+  const hashes = await redisClient.hGetAll('service_session');
+
+  console.log(hashes);
+  for (const session of service_sessions) {
+    const start_time = new Date(session.start_time);
+    const end_time = new Date(session.end_time);
+    const offset = new Date(start_time.getTime() - 10 * 60000);
+
+    const withinInterval = local_time <= end_time && local_time >= offset;
+
+    if (withinInterval) {
+      // if yes, service session is active
+
+      if (!Object.values(hashes).find((v) => v === String(session.service_session_id))) {
+        // if service session id is not in redis, generate a hash as key and service session id as value
+
+        const newHash = randomBytes(128).toString('hex');
+
+        await redisClient.hSet('service_session', newHash, session.service_session_id);
+      }
+    }
+    // setting expiry is not possible with hset, so we need to check if the hash is expired
+    // if yes, remove it from redis
+    else if (Object.values(hashes).find((k) => k === String(session.service_session_id))) {
+      await redisClient.hDel(
+        'service_session',
+        Object.keys(hashes).find((k) => hashes[k] === String(session.service_session_id))!,
+      );
+    }
+  }
+});
