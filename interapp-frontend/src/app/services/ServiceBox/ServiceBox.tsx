@@ -1,6 +1,6 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { Service } from '../page';
+import { Service } from '../types';
 import { Suspense, memo, useState } from 'react';
 import { Text, Title, Skeleton } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';

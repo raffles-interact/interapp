@@ -1,11 +1,10 @@
 'use client';
-import { ActionIcon, Group, NumberInput, TextInput, Textarea, Button } from '@mantine/core';
+import { Group, NumberInput, TextInput, Textarea, Button } from '@mantine/core';
 import { TimeInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
 import { useEffect, useContext, useState } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { Service } from '../page';
 import { notifications } from '@mantine/notifications';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
 import APIClient from '@api/api_client';
@@ -18,9 +17,8 @@ import { Permissions } from '@/app/route_permissions';
 import { getAllUsernames } from '@api/utils';
 import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
 import { useRouter } from 'next/navigation';
+import { CreateServiceWithUsers } from '../types';
 
-export type ServiceWithUsers = Service & { usernames: string[] };
-export type CreateServiceWithUsers = Omit<ServiceWithUsers, 'service_id'>;
 
 const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
