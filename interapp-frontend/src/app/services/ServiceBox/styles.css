@@ -21,10 +21,12 @@
   position: relative;
 }
 
-.service-box-delete {
+.service-box-actions {
   position: absolute;
   top: 0.2rem;
   right: 0.2rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 .service-box-info {

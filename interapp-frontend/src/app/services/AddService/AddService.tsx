@@ -11,16 +11,13 @@ import APIClient from '@api/api_client';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
 
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
-import UploadImage, { convertToBase64 } from '@components/UploadImage/UploadImage';
+import UploadImage, { convertToBase64, allowedFormats } from '@components/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
 import { getAllUsernames } from '@api/utils';
 import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
 import { useRouter } from 'next/navigation';
 import { CreateServiceWithUsers } from '../types';
-
-
-const allowedFormats = ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
 
 const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: string[] }) => {
   const { user } = useContext(AuthContext);
@@ -181,10 +178,10 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
             label='Day of Week'
             required
           />
-          <Group>
+          <div className='add-service-times'>
             <TimeInput label='Start Time' required {...form.getInputProps('start_time')} />
             <TimeInput label='End Time' required {...form.getInputProps('end_time')} />
-          </Group>
+          </div>
 
           <SearchableSelect
             defaultValue={''}
