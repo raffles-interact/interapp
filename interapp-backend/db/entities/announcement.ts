@@ -29,7 +29,7 @@ export class Announcement {
   @Column()
   username: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   user: Relation<User>;
 
   @OneToMany(

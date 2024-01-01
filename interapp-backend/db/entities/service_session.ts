@@ -26,7 +26,7 @@ export class ServiceSession {
   @Column()
   ad_hoc_enabled: boolean;
 
-  @ManyToOne(() => Service, (service) => service.service_sessions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Service, (service) => service.service_sessions, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   service: Relation<Service>;
 
   @OneToMany(
