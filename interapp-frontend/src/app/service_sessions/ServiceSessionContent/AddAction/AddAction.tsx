@@ -13,7 +13,7 @@ import CRUDModal from '@components/CRUDModal/CRUDModal';
 import { getAllUsernames } from '@api/utils';
 import { ServiceSessionUser } from '../../types';
 import { IconPlus } from '@tabler/icons-react';
-import { Service } from '@/app/services/page';
+import { Service } from '@/app/services/types';
 import './styles.css';
 
 export interface AddActionProps {
