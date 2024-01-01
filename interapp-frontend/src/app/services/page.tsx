@@ -74,6 +74,7 @@ export default async function ServicesPage() {
               end_time={service.end_time}
               service_ic_username={service.service_ic_username}
               service_id={service.service_id}
+              alreadyServiceICUsernames={allServices.map((service) => service.service_ic_username)}
             />
           ))}
         </Suspense>

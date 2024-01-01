@@ -15,7 +15,6 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
   const get_users_by_service = await apiClient.get(
     `/service/get_users_by_service?service_id=${service_id}`,
   );
-  if (get_users_by_service.status !== 200) throw new Error('Could not get users by service');
   const users: Omit<User, 'permissions'>[] = get_users_by_service.data.users;
   const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
 
@@ -30,6 +29,7 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
 interface ServiceBoxUsersProps {
   service_id: number;
   service_ic: string;
+  alreadyServiceICUsernames: string[];
   handleChangeServiceIc: (service_ic: string) => void;
   handleChangeServiceUsers: (old_service_users: string[], service_users: string[]) => void;
 }
@@ -37,6 +37,7 @@ interface ServiceBoxUsersProps {
 const ServiceBoxUsers = ({
   service_id,
   service_ic,
+  alreadyServiceICUsernames,
   handleChangeServiceIc,
   handleChangeServiceUsers,
 }: ServiceBoxUsersProps) => {
@@ -45,6 +46,7 @@ const ServiceBoxUsers = ({
 
   const [serviceUsers, setServiceUsers] = useState<string[]>([]);
   const [allUsernames, setAllUsernames] = useState<string[]>([]);
+  const [allValidServiceICUsernames, setAllValidServiceICUsernames] = useState<string[]>([]);
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -57,6 +59,10 @@ const ServiceBoxUsers = ({
     handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsernames]) => {
       setServiceUsers(serviceUsers);
       setAllUsernames(allUsernames);
+      setAllValidServiceICUsernames([
+        ...allUsernames.filter((username) => !alreadyServiceICUsernames.includes(username)),
+        service_ic,
+      ]);
     });
   }, [open]);
 
@@ -83,7 +89,7 @@ const ServiceBoxUsers = ({
 
           <SearchableSelect
             defaultValue={newServiceIc}
-            allValues={allUsernames}
+            allValues={allValidServiceICUsernames}
             onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
             label='Service IC'
           />
