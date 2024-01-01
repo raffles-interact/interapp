@@ -1,8 +1,9 @@
 import { memo } from 'react';
-import { Table, Pill, Text } from '@mantine/core';
+import { Table, Pill, Text, Group } from '@mantine/core';
 import { ServiceSession } from '../../types';
 import EditAction from '../EditAction/EditAction';
 import './styles.css';
+import DeleteAction from '../DeleteAction/DeleteAction';
 
 // convert start_time and end_time to date and time (in 24 hour format)
 const parseDateAndTime = (startTime: string, endTime: string): readonly [string, string] => {
@@ -67,14 +68,17 @@ const ServiceSession = ({
         </div>
       </Table.Td>
       <Table.Td>
-        <EditAction
-          service_session_id={service_session_id}
-          start_time={start_time}
-          end_time={end_time}
-          ad_hoc_enabled={ad_hoc_enabled}
-          attendees={service_session_users}
-          refreshData={refreshData}
-        />
+        <Group gap={2} justify='center'>
+          <EditAction
+            service_session_id={service_session_id}
+            start_time={start_time}
+            end_time={end_time}
+            ad_hoc_enabled={ad_hoc_enabled}
+            attendees={service_session_users}
+            refreshData={refreshData}
+          />
+          <DeleteAction id={service_session_id} refreshData={refreshData} />
+        </Group>
       </Table.Td>
     </Table.Tr>
   );

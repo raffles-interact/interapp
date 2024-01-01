@@ -80,7 +80,6 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
         message: 'Could not add service session',
         color: 'red',
       });
-      close();
       setLoading(false);
       form.reset();
 
@@ -106,7 +105,6 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
           color: 'red',
         });
         refreshData();
-        close();
         setLoading(false);
         form.reset();
 
