@@ -1,4 +1,4 @@
-import { Service } from '../services/page';
+import { Service } from '../services/types';
 
 export interface ServiceSession {
   service_session_id: number;
