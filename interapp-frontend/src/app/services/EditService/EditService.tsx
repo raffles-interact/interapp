@@ -128,9 +128,10 @@ const EditService = ({
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <div className='edit-service'>
           <UploadImage
-            onChange={async (_, file) =>
-              form.setFieldValue('promotional_image', await convertToBase64(file))
-            }
+            onChange={async (_, file) => {
+              if (file) form.setFieldValue('promotional_image', await convertToBase64(file));
+              else form.setFieldValue('promotional_image', '');
+            }}
             accept={allowedFormats}
             className='edit-service-file-display'
             defaultImageURL={promotional_image}
