@@ -362,4 +362,14 @@ serviceRouter.delete(
     res.status(204).send();
   },
 );
+
+serviceRouter.get(
+  '/active_sessions',
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
+  async (req, res) => {
+    const sessions = await ServiceModel.getActiveServiceSessions();
+    res.status(200).send(sessions);
+  },
+);
 export default serviceRouter;

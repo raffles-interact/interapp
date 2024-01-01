@@ -4,6 +4,7 @@ import minioClient from '@utils/init_minio';
 import dataUrlToBuffer from '@utils/dataUrlToBuffer';
 import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
 import { UserModel } from './user';
+import redisClient from '@utils/init_redis';
 
 export class ServiceModel {
   public static async createService(
@@ -334,5 +335,26 @@ export class ServiceModel {
       .getMany();
 
     return { data: parseRes(res), total_entries, length_of_page: res.length };
+  }
+  public static async getActiveServiceSessions() {
+    const active = await redisClient.hGetAll('service_session');
+
+    if (Object.keys(active).length === 0) return [];
+
+    const ICs = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session_user.username')
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_id IN (:...service_session_ids)', {
+        service_session_ids: Object.values(active).map((v) => parseInt(v)),
+      })
+      .andWhere('service_session_user.is_ic = true')
+      .getMany();
+    return Object.entries(active).map(([hash, id]) => ({
+      [hash]: {
+        service_session_id: parseInt(id),
+        ICs: ICs.map((IC) => IC.username),
+      },
+    }));
   }
 }

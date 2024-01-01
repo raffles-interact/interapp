@@ -2,6 +2,10 @@ import { test, expect, describe, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
+import { ServiceModel } from '@models/service';
+import { randomBytes } from 'crypto';
+import redisClient from '@utils/init_redis';
+import { recreateRedis } from '../utils/recreate_redis';
 
 const API_URL = process.env.API_URL;
 
@@ -567,7 +571,77 @@ describe('API (service session)', async () => {
     });
   });
 
+  test('create more service sessions', async () => {
+    const res = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1,
+        start_time: '2023-11-28T16:42Z',
+        end_time: '2023-11-28T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+
+    const res2 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1,
+        start_time: '2023-11-29T16:42Z',
+        end_time: '2023-11-29T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(200);
+
+    const res3 = await fetch(`${API_URL}/service/session`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_id: 1,
+        start_time: '2023-11-30T16:42Z',
+        end_time: '2023-11-30T17:42Z',
+        ad_hoc_enabled: true,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res3.status).toBe(200);
+  });
+
+  test('dump keys into redis', async () => {
+    // get all service sessions
+    const service_sessions = (await ServiceModel.getAllServiceSessions()).data;
+    let hashes = await redisClient.hGetAll('service_session');
+    for (const session of service_sessions) {
+      // check if service session id is in redis
+
+      if (!Object.values(hashes).find((v) => v === String(session.service_session_id))) {
+        // if service session id is not in redis, generate a hash as key and service session id as value
+
+        const newHash = randomBytes(128).toString('hex');
+
+        await redisClient.hSet('service_session', newHash, session.service_session_id);
+      }
+    }
+    hashes = await redisClient.hGetAll('service_session');
+    expect(Object.entries(hashes)).toBeArrayOfSize(10);
+  });
+
+  test('get active service sessions', async () => {
+    const res = await fetch(`${API_URL}/service/active_sessions`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const res_json = await res.json();
+    expect(
+      Object.entries(res_json as Record<string, { service_session_id: number; ICs: string[] }>),
+    ).toBeArrayOfSize(10);
+  });
+
   afterAll(async () => {
     await recreateDB();
+    await recreateRedis();
   });
 });

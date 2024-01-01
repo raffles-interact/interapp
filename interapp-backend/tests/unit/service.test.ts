@@ -3,6 +3,9 @@ import { ServiceModel } from '@models/service';
 import { describe, expect, test, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
 import { AttendanceStatus } from '@db/entities';
+import { randomBytes } from 'crypto';
+import redisClient from '@utils/init_redis';
+import { recreateRedis } from '../utils/recreate_redis';
 
 describe('Unit (service)', () => {
   beforeAll(async () => {
@@ -267,7 +270,58 @@ describe('Unit (service)', () => {
     const serviceSessions = await ServiceModel.getAllServiceSessions(1, 5, 1);
     expect(serviceSessions.data).toBeArrayOfSize(1);
   });
+
+  test('create more service sessions starting now', async () => {
+    const now = new Date();
+    const inOneHour = new Date();
+    inOneHour.setHours(now.getHours() + 1);
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: now.toISOString(),
+      end_time: inOneHour.toISOString(),
+      ad_hoc_enabled: false,
+    });
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: now.toISOString(),
+      end_time: inOneHour.toISOString(),
+      ad_hoc_enabled: false,
+    });
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: now.toISOString(),
+      end_time: inOneHour.toISOString(),
+      ad_hoc_enabled: false,
+    });
+    expect((await ServiceModel.getAllServiceSessions(1, 5)).data).toBeArrayOfSize(4);
+  });
+
+  test('dump keys into redis', async () => {
+    // get all service sessions
+    const service_sessions = (await ServiceModel.getAllServiceSessions()).data;
+    let hashes = await redisClient.hGetAll('service_session');
+    for (const session of service_sessions) {
+      // check if service session id is in redis
+
+      if (!Object.values(hashes).find((v) => v === String(session.service_session_id))) {
+        // if service session id is not in redis, generate a hash as key and service session id as value
+
+        const newHash = randomBytes(128).toString('hex');
+
+        await redisClient.hSet('service_session', newHash, session.service_session_id);
+      }
+    }
+    hashes = await redisClient.hGetAll('service_session');
+    expect(Object.entries(hashes)).toBeArrayOfSize(4);
+  });
+
+  test('get active service sessions', async () => {
+    const activeServiceSessions = await ServiceModel.getActiveServiceSessions();
+    expect(Object.entries(activeServiceSessions)).toBeArrayOfSize(4);
+  });
+
   afterAll(async () => {
     await recreateDB();
+    await recreateRedis();
   });
 });
