@@ -12,6 +12,7 @@ export interface CRUDModalProps {
   Icon: (props: TablerIconsProps) => JSX.Element;
   iconColor?: string;
   children: ReactNode;
+  className?: string;
 }
 
 const CRUDModal = ({
@@ -23,6 +24,7 @@ const CRUDModal = ({
   title,
   Icon,
   iconColor,
+  className,
 }: CRUDModalProps) => {
   if (show && !show()) return null;
   return (
@@ -38,7 +40,12 @@ const CRUDModal = ({
       >
         {children}
       </Modal>
-      <ActionIcon size={36} onClick={open} className='action-icon' color={iconColor ?? 'blue'}>
+      <ActionIcon
+        size={36}
+        onClick={open}
+        className={`action-icon ${className}`}
+        color={iconColor ?? 'blue'}
+      >
         <Icon />
       </ActionIcon>
     </>
