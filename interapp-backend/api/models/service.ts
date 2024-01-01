@@ -289,7 +289,13 @@ export class ServiceModel {
     await appDataSource.manager.delete(ServiceSessionUser, { service_session_id, username });
   }
   public static async deleteServiceSessionUsers(service_session_id: number, usernames: string[]) {
-    await appDataSource.manager.createQueryBuilder().delete().from(ServiceSessionUser).where('service_session_id = :service_session_id', { service_session_id }).andWhere('username IN (:...usernames)', { usernames }).execute();
+    await appDataSource.manager
+      .createQueryBuilder()
+      .delete()
+      .from(ServiceSessionUser)
+      .where('service_session_id = :service_session_id', { service_session_id })
+      .andWhere('username IN (:...usernames)', { usernames })
+      .execute();
   }
   public static async getAllServiceSessions(page: number, perPage: number, service_id?: number) {
     const parseRes = (res: Partial<ServiceSession>[]) =>
@@ -300,7 +306,12 @@ export class ServiceModel {
       });
     const condition = service_id ? 'service_session.service_id = :service_id' : '1 = 1';
 
-    const total_entries = await appDataSource.manager.createQueryBuilder().select('service_session').from(ServiceSession, 'service_session').where(condition, { service_id }).getCount();
+    const total_entries = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where(condition, { service_id })
+      .getCount();
 
     const res = await appDataSource.manager
       .createQueryBuilder()
@@ -314,8 +325,8 @@ export class ServiceModel {
       .take(perPage)
       .skip((page - 1) * perPage)
       .orderBy('service_session.start_time', 'DESC')
-      .getMany()
+      .getMany();
 
-    return {data: parseRes(res), total_entries, length_of_page: res.length};
+    return { data: parseRes(res), total_entries, length_of_page: res.length };
   }
 }
