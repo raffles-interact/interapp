@@ -53,7 +53,7 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
     if (!event.target.files) return;
     const file = event.target.files[0];
     // validate file
-    if (!accept.includes(file.type)) {
+    if (file && !accept.includes(file.type)) {
       notifications.show({
         title: 'Invalid file type',
         message: `File type ${file.type} is not supported`,
