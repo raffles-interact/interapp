@@ -261,7 +261,6 @@ describe('Unit (service)', () => {
     expect(serviceSessions.data).toBeArrayOfSize(1);
     expect(serviceSessions.total_entries).toBe(1);
     expect(serviceSessions.length_of_page).toBe(1);
-
   });
 
   test('get all service sessions by session id', async () => {

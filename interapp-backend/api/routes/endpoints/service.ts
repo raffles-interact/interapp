@@ -166,8 +166,6 @@ serviceRouter.post(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    
-
     if (req.body.start_time >= req.body.end_time) {
       throw new HTTPError(
         'Invalid field type',
@@ -357,7 +355,10 @@ serviceRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    await ServiceModel.deleteServiceSessionUsers(Number(req.body.service_session_id), req.body.usernames);
+    await ServiceModel.deleteServiceSessionUsers(
+      Number(req.body.service_session_id),
+      req.body.usernames,
+    );
     res.status(204).send();
   },
 );

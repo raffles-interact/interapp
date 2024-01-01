@@ -23,25 +23,19 @@ const minioClient = new Client({
 const exists = await minioClient.bucketExists(config.bucketName as string);
 if (!exists) {
   const policy = JSON.stringify({
-    "Version": "2012-10-17",
-    "Statement": [
+    Version: '2012-10-17',
+    Statement: [
       {
-        "Action": [
-          "s3:GetObject"
-        ],
-        "Effect": "Allow",
-        "Principal": {
-          "AWS": [
-            "*"
-          ]
+        Action: ['s3:GetObject'],
+        Effect: 'Allow',
+        Principal: {
+          AWS: ['*'],
         },
-        "Resource": [
-          `arn:aws:s3:::${config.bucketName as string}/*`
-        ],
-        "Sid": ""
-      }
-    ]
-  })
+        Resource: [`arn:aws:s3:::${config.bucketName as string}/*`],
+        Sid: '',
+      },
+    ],
+  });
   await minioClient.makeBucket(config.bucketName as string, 'ap-southeast-1');
   await minioClient.setBucketPolicy(config.bucketName as string, policy);
 }
