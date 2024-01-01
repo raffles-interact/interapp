@@ -79,6 +79,10 @@ export class ServiceModel {
     const service_ic = await UserModel.getUser(service.service_ic_username);
     if (!service.promotional_image) service.promotional_image = null;
     else {
+      // why we do this:
+      // if promotional_image is a URL, then it is not changed
+      // if promotional_image is a data:image/gif...., then it is changed to a URL and dumped into minio
+      // in either case, service.promotional_image points to the location of the image in minio
       if (service.promotional_image.startsWith('data:')) {
         const convertedFile = dataUrlToBuffer(service.promotional_image);
         if (!convertedFile) {
@@ -93,8 +97,8 @@ export class ServiceModel {
           'service/' + service.name,
           convertedFile.buffer,
         );
-        service.promotional_image = 'service/' + service.name;
       }
+      service.promotional_image = 'service/' + service.name;
     }
 
     service.service_ic = service_ic;
