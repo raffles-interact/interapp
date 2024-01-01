@@ -63,7 +63,6 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
   });
 
   const handleSubmit = async (values: typeof form.values) => {
-    console.log(values);
     setLoading(true);
 
     const body = {
@@ -81,7 +80,6 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
         color: 'red',
       });
       setLoading(false);
-      form.reset();
 
       return;
     }
@@ -98,7 +96,7 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
         })),
       };
       const res = await apiClient.post(`/service/session_user_bulk`, body);
-      if (res.status !== 200) {
+      if (res.status !== 201) {
         notifications.show({
           title: 'Error',
           message: 'Could not add service session users',
@@ -106,7 +104,6 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
         });
         refreshData();
         setLoading(false);
-        form.reset();
 
         return;
       }
@@ -114,7 +111,7 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
 
     notifications.show({
       title: 'Success',
-      message: 'Service session added successfully',
+      message: `Service session added successfully. (id: ${id})`,
       color: 'green',
     });
 

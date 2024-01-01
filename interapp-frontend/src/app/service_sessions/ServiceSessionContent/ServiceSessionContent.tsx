@@ -38,7 +38,7 @@ const ServiceSessionContent = ({
   const [serviceSessions, setServiceSessions] = useState(serviceSessionsWithMeta.data);
 
   const refresh = () => {
-    const args: readonly [number, number?] = serviceId !== undefined ? [page, serviceId] : [page];
+    const args: readonly [number, number?] = serviceId === undefined ? [page] : [page, serviceId];
     refreshData(...args).then(([serviceSessionsWithMeta, _]) => {
       setServiceSessions(serviceSessionsWithMeta.data);
       setTotalPagesState(Math.ceil(serviceSessionsWithMeta.total_entries / perPage));
