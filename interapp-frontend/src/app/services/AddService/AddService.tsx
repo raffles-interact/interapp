@@ -155,12 +155,10 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <div className='add-service'>
           <UploadImage
-            onChange={async (_, file) =>
-              {
-                if (file) form.setFieldValue('promotional_image', await convertToBase64(file));
+            onChange={async (_, file) => {
+              if (file) form.setFieldValue('promotional_image', await convertToBase64(file));
               else form.setFieldValue('promotional_image', '');
-              }
-            }
+            }}
             accept={allowedFormats}
             className='add-service-file-display'
           />
