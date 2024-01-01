@@ -6,26 +6,10 @@ const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
 import { Title, Skeleton, Text } from '@mantine/core';
 import { remapAssetUrl } from '@api/utils';
+import { Service } from './types';
 import './styles.css';
 
-export interface Service {
-  service_id: number;
-  name: string;
-  description: string | null;
-  contact_email: string;
-  contact_number: number | null;
-  website: string | null;
-  promotional_image: string | null;
-  day_of_week: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  start_time: string;
-  end_time: string;
-  service_ic_username: string;
-}
 
-export interface ServiceWithUsers {
-  service: Service;
-  usernames: string[];
-}
 
 const fetchAllServices = async () => {
   const apiClient = new APIClient({ useClient: false }).instance;
