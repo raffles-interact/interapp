@@ -27,7 +27,13 @@ const parseDateAndTime = (startTime: string, endTime: string): readonly [string,
   ];
 };
 
-const ServiceSession = ({
+type ServiceSessionRowProps = Omit<ServiceSession, 'service_id'> & {
+  service_promotional_image?: string | null;
+  isDesktop: boolean;
+  refreshData: () => void;
+};
+
+const ServiceSessionRow = ({
   service_session_id,
   service_promotional_image,
   service_name,
@@ -37,11 +43,7 @@ const ServiceSession = ({
   service_session_users,
   isDesktop,
   refreshData,
-}: Omit<ServiceSession, 'service_id'> & {
-  service_promotional_image?: string | null;
-  isDesktop: boolean;
-  refreshData: () => void;
-}) => {
+}: ServiceSessionRowProps) => {
   const [timeInterval, date] = parseDateAndTime(start_time, end_time);
   return (
     <Table.Tr>
@@ -84,4 +86,4 @@ const ServiceSession = ({
   );
 };
 
-export default memo(ServiceSession);
+export default memo(ServiceSessionRow);

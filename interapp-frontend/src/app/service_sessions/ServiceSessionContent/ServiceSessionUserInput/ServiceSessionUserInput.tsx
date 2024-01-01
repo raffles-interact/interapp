@@ -1,16 +1,6 @@
 'use client';
-import {
-  Accordion,
-  Select,
-  Checkbox,
-  Group,
-  Stack,
-  ActionIcon,
-  Center,
-  MultiSelect,
-} from '@mantine/core';
+import { Accordion, Select, Checkbox, Group, Stack, Center, MultiSelect } from '@mantine/core';
 import { ServiceSessionUser, AttendanceStatus } from '../../types';
-import { IconTrash } from '@tabler/icons-react';
 import { useState, useEffect } from 'react';
 import './styles.css';
 
