@@ -1,13 +1,14 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { Text } from '@mantine/core';
+import { Text, ActionIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
+import { IconX } from '@tabler/icons-react';
 
 import './styles.css';
 
 export interface UploadImageProps {
-  onChange: (imageURL: string, file: File) => void;
+  onChange: (imageURL: string, file: File | null) => void;
   accept: string[];
   defaultImageURL?: string | null;
   className?: string;
@@ -88,15 +89,29 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
           <Text>Upload an image</Text>
         </div>
       ) : (
-        <img
-          src={imageURL}
-          className='upload-image-preview'
-          onClick={() => inputRef.current?.click()}
-          onKeyDown={(e) => {
-            if (e.key === 'F1') inputRef.current?.click();
-          }}
-          alt='upload-service-preview'
-        />
+        <>
+          <ActionIcon
+            variant='subtle'
+            color='red'
+            radius='xl'
+            className='upload-image-remove-button'
+            onClick={() => {
+              setImageURL('');
+              onChange('', null);
+            }}
+          >
+            <IconX />
+          </ActionIcon>
+          <img
+            src={imageURL}
+            className='upload-image-preview'
+            onClick={() => inputRef.current?.click()}
+            onKeyDown={(e) => {
+              if (e.key === 'F1') inputRef.current?.click();
+            }}
+            alt='upload-service-preview'
+          />
+        </>
       )}
     </div>
   );
