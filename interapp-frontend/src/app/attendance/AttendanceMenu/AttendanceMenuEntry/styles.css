@@ -1,0 +1,50 @@
+.entry-skeleton {
+  width: 90%;
+  height: 10rem;
+  border-radius: 7px;
+}
+
+.entry {
+  border-radius: 7px;
+  padding: 1rem;
+  display: flex;
+  gap: 1rem;
+}
+
+.entry-image {
+  width: 7rem;
+  height: 7rem;
+
+  object-fit: scale-down;
+}
+
+.entry-image-container {
+  padding: 0.7rem;
+  border: 1px solid var(--mantine-color-dark-9);
+  background-color: var(--mantine-color-white);
+  border-radius: 7px;
+}
+
+.entry-text {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.entry-users {
+  display: grid;
+  grid-template-columns: repeat( auto-fit, minmax(3rem, 1fr) );
+  row-gap: 0.5rem;
+  column-gap: 0.3rem;
+  justify-items: center;
+}
+
+.entry-users > * {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .entry-users {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

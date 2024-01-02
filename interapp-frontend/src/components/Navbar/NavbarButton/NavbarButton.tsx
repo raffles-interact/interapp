@@ -1,5 +1,5 @@
 'use client';
-import { memo, useContext, useState, useMemo } from 'react';
+import { memo, useContext, useState, useMemo, useCallback } from 'react';
 import {
   IconHome,
   IconLogin,
@@ -13,6 +13,7 @@ import {
   IconMail,
   IconHeart,
   type TablerIconsProps,
+  IconCheck,
 } from '@tabler/icons-react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { User } from '@providers/AuthProvider/types';
@@ -175,6 +176,16 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
         user.permissions.includes(Permissions.MENTORSHIP_IC)),
     category: 'Administration',
   },
+  {
+    name: 'Attendance',
+    callback: () => goTo('/attendance'),
+    icon: IconCheck,
+    show:
+      !!user &&
+      (user.permissions.includes(Permissions.SERVICE_IC) ||
+        user.permissions.includes(Permissions.MENTORSHIP_IC)),
+    category: 'Administration',
+  },
 ];
 
 const catagoriseTabs = (tabs: NavbarTab[]) => {
@@ -202,9 +213,8 @@ const NavbarButton = () => {
 
   const { user, logout } = useContext(AuthContext);
   const apiClient = new APIClient().instance;
-  const resendVerificationEmail = useMemo(
-    () => async () =>
-      (await apiClient.post('/user/verify_email', { username: user?.username })).status,
+  const resendVerificationEmail = useCallback(
+    async () => (await apiClient.post('/user/verify_email', { username: user?.username })).status,
     [user],
   );
 

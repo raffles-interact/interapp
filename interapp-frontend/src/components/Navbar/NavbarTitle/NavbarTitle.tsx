@@ -66,6 +66,31 @@ export const getNavbarTitle = (pathname: string) => {
         title: 'Services',
         Icon: IconHeart,
       };
+    case '/service_sessions':
+      return {
+        title: 'Service Sessions',
+        Icon: IconPlaylistAdd,
+      };
+    case '/attendance':
+      return {
+        title: 'Attendance',
+        Icon: IconCheck,
+      };
+    case '/attendance/verify':
+      return {
+        title: 'Verify Attendance',
+        Icon: IconCheck,
+      };
+    case '/announcements':
+      return {
+        title: 'Announcements',
+        Icon: IconSpeakerphone,
+      };
+    case '/profile':
+      return {
+        title: 'Profile',
+        Icon: IconUserSquare,
+      };
     default:
       return {
         title: 'Page Not Found',
