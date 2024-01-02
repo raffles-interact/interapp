@@ -272,7 +272,7 @@ serviceRouter.post(
           'ad_hoc' in user &&
           'attended' in user &&
           'is_ic' in user &&
-          user.attended in AttendanceStatus
+          Object.values(AttendanceStatus).some((status) => status === user.attended)
         )
       ) {
         throw new HTTPError(
