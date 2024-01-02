@@ -1,18 +1,19 @@
 'use client';
 
 import APIClient from '@/api/api_client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, memo } from 'react';
 import { Text, Skeleton, Paper, Title, Badge } from '@mantine/core';
 import { AxiosResponse } from 'axios';
 import { remapAssetUrl } from '@/api/utils';
 import { IconFlag } from '@tabler/icons-react';
+import { useRouter } from 'next/navigation';
 import './styles.css';
 
 interface AttendanceMenuEntryProps {
   service_session_id: number;
 }
 
-const fetchAttendanceDetails = async (service_session_id: number) => {
+export const fetchAttendanceDetails = async (service_session_id: number) => {
   const apiClient = new APIClient({ useClient: false }).instance;
   const res = await apiClient.get('/service/session', {
     params: { service_session_id: service_session_id },
@@ -57,9 +58,10 @@ const fetchAttendanceDetails = async (service_session_id: number) => {
   };
 };
 
-type fetchAttendanceDetailsType = Awaited<ReturnType<typeof fetchAttendanceDetails>>;
+export type fetchAttendanceDetailsType = Awaited<ReturnType<typeof fetchAttendanceDetails>>;
 
 const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) => {
+  const router = useRouter();
   const [detail, setDetail] = useState<fetchAttendanceDetailsType>(
     {} as fetchAttendanceDetailsType,
   );
@@ -75,7 +77,13 @@ const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) =
   }
 
   return (
-    <Paper shadow='xs' withBorder component='button' w='100%'>
+    <Paper
+      shadow='xs'
+      withBorder
+      component='button'
+      w='100%'
+      onClick={() => router.push('/attendance?id=' + detail.service_session_id)}
+    >
       <div className='entry'>
         <div className='entry-image-container'>
           <img src={detail.promotional_image ?? '/placeholder-image.jpg'} className='entry-image' />
@@ -119,4 +127,4 @@ const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) =
   );
 };
 
-export default AttendanceMenuEntry;
+export default memo(AttendanceMenuEntry);

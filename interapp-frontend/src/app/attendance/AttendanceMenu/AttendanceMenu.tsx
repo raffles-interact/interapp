@@ -1,11 +1,32 @@
 'use client';
-import { fetchActiveServiceSessions, type fetchActiveServiceSessionsType } from '../page';
+import APIClient from '@/api/api_client';
 import { useState, useEffect, useContext } from 'react';
 import { Stack, Text } from '@mantine/core';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import AttendanceMenuEntry from './AttendanceMenuEntry/AttendanceMenuEntry';
+import QRPage from './QRPage/QRPage';
 
-const AttendanceMenu = () => {
+interface AttendanceMenuProps {
+  id?: number;
+}
+
+export const fetchActiveServiceSessions = async () => {
+  const apiClient = new APIClient().instance;
+  const response = await apiClient.get('/service/active_sessions');
+  if (response.status !== 200) throw new Error('Failed to fetch active service sessions');
+
+  const data: {
+    [hash: string]: {
+      service_session_id: number;
+      ICs: string[];
+    };
+  }[] = response.data;
+  return data;
+};
+
+export type fetchActiveServiceSessionsType = Awaited<ReturnType<typeof fetchActiveServiceSessions>>;
+
+const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
   const [activeSessions, setActiveSessions] = useState<fetchActiveServiceSessionsType>([]);
   const { user } = useContext(AuthContext);
 
@@ -14,28 +35,43 @@ const AttendanceMenu = () => {
       setActiveSessions(data);
     });
   }, []);
+  if (id === undefined) {
+    if (Object.keys(activeSessions).length === 0) {
+      return <Text m='1rem'>No active sessions!</Text>;
+    }
 
-  if (Object.keys(activeSessions).length === 0) {
-    return <Text>No active sessions!</Text>;
+    const destructuredActiveSessions = activeSessions.map((session) => {
+      const hash = Object.keys(session)[0];
+      const { service_session_id, ICs } = session[hash];
+      return { hash, service_session_id, ICs };
+    });
+
+    const visibleActiveSessions = destructuredActiveSessions.filter(({ ICs }) => {
+      return ICs.includes(user?.username ?? '');
+    });
+
+    return (
+      <Stack gap={10} m={10}>
+        {visibleActiveSessions.map(({ hash, service_session_id }) => {
+          return <AttendanceMenuEntry service_session_id={service_session_id} key={hash} />;
+        })}
+      </Stack>
+    );
+  } else {
+    const activeSession = activeSessions.find((session) => {
+      const hash = Object.keys(session)[0];
+      const { service_session_id } = session[hash];
+      return service_session_id === id;
+    });
+
+    if (activeSession === undefined) {
+      return <Text m='1rem'>Session not found!</Text>;
+    }
+
+    const hash = Object.keys(activeSession)[0];
+
+    return <QRPage id={id} hash={hash} />;
   }
-
-  const destructuredActiveSessions = activeSessions.map((session) => {
-    const hash = Object.keys(session)[0];
-    const { service_session_id, ICs } = session[hash];
-    return { hash, service_session_id, ICs };
-  });
-
-  const visibleActiveSessions = destructuredActiveSessions.filter(({ ICs }) => {
-    return ICs.includes(user?.username ?? '');
-  });
-
-  return (
-    <Stack gap={10} m={10}>
-      {visibleActiveSessions.map(({ hash, service_session_id }) => {
-        return <AttendanceMenuEntry service_session_id={service_session_id} key={hash} />;
-      })}
-    </Stack>
-  );
 };
 
 export default AttendanceMenu;
