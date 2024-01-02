@@ -6,18 +6,15 @@ import './error-styles.css';
 export default async function AttendancePage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
 }) {
   // if there is an id, it must be a number
-  if (
-    searchParams.id instanceof Array ||
-    (searchParams.id && !/^\d+$/.test(searchParams.id as string))
-  )
+  if (searchParams.id instanceof Array || (searchParams.id && !/^\d+$/.test(searchParams.id)))
     return (
       <div className='error-container'>
         <Text>Invalid id</Text>
         <GoHomeButton />
       </div>
     );
-  return <AttendanceMenu id={searchParams.id ? parseInt(searchParams.id as string) : undefined} />;
+  return <AttendanceMenu id={searchParams.id ? parseInt(searchParams.id) : undefined} />;
 }
