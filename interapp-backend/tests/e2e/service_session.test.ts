@@ -662,7 +662,6 @@ describe('API (service session)', async () => {
     expect(hashPair).toBeDefined();
     const hash = hashPair![0];
 
-
     // verify attendance
     const res2 = await fetch(`${API_URL}/service/verify_attendance`, {
       method: 'POST',

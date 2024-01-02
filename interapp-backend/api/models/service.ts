@@ -386,7 +386,6 @@ export class ServiceModel {
     );
 
     if (service_session_user.attended === AttendanceStatus.Attended) {
-      
       throw new HTTPError(
         'Already attended',
         `User ${username} has already attended service session with service_session_id ${service_session_id}`,
