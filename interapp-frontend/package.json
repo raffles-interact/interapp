@@ -18,11 +18,13 @@
     "@tabler/icons-react": "^2.44.0",
     "axios": "^1.6.2",
     "next": "^14.0.4",
+    "qrcode": "^1.5.3",
     "react": "^18",
     "react-dom": "^18"
   },
   "devDependencies": {
     "@types/node": "^20",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "bun-types": "^1.0.11",
