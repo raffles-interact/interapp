@@ -320,6 +320,34 @@ describe('Unit (service)', () => {
     expect(Object.entries(activeServiceSessions)).toBeArrayOfSize(4);
   });
 
+  test('add user to active service session and verify attendance', async () => {
+    await ServiceModel.createServiceSessionUser({
+      service_session_id: 3,
+      username: 'testuser',
+      is_ic: false,
+      attended: AttendanceStatus.Absent,
+      ad_hoc: false,
+    });
+
+    const activeServiceSessions = await ServiceModel.getActiveServiceSessions();
+    expect(Object.entries(activeServiceSessions)).toBeArrayOfSize(4);
+
+    // find the service session hash that the user is in (id 3)
+    const serviceSessionHash = activeServiceSessions.find((v) =>
+      Object.values(v).find((v) => v.service_session_id === 3),
+    );
+    expect(serviceSessionHash).toBeDefined();
+
+    // get the hash
+    const hash = Object.keys(serviceSessionHash!)[0];
+
+    await ServiceModel.verifyAttendance(hash, 'testuser');
+
+    expect((await ServiceModel.getServiceSessionUser(3, 'testuser')).attended).toBe(
+      AttendanceStatus.Attended,
+    );
+  });
+
   afterAll(async () => {
     await recreateDB();
     await recreateRedis();

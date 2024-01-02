@@ -640,6 +640,41 @@ describe('API (service session)', async () => {
     ).toBeArrayOfSize(10);
   });
 
+  test('add user to active service session and verify attendance', async () => {
+    // add user to service session
+    const res = await fetch(`${API_URL}/service/session_user`, {
+      method: 'POST',
+      body: JSON.stringify({
+        service_session_id: 1,
+        username: 'testuser3',
+        ad_hoc: false,
+        attended: 'Absent',
+        is_ic: false,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(201);
+
+    // find hash of service session
+    const hashes = await redisClient.hGetAll('service_session');
+    const hashPair = Object.entries(hashes).find(([k, v]) => v === '1');
+
+    expect(hashPair).toBeDefined();
+    const hash = hashPair![0];
+
+
+    // verify attendance
+    const res2 = await fetch(`${API_URL}/service/verify_attendance`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'testuser3',
+        hash: hash,
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(204);
+  });
+
   afterAll(async () => {
     await recreateDB();
     await recreateRedis();
