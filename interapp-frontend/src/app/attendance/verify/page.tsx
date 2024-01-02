@@ -6,7 +6,7 @@ import './../error-styles.css';
 export default function AttendanceVerifyPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
 }) {
   if (searchParams.hash instanceof Array || searchParams.hash === undefined)
     return (
@@ -24,8 +24,5 @@ export default function AttendanceVerifyPage({
       </div>
     );
 
-  const hash = searchParams.hash as string;
-  const id = searchParams.id as string;
-
-  return <VerifyAttendance hash={hash} id={parseInt(id)} />;
+  return <VerifyAttendance hash={searchParams.hash} id={parseInt(searchParams.id)} />;
 }

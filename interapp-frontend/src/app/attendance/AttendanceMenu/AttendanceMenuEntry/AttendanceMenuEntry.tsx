@@ -25,10 +25,10 @@ export const fetchAttendanceDetails = async (service_session_id: number) => {
   });
   if (res2.status !== 200) throw new Error('Failed to fetch user attendance details');
 
-  let res3: AxiosResponse<any, any> | null = await apiClient.get('/service', {
+  let res3: AxiosResponse<any, any> | null = (await apiClient.get('/service', {
     params: { service_id: res.data.service_id },
-  });
-  if (res3!.status !== 200) res3 = null;
+  })) satisfies AxiosResponse<any, any>;
+  if (res3.status !== 200) res3 = null;
 
   const promo: string | null = res3 ? res3.data.promotional_image : null;
   const serviceTitle: string | null = res3 ? res3.data.name : null;
@@ -86,7 +86,11 @@ const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) =
     >
       <div className='entry'>
         <div className='entry-image-container'>
-          <img src={detail.promotional_image ?? '/placeholder-image.jpg'} className='entry-image' />
+          <img
+            src={detail.promotional_image ?? '/placeholder-image.jpg'}
+            className='entry-image'
+            alt='promotional-img'
+          />
         </div>
 
         <div className='entry-text'>

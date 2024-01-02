@@ -5,7 +5,7 @@ import {
 } from '../AttendanceMenuEntry/AttendanceMenuEntry';
 import APIClient from '@/api/api_client';
 import { useState, useEffect, memo, useRef, Suspense } from 'react';
-import { Title, Text, Badge, Skeleton, NavLink } from '@mantine/core';
+import { Title, Text, Badge, Skeleton } from '@mantine/core';
 import { useInterval } from '@mantine/hooks';
 import QRCode from 'qrcode';
 import { IconFlag, IconExternalLink } from '@tabler/icons-react';
