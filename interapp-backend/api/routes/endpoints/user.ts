@@ -194,7 +194,6 @@ userRouter.patch(
 userRouter.patch(
   '/service_hours',
   verifyJWT,
-  verifyRequiredPermission(Permissions.ADMIN),
   validateRequiredFields(['username', 'hours']),
   async (req, res) => {
     await UserModel.updateServiceHours(req.body.username, req.body.hours);

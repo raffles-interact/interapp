@@ -97,13 +97,14 @@ const QRPage = ({ id, hash }: QRPageProps) => {
   }, [timer]);
 
   return (
-    <div>
-      <h1>QR Page</h1>
+    <>
       <div className='QRCode-container'>
         <canvas className='QRCode' ref={canvasRef} />
         <div className='QRCode-redirect'>
           <IconExternalLink color='blue' />
-          <Link href={redirectLink.current}>Verify Attendance</Link>
+          <Link href={redirectLink.current} target='_blank'>
+            Verify Attendance
+          </Link>
         </div>
       </div>
       <Suspense fallback={<Skeleton width='100%' height={30} />}>
@@ -141,7 +142,7 @@ const QRPage = ({ id, hash }: QRPageProps) => {
           <Text>Refreshes in {timer} seconds!</Text>
         </div>
       </Suspense>
-    </div>
+    </>
   );
 };
 
