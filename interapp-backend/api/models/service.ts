@@ -341,19 +341,33 @@ export class ServiceModel {
 
     if (Object.keys(active).length === 0) return [];
 
-    const ICs = await appDataSource.manager
+    const ICs: {
+      username: string;
+      service_session_id: number;
+    }[] = await appDataSource.manager
       .createQueryBuilder()
-      .select('service_session_user.username')
+      .select(['service_session_user.username', 'service_session_user.service_session_id'])
       .from(ServiceSessionUser, 'service_session_user')
       .where('service_session_id IN (:...service_session_ids)', {
         service_session_ids: Object.values(active).map((v) => parseInt(v)),
       })
       .andWhere('service_session_user.is_ic = true')
       .getMany();
+
+    // sort by service_session_id
+    const sortedICs = ICs.reduce(
+      (acc, cur) => {
+        acc[cur.service_session_id] = acc[cur.service_session_id] ?? [];
+        acc[cur.service_session_id].push(cur.username);
+        return acc;
+      },
+      {} as { [key: number]: string[] },
+    );
+
     return Object.entries(active).map(([hash, id]) => ({
       [hash]: {
         service_session_id: parseInt(id),
-        ICs: ICs.map((IC) => IC.username),
+        ICs: sortedICs[parseInt(id)],
       },
     }));
   }
