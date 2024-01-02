@@ -2,7 +2,7 @@ import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
 import minioClient from '@utils/init_minio';
 import dataUrlToBuffer from '@utils/dataUrlToBuffer';
-import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
+import { AttendanceStatus, Service, ServiceSession, ServiceSessionUser } from '@db/entities';
 import { UserModel } from './user';
 import redisClient from '@utils/init_redis';
 
@@ -370,5 +370,31 @@ export class ServiceModel {
         ICs: sortedICs[parseInt(id)],
       },
     }));
+  }
+  public static async verifyAttendance(hash: string, username: string) {
+    const service_session_id = await redisClient.hGet('service_session', hash);
+    if (!service_session_id) {
+      throw new HTTPError(
+        'Invalid hash',
+        `Hash ${hash} is not a valid hash`,
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    const service_session_user = await this.getServiceSessionUser(
+      parseInt(service_session_id),
+      username,
+    );
+
+    if (service_session_user.attended === AttendanceStatus.Attended) {
+      
+      throw new HTTPError(
+        'Already attended',
+        `User ${username} has already attended service session with service_session_id ${service_session_id}`,
+        HTTPErrorCode.CONFLICT_ERROR,
+      );
+    }
+    service_session_user.attended = AttendanceStatus.Attended;
+    await this.updateServiceSessionUser(service_session_user);
+    return service_session_user;
   }
 }

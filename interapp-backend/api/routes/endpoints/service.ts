@@ -372,4 +372,15 @@ serviceRouter.get(
     res.status(200).send(sessions);
   },
 );
+
+serviceRouter.post(
+  '/verify_attendance',
+  validateRequiredFields(['username', 'hash']),
+  verifyJWT,
+  async (req, res) => {
+    await ServiceModel.verifyAttendance(req.body.hash, req.body.username);
+    res.status(204).send();
+  },
+);
+
 export default serviceRouter;
