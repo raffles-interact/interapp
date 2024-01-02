@@ -40,7 +40,7 @@ const QRPage = ({ id, hash }: QRPageProps) => {
   );
 
   const redirectLink = useRef<string>(
-    process.env.NEXT_PUBLIC_WEBSITE_URL + '/attendance/verify?hash=' + hash,
+    process.env.NEXT_PUBLIC_WEBSITE_URL + '/attendance/verify?hash=' + hash + '&id=' + id,
   );
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
