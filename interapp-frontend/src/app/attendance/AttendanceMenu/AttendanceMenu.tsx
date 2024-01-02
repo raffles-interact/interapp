@@ -1,7 +1,7 @@
 'use client';
 import APIClient from '@/api/api_client';
 import { useState, useEffect, useContext } from 'react';
-import { Stack, Text } from '@mantine/core';
+import { Stack, Text, Title } from '@mantine/core';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import AttendanceMenuEntry from './AttendanceMenuEntry/AttendanceMenuEntry';
 import QRPage from './QRPage/QRPage';
@@ -51,11 +51,19 @@ const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
     });
 
     return (
-      <Stack gap={10} m={10}>
-        {visibleActiveSessions.map(({ hash, service_session_id }) => {
-          return <AttendanceMenuEntry service_session_id={service_session_id} key={hash} />;
-        })}
-      </Stack>
+      <>
+        <Stack gap={3} m={10}>
+          <Title>Verify Attendance</Title>
+          <Text>
+            This page shows all ongoing service sessions. Click on a session to view the QR code.
+          </Text>
+        </Stack>
+        <Stack gap={10} m={10}>
+          {visibleActiveSessions.map(({ hash, service_session_id }) => {
+            return <AttendanceMenuEntry service_session_id={service_session_id} key={hash} />;
+          })}
+        </Stack>
+      </>
     );
   } else {
     const activeSession = activeSessions.find((session) => {
@@ -70,7 +78,15 @@ const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
 
     const hash = Object.keys(activeSession)[0];
 
-    return <QRPage id={id} hash={hash} />;
+    return (
+      <>
+        <Stack gap={3} m={15}>
+          <Title>Verify Attendance</Title>
+          <Text>This page shows the QR code for the selected service session.</Text>
+        </Stack>
+        <QRPage id={id} hash={hash} />
+      </>
+    );
   }
 };
 
