@@ -1,5 +1,5 @@
 import { memo } from 'react';
-import { Table, Pill, Text, Group } from '@mantine/core';
+import { Table, Badge, Text, Group } from '@mantine/core';
 import { ServiceSession } from '../../types';
 import EditAction from '../EditAction/EditAction';
 import './styles.css';
@@ -16,7 +16,9 @@ const parseDateAndTime = (startTime: string, endTime: string): readonly [string,
     startDate.getFullYear() === endDate.getFullYear();
 
   return [
-    `${startDate.getHours()}:${(startDate.getMinutes() < 10 ? '0' : '') + startDate.getMinutes()} - ${endDate.getHours()}:${(endDate.getMinutes() < 10 ? '0' : '') + endDate.getMinutes()}`,
+    `${startDate.getHours()}:${
+      (startDate.getMinutes() < 10 ? '0' : '') + startDate.getMinutes()
+    } - ${endDate.getHours()}:${(endDate.getMinutes() < 10 ? '0' : '') + endDate.getMinutes()}`,
     isSameDay
       ? `${startDate.getDate()}/${startDate.getMonth() + 1}/${startDate.getFullYear()}`
       : `${startDate.getDate()}/${
@@ -65,7 +67,18 @@ const ServiceSessionRow = ({
       <Table.Td>
         <div className='service-session-users'>
           {service_session_users.map((user) => (
-            <Pill key={user.username}>{user.username}</Pill>
+            <Badge
+              color={
+                {
+                  Absent: 'red',
+                  Attended: 'green',
+                  'Valid Reason': 'yellow',
+                }[user.attended]
+              }
+              key={user.username}
+            >
+              {user.username}
+            </Badge>
           ))}
         </div>
       </Table.Td>
