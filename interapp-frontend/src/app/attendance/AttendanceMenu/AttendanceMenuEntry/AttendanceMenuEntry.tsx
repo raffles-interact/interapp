@@ -53,7 +53,7 @@ export const fetchAttendanceDetails = async (service_session_id: number) => {
     start_time: new Date(sessionDetails.start_time),
     end_time: new Date(sessionDetails.end_time),
     user_details: sessionUserDetails,
-    promotional_image: !!promo ? remapAssetUrl(promo) : null,
+    promotional_image: promo ? remapAssetUrl(promo) : null,
     service_title: serviceTitle,
   };
 };

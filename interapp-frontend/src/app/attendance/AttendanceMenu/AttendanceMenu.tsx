@@ -52,13 +52,13 @@ const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
 
     return (
       <>
-        <Stack gap={3} m={10}>
+        <Stack gap={3} m={20}>
           <Title>Verify Attendance</Title>
           <Text>
             This page shows all ongoing service sessions. Click on a session to view the QR code.
           </Text>
         </Stack>
-        <Stack gap={10} m={10}>
+        <Stack gap={10} m={20}>
           {visibleActiveSessions.map(({ hash, service_session_id }) => {
             return <AttendanceMenuEntry service_session_id={service_session_id} key={hash} />;
           })}
@@ -80,7 +80,7 @@ const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
 
     return (
       <>
-        <Stack gap={3} m={15}>
+        <Stack gap={3} m={20}>
           <Title>Verify Attendance</Title>
           <Text>This page shows the QR code for the selected service session.</Text>
         </Stack>

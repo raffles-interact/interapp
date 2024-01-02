@@ -5,9 +5,9 @@ import './../error-styles.css';
 
 export default function AttendanceVerifyPage({
   searchParams,
-}: {
-  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
-}) {
+}: Readonly<{
+  searchParams: { [key: string]: string | string[] | undefined };
+}>) {
   if (searchParams.hash instanceof Array || searchParams.hash === undefined)
     return (
       <div className='error-container'>
