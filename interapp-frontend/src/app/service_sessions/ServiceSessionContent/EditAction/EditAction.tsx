@@ -79,19 +79,22 @@ function EditAction({
     }
     const addedAttendees = values.attendees.filter((attendee) => !attendees.includes(attendee));
     const removedAttendees = attendees.filter((attendee) => !values.attendees.includes(attendee));
-
-    const res1 = await apiClient.delete(`/service/session_user_bulk`, {
-      data: {
+    let res1 = null;
+    if (removedAttendees.length > 0)
+      res1 = await apiClient.delete(`/service/session_user_bulk`, {
+        data: {
+          service_session_id,
+          usernames: removedAttendees.map((attendee) => attendee.username),
+        },
+      });
+    let res2 = null;
+    if (addedAttendees.length > 0)
+      res2 = await apiClient.post(`/service/session_user_bulk`, {
         service_session_id,
-        usernames: removedAttendees.map((attendee) => attendee.username),
-      },
-    });
-    const res2 = await apiClient.post(`/service/session_user_bulk`, {
-      service_session_id,
-      users: addedAttendees,
-    });
+        users: addedAttendees,
+      });
 
-    if (res1.status >= 400 || res2.status >= 400) {
+    if ((res1 && res1.status >= 400) || (res2 && res2.status >= 400)) {
       notifications.show({
         title: 'Error',
         message:
