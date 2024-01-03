@@ -6,8 +6,27 @@ import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
-userRouter.get('/', verifyJWT, verifyRequiredPermission(Permissions.ADMIN), async (req, res) => {
-  const users = await UserModel.getAllUsers();
+userRouter.get('/', validateRequiredFields([], ['username']), verifyJWT, async (req, res) => {
+  const username = req.query.username as string | undefined;
+
+  if (username !== undefined) {
+    const user = await UserModel.getUserDetails(username);
+    res.status(200).send(user);
+    return;
+  }
+
+  const requesterUsername = req.headers.username as string;
+  const requesterPerms = await UserModel.checkPermissions(requesterUsername);
+
+  if (!requesterPerms.includes(Permissions.ADMIN)) {
+    throw new HTTPError(
+      'Insufficient permissions',
+      'Only admins can get all users',
+      HTTPErrorCode.UNAUTHORIZED_ERROR,
+    );
+  }
+
+  const users = await UserModel.getUserDetails();
   res.status(200).send(users);
 });
 

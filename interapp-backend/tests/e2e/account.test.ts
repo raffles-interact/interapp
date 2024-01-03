@@ -207,6 +207,22 @@ describe('API (account)', async () => {
     expect(response_as_json).toHaveLength(2);
   });
 
+  test('get user', async () => {
+    const res = await fetch(`${API_URL}/user?username=testuser`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const response_as_json = (await res.json()) as Object;
+    expect(response_as_json).toMatchObject({
+      user_id: 1,
+      username: 'testuser',
+      email: 'new_email@new_email.com',
+      verified: false,
+      service_hours: 10,
+    });
+  });
+
   test('get user permissions', async () => {
     const res = await fetch(`${API_URL}/user/permissions?username=testuser`, {
       method: 'GET',

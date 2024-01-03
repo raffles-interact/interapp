@@ -211,9 +211,20 @@ describe('Unit (user)', () => {
   });
 
   test('get all users', async () => {
-    const users = await UserModel.getAllUsers();
+    const users = await UserModel.getUserDetails();
     expect(users).toBeArray();
     expect(users).toHaveLength(2);
+  });
+
+  test('get 1st user', async () => {
+    const user = await UserModel.getUserDetails('testuser');
+    expect(user).toMatchObject({
+      user_id: 1,
+      username: 'testuser',
+      email: 'newemail@newemail',
+      verified: true,
+      service_hours: 0,
+    });
   });
 
   test('get permissions of all users', async () => {
