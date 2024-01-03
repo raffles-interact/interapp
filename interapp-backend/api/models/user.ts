@@ -31,7 +31,9 @@ export class UserModel {
   public static async deleteUser(username: string) {
     await appDataSource.manager.delete(User, { username });
   }
-  public static async getAllUsers() {
+  // the following function does not expose sensitive information
+  public static async getUserDetails(username?: string) {
+    const condition = username ? 'user.username = :username' : '1=1';
     const users = await appDataSource.manager
       .createQueryBuilder()
       .select([
@@ -41,8 +43,36 @@ export class UserModel {
         'user.user_id',
         'user.service_hours',
       ])
+      .where(condition, { username })
       .from(User, 'user')
       .getMany();
+
+    if (username) {
+      switch (users.length) {
+        case 0:
+          throw new HTTPError(
+            'User not found',
+            `The user with username ${username} was not found in the database`,
+            HTTPErrorCode.NOT_FOUND_ERROR,
+          );
+        case 1:
+          return users[0] as Omit<
+            User,
+            | 'password_hash'
+            | 'refresh_token'
+            | 'user_permissions'
+            | 'user_services'
+            | 'service_session_users'
+          >;
+        default:
+          throw new HTTPError(
+            'Multiple users found',
+            `Multiple users with username ${username} were found in the database`,
+            HTTPErrorCode.INTERNAL_SERVER_ERROR,
+          );
+      }
+    }
+
     return users as Omit<
       User,
       | 'password_hash'
