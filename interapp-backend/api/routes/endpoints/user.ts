@@ -106,14 +106,10 @@ userRouter.patch(
   },
 );
 
-userRouter.post(
-  '/verify_email',
-  verifyJWT,
-  async (req, res) => {
-    await UserModel.sendVerifyEmail(req.headers.username as string);
-    res.status(204).send();
-  },
-);
+userRouter.post('/verify_email', verifyJWT, async (req, res) => {
+  await UserModel.sendVerifyEmail(req.headers.username as string);
+  res.status(204).send();
+});
 
 userRouter.patch('/verify', validateRequiredFields(['token']), verifyJWT, async (req, res) => {
   await UserModel.verifyEmail(req.body.token);
@@ -250,14 +246,10 @@ userRouter.patch(
     await UserModel.updateProfilePicture(req.headers.username as string, req.body.profile_picture);
     res.status(204).send();
   },
-)
+);
 
-userRouter.delete(
-  '/profile_picture',
-  verifyJWT,
-  async (req, res) => {
-    await UserModel.deleteProfilePicture(req.headers.username as string);
-    res.status(204).send();
-  },
-)
+userRouter.delete('/profile_picture', verifyJWT, async (req, res) => {
+  await UserModel.deleteProfilePicture(req.headers.username as string);
+  res.status(204).send();
+});
 export default userRouter;
