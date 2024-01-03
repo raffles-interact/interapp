@@ -149,7 +149,6 @@ userRouter.get(
   '/permissions',
   validateRequiredFields([], ['username']),
   verifyJWT,
-  verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
     const username = req.query.username as string | undefined;
     const permissions = await UserModel.getPermissions(username);
