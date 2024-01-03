@@ -6,6 +6,7 @@ import {
   User,
   AuthContextType,
   UserWithJWT,
+  validateUserType,
 } from './types';
 import APIClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
@@ -33,6 +34,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (loading) return; // we dont know if user is logged in or not yet
     if (justLoggedIn) {
       setJustLoggedIn(false);
+      return;
+    }
+
+    const validUser = validateUserType(user);
+    if (!validUser) {
+      logout();
       return;
     }
 
