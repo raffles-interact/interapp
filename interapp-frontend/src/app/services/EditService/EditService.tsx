@@ -95,7 +95,7 @@ const EditService = ({
       promotional_image: data.promotional_image ? data.promotional_image : null,
     };
 
-    const res = await apiClient.patch(`/service`, body);
+    const res = await apiClient.patch('/service', body);
     if (res.status !== 200) {
       notifications.show({
         title: 'Error',
