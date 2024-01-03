@@ -44,7 +44,7 @@ const verifyAttendanceUser = async (
 ): Promise<{ status: 'Success' | 'Error'; message: string }> => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.post('/service/verify_attendance', {
-    hash
+    hash,
   });
   switch (res.status) {
     case 204:

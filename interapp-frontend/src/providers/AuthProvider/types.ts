@@ -47,16 +47,17 @@ export function validateUserType(user: User | null): boolean {
   if (user === null) return true;
 
   const conditions = [
-    user.username && typeof user.username === 'string',
-    user.user_id && typeof user.user_id === 'number',
-    user.email && typeof user.email === 'string',
-    user.permissions &&
+    user.username !== undefined && typeof user.username === 'string',
+    user.user_id !== undefined && typeof user.user_id === 'number',
+    user.email !== undefined && typeof user.email === 'string',
+    user.permissions !== undefined &&
       Array.isArray(user.permissions) &&
       user.permissions.length > 0 &&
       user.permissions.every((permission) => permission in Object.values(Permissions)),
     user.verified !== undefined && typeof user.verified === 'boolean',
-    user.service_hours && typeof user.service_hours === 'number',
+    user.service_hours !== undefined && typeof user.service_hours === 'number',
   ];
+
   if (conditions.every((condition) => condition)) return true;
   return false;
 }

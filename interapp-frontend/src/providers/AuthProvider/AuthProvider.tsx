@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const validUser = validateUserType(user);
     if (!validUser) {
       logout();
-      return;
+      throw new Error('Invalid user type in local storage\n' + JSON.stringify(user));
     }
 
     if (!user) {
