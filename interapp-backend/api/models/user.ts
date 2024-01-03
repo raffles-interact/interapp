@@ -5,6 +5,8 @@ import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import transporter from '@email_handler/index';
 import Mail from 'nodemailer/lib/mailer';
+import dataUrlToBuffer from '@utils/dataUrlToBuffer';
+import minioClient from '@utils/init_minio';
 
 interface EmailOptions extends Mail.Options {
   template: string;
@@ -47,6 +49,13 @@ export class UserModel {
       .where(condition, { username })
       .from(User, 'user')
       .getMany();
+      
+    for (const user of users) {
+      if (user.profile_picture) {
+        const url = await minioClient.presignedGetObject(process.env.MINIO_BUCKETNAME as string, user.profile_picture);
+        user.profile_picture = url;
+      }
+    }
 
     if (username) {
       switch (users.length) {
@@ -522,6 +531,51 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     user.service_hours = hours;
+    await appDataSource.manager.update(User, { username }, user);
+  }
+  public static async updateProfilePicture(username: string, profile_picture: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!user)
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    const converted = dataUrlToBuffer(profile_picture);
+
+    if (!converted) throw new HTTPError('Invalid image', 'The image you provided is invalid', HTTPErrorCode.BAD_REQUEST_ERROR);
+    await minioClient.putObject(
+      process.env.MINIO_BUCKETNAME as string,
+      `profile_pictures/${username}`,
+      converted.buffer,
+      { 'Content-Type': converted.mimetype },
+    );
+    user.profile_picture =  `profile_pictures/${username}`;
+
+    await appDataSource.manager.update(User, { username }, user);
+  }
+  public static async deleteProfilePicture(username: string) { 
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!user)
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+
+    await minioClient.removeObject(process.env.MINIO_BUCKETNAME as string, `profile_pictures/${username}`)
+    user.profile_picture = null;
+
     await appDataSource.manager.update(User, { username }, user);
   }
 }

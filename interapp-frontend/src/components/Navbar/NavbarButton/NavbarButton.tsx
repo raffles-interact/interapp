@@ -214,7 +214,7 @@ const NavbarButton = () => {
   const { user, logout } = useContext(AuthContext);
   const apiClient = new APIClient().instance;
   const resendVerificationEmail = useCallback(
-    async () => (await apiClient.post('/user/verify_email', { username: user?.username })).status,
+    async () => (await apiClient.post('/user/verify_email')).status,
     [user],
   );
 

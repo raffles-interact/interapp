@@ -5,6 +5,15 @@ import { User, UserPermission } from '@db/entities';
 
 const API_URL = process.env.API_URL;
 
+const imageUrlToBase64 = async (url: string) => {
+  const response = await fetch(url);
+  
+  const blob = await response.blob();
+  const buffer = Buffer.from(await blob.text());
+  return "data:" + blob.type + ';base64,' + buffer.toString('base64');
+};
+
+
 describe('API (account)', async () => {
   let accessToken: string;
 
@@ -147,6 +156,17 @@ describe('API (account)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('add service hours (non-admin)', async () => {
+    const res = await fetch(`${API_URL}/user/service_hours`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        hours: 10,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
   test('add service hours (non-existant)', async () => {
     const res = await fetch(`${API_URL}/user/service_hours`, {
       method: 'PATCH',
@@ -265,6 +285,45 @@ describe('API (account)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('update profile picture', async () => {
+
+    const img = await imageUrlToBase64('https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png');
+    
+    const res = await fetch(`${API_URL}/user/profile_picture`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        profile_picture: img,
+      }),
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+    
+    // check if profile picture is updated
+    const res2 = await fetch(`${API_URL}/user?username=testuser`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res2.status).toBe(200);
+    const response_as_json = (await res2.json()) as Object;
+    expect(response_as_json).toMatchObject({
+      user_id: 1,
+      username: 'testuser',
+      email: 'new_email@new_email.com',
+      verified: false,
+      service_hours: 10,
+      profile_picture: expect.any(String),
+    });
+    
+  });
+
+  test('delete profile picture', async () => {
+    const res = await fetch(`${API_URL}/user/profile_picture`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
+
   //test logout
   test('logout', async () => {
     const res = await fetch(`${API_URL}/auth/signout`, {
@@ -310,6 +369,8 @@ describe('API (account)', async () => {
       expire: expect.any(Number),
     });
   });
+
+  
 
   afterAll(async () => {
     await recreateDB();

@@ -108,10 +108,9 @@ userRouter.patch(
 
 userRouter.post(
   '/verify_email',
-  validateRequiredFields(['username']),
   verifyJWT,
   async (req, res) => {
-    await UserModel.sendVerifyEmail(req.body.username);
+    await UserModel.sendVerifyEmail(req.headers.username as string);
     res.status(204).send();
   },
 );
@@ -221,10 +220,44 @@ userRouter.patch(
 userRouter.patch(
   '/service_hours',
   verifyJWT,
-  validateRequiredFields(['username', 'hours']),
+  validateRequiredFields(['hours'], ['username']),
   async (req, res) => {
-    await UserModel.updateServiceHours(req.body.username, req.body.hours);
-    res.status(204).send();
+    if (req.body.username) {
+      // we are changing someone else's service hours
+      const perms = await UserModel.checkPermissions(req.headers.username as string);
+      if (!perms.includes(Permissions.ADMIN)) {
+        throw new HTTPError(
+          'Insufficient permissions',
+          "Only admins can change other users' service hours",
+          HTTPErrorCode.UNAUTHORIZED_ERROR,
+        );
+      }
+      await UserModel.updateServiceHours(req.body.username, req.body.hours);
+      res.status(204).send();
+    } else {
+      // we are changing our own service hours
+      await UserModel.updateServiceHours(req.headers.username as string, req.body.hours);
+      res.status(204).send();
+    }
   },
 );
+
+userRouter.patch(
+  '/profile_picture',
+  verifyJWT,
+  validateRequiredFields(['profile_picture']),
+  async (req, res) => {
+    await UserModel.updateProfilePicture(req.headers.username as string, req.body.profile_picture);
+    res.status(204).send();
+  },
+)
+
+userRouter.delete(
+  '/profile_picture',
+  verifyJWT,
+  async (req, res) => {
+    await UserModel.deleteProfilePicture(req.headers.username as string);
+    res.status(204).send();
+  },
+)
 export default userRouter;

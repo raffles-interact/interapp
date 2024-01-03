@@ -375,10 +375,10 @@ serviceRouter.get(
 
 serviceRouter.post(
   '/verify_attendance',
-  validateRequiredFields(['username', 'hash']),
+  validateRequiredFields(['hash']),
   verifyJWT,
   async (req, res) => {
-    await ServiceModel.verifyAttendance(req.body.hash, req.body.username);
+    await ServiceModel.verifyAttendance(req.body.hash, req.headers.username as string);
     res.status(204).send();
   },
 );

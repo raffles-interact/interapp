@@ -44,8 +44,7 @@ const verifyAttendanceUser = async (
 ): Promise<{ status: 'Success' | 'Error'; message: string }> => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.post('/service/verify_attendance', {
-    hash,
-    username,
+    hash
   });
   switch (res.status) {
     case 204:
@@ -76,10 +75,9 @@ const verifyAttendanceUser = async (
   }
 };
 
-const updateServiceHours = async (username: string, newHours: number) => {
+const updateServiceHours = async (newHours: number) => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.patch('/user/service_hours', {
-    username,
     hours: newHours,
   });
   if (res.status !== 204) throw new Error('Failed to update service hours');
@@ -100,7 +98,7 @@ const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
       if (status === 'Success') {
         fetchDuration(id).then((data) => {
           updateUser({ ...user, service_hours: user.service_hours + data });
-          updateServiceHours(user.username, user.service_hours + data);
+          updateServiceHours(user.service_hours + data);
 
           setGainedHours(data);
         });
