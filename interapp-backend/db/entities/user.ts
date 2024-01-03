@@ -11,6 +11,9 @@ export class User {
   @Column({ unique: true })
   user_id: number;
 
+  @Column({ nullable: true })
+  profile_picture: string | null;
+
   @Column()
   email: string;
 

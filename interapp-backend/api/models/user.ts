@@ -42,6 +42,7 @@ export class UserModel {
         'user.verified',
         'user.user_id',
         'user.service_hours',
+        'user.profile_picture',
       ])
       .where(condition, { username })
       .from(User, 'user')

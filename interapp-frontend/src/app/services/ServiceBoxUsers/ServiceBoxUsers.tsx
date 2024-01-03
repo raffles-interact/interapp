@@ -2,7 +2,7 @@
 import APIClient from '@api/api_client';
 import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
-import { User } from '@providers/AuthProvider/types';
+import { UserWithProfilePicture } from '@providers/AuthProvider/types';
 import { AxiosInstance } from 'axios';
 import { useState, useEffect, useContext } from 'react';
 import { Modal, Button, Text } from '@mantine/core';
@@ -15,12 +15,12 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
   const get_users_by_service = await apiClient.get(
     `/service/get_users_by_service?service_id=${service_id}`,
   );
-  const users: Omit<User, 'permissions'>[] = get_users_by_service.data.users;
+  const users: Omit<UserWithProfilePicture, 'permissions'>[] = get_users_by_service.data.users;
   const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
 
   const get_all_users = await apiClient.get('/user');
   if (get_all_users.status !== 200) throw new Error('Could not get all users');
-  const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
+  const all_users: Omit<UserWithProfilePicture, 'permissions'>[] = get_all_users.data;
   const allUsernames = all_users !== undefined ? all_users.map((user) => user.username) : [];
 
   return [serviceUsers, allUsernames];
