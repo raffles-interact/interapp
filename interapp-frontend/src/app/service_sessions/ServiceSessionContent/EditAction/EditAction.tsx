@@ -64,7 +64,7 @@ function EditAction({
       ad_hoc_enabled: values.ad_hoc_enabled,
     };
 
-    const res = await apiClient.patch(`/service/session`, body);
+    const res = await apiClient.patch('/service/session', body);
 
     if (res.status !== 200) {
       notifications.show({
@@ -81,7 +81,7 @@ function EditAction({
     const removedAttendees = attendees.filter((attendee) => !values.attendees.includes(attendee));
     let res1 = null;
     if (removedAttendees.length > 0)
-      res1 = await apiClient.delete(`/service/session_user_bulk`, {
+      res1 = await apiClient.delete('/service/session_user_bulk', {
         data: {
           service_session_id,
           usernames: removedAttendees.map((attendee) => attendee.username),
@@ -89,7 +89,7 @@ function EditAction({
       });
     let res2 = null;
     if (addedAttendees.length > 0)
-      res2 = await apiClient.post(`/service/session_user_bulk`, {
+      res2 = await apiClient.post('/service/session_user_bulk', {
         service_session_id,
         users: addedAttendees,
       });

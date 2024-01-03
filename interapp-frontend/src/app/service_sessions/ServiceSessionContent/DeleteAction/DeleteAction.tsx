@@ -22,7 +22,7 @@ const DeleteAction = ({ id, refreshData }: DeleteActionProps) => {
 
   const handleDelete = async () => {
     setLoading(true);
-    const response = await apiClient.delete(`/service/session`, {
+    const response = await apiClient.delete('/service/session', {
       data: { service_session_id: id },
     });
     if (response.status !== 204) {

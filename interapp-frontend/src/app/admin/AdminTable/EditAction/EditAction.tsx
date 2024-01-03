@@ -56,7 +56,7 @@ function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: (
       <Modal
         opened={opened}
         onClose={close}
-        title='Edit User Data'
+        title={`Edit ${user.username}`}
         className='edit-modal'
         closeOnClickOutside={false}
         closeOnEscape={false}

@@ -18,7 +18,7 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
   const users: Omit<User, 'permissions'>[] = get_users_by_service.data.users;
   const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
 
-  const get_all_users = await apiClient.get(`/user`);
+  const get_all_users = await apiClient.get('/user');
   if (get_all_users.status !== 200) throw new Error('Could not get all users');
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
   const allUsernames = all_users !== undefined ? all_users.map((user) => user.username) : [];

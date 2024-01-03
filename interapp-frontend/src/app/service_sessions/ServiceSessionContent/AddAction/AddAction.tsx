@@ -72,7 +72,7 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
       ad_hoc_enabled: values.ad_hoc_enabled,
     };
 
-    const res = await apiClient.post(`/service/session`, body);
+    const res = await apiClient.post('/service/session', body);
     if (res.status !== 200) {
       notifications.show({
         title: 'Error',
@@ -95,7 +95,7 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
           ad_hoc: user.ad_hoc,
         })),
       };
-      const res = await apiClient.post(`/service/session_user_bulk`, body);
+      const res = await apiClient.post('/service/session_user_bulk', body);
       if (res.status !== 201) {
         notifications.show({
           title: 'Error',

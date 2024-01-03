@@ -18,7 +18,10 @@ userRouter.get('/', validateRequiredFields([], ['username']), verifyJWT, async (
   const requesterUsername = req.headers.username as string;
   const requesterPerms = await UserModel.checkPermissions(requesterUsername);
 
-  if (!requesterPerms.includes(Permissions.ADMIN)) {
+  // need 1 of these permissions to get all users
+  const neededPerms = [Permissions.ADMIN, Permissions.EXCO, Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC];
+
+  if (!requesterPerms.some((perm) => neededPerms.includes(perm))) {
     throw new HTTPError(
       'Insufficient permissions',
       'Only admins can get all users',
