@@ -7,12 +7,11 @@ const API_URL = process.env.API_URL;
 
 const imageUrlToBase64 = async (url: string) => {
   const response = await fetch(url);
-  
+
   const blob = await response.blob();
   const buffer = Buffer.from(await blob.text());
-  return "data:" + blob.type + ';base64,' + buffer.toString('base64');
+  return 'data:' + blob.type + ';base64,' + buffer.toString('base64');
 };
-
 
 describe('API (account)', async () => {
   let accessToken: string;
@@ -286,9 +285,10 @@ describe('API (account)', async () => {
   });
 
   test('update profile picture', async () => {
+    const img = await imageUrlToBase64(
+      'https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png',
+    );
 
-    const img = await imageUrlToBase64('https://www.google.com/images/branding/googlelogo/1x/googlelogo_light_color_272x92dp.png');
-    
     const res = await fetch(`${API_URL}/user/profile_picture`, {
       method: 'PATCH',
       body: JSON.stringify({
@@ -297,7 +297,7 @@ describe('API (account)', async () => {
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(204);
-    
+
     // check if profile picture is updated
     const res2 = await fetch(`${API_URL}/user?username=testuser`, {
       method: 'GET',
@@ -313,7 +313,6 @@ describe('API (account)', async () => {
       service_hours: 10,
       profile_picture: expect.any(String),
     });
-    
   });
 
   test('delete profile picture', async () => {
@@ -369,8 +368,6 @@ describe('API (account)', async () => {
       expire: expect.any(Number),
     });
   });
-
-  
 
   afterAll(async () => {
     await recreateDB();

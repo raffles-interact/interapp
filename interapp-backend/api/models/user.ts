@@ -49,10 +49,13 @@ export class UserModel {
       .where(condition, { username })
       .from(User, 'user')
       .getMany();
-      
+
     for (const user of users) {
       if (user.profile_picture) {
-        const url = await minioClient.presignedGetObject(process.env.MINIO_BUCKETNAME as string, user.profile_picture);
+        const url = await minioClient.presignedGetObject(
+          process.env.MINIO_BUCKETNAME as string,
+          user.profile_picture,
+        );
         user.profile_picture = url;
       }
     }
@@ -548,18 +551,23 @@ export class UserModel {
       );
     const converted = dataUrlToBuffer(profile_picture);
 
-    if (!converted) throw new HTTPError('Invalid image', 'The image you provided is invalid', HTTPErrorCode.BAD_REQUEST_ERROR);
+    if (!converted)
+      throw new HTTPError(
+        'Invalid image',
+        'The image you provided is invalid',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
     await minioClient.putObject(
       process.env.MINIO_BUCKETNAME as string,
       `profile_pictures/${username}`,
       converted.buffer,
       { 'Content-Type': converted.mimetype },
     );
-    user.profile_picture =  `profile_pictures/${username}`;
+    user.profile_picture = `profile_pictures/${username}`;
 
     await appDataSource.manager.update(User, { username }, user);
   }
-  public static async deleteProfilePicture(username: string) { 
+  public static async deleteProfilePicture(username: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()
       .select(['user'])
@@ -573,7 +581,10 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
 
-    await minioClient.removeObject(process.env.MINIO_BUCKETNAME as string, `profile_pictures/${username}`)
+    await minioClient.removeObject(
+      process.env.MINIO_BUCKETNAME as string,
+      `profile_pictures/${username}`,
+    );
     user.profile_picture = null;
 
     await appDataSource.manager.update(User, { username }, user);
