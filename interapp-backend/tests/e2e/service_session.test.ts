@@ -646,7 +646,7 @@ describe('API (service session)', async () => {
       method: 'POST',
       body: JSON.stringify({
         service_session_id: 1,
-        username: 'testuser3',
+        username: 'testuser',
         ad_hoc: false,
         attended: 'Absent',
         is_ic: false,
@@ -666,7 +666,6 @@ describe('API (service session)', async () => {
     const res2 = await fetch(`${API_URL}/service/verify_attendance`, {
       method: 'POST',
       body: JSON.stringify({
-        username: 'testuser3',
         hash: hash,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
