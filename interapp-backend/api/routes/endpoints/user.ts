@@ -19,7 +19,12 @@ userRouter.get('/', validateRequiredFields([], ['username']), verifyJWT, async (
   const requesterPerms = await UserModel.checkPermissions(requesterUsername);
 
   // need 1 of these permissions to get all users
-  const neededPerms = [Permissions.ADMIN, Permissions.EXCO, Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC];
+  const neededPerms = [
+    Permissions.ADMIN,
+    Permissions.EXCO,
+    Permissions.SERVICE_IC,
+    Permissions.MENTORSHIP_IC,
+  ];
 
   if (!requesterPerms.some((perm) => neededPerms.includes(perm))) {
     throw new HTTPError(

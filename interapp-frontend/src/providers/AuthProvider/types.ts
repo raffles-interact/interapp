@@ -29,6 +29,10 @@ export interface User {
   service_hours: number;
 }
 
+export interface UserWithProfilePicture extends User {
+  profile_picture: string | null;
+}
+
 export interface AuthProviderProps {
   children: ReactNode;
 }

@@ -46,6 +46,7 @@ export class AuthModel {
     user.email = email;
     user.service_hours = 0;
     user.verified = false;
+    user.profile_picture = null;
 
     try {
       user.password_hash = await Bun.password.hash(password);
