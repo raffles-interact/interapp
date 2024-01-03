@@ -88,7 +88,7 @@ const AdminTable = () => {
                       </Table.Td>
                       <Table.Td>
                         <div className='admin-table-permissions'>
-                          {user.permissions.map((perm) => (
+                          {user.permissions && user.permissions.map((perm) => (
                             <Pill key={perm} className='admin-table-permission'>
                               {permissionsMap[perm]}
                             </Pill>
