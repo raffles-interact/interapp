@@ -1,5 +1,12 @@
 import appDataSource from '@utils/init_datasource';
-import { User, UserPermission, UserService, Service, ServiceSessionUser } from '@db/entities';
+import {
+  User,
+  UserPermission,
+  UserService,
+  Service,
+  ServiceSessionUser,
+  ServiceSession,
+} from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
@@ -395,12 +402,23 @@ export class UserModel {
       .getMany();
   }
   public static async getAllServiceSessionsByUser(username: string) {
-    const serviceSessions: Omit<ServiceSessionUser, 'service_session' | 'user'>[] = await appDataSource.manager
-    .createQueryBuilder()
-    .select(['service_session'])
-    .from(ServiceSessionUser, 'service_session')
-    .where('service_session.username = :username', { username })
-    .getMany();
+    type getAllServiceSessionsByUserResult = Omit<ServiceSessionUser, 'service_session' | 'user'> &
+      {service_session: Pick<ServiceSession, 'start_time' | 'end_time' | 'service_id'> & {service: Pick<Service, 'name' | 'promotional_image'>}};
+      
+    const serviceSessions = (await appDataSource.manager
+      .createQueryBuilder()
+      .select(['service_session_user'])
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_user.username = :username', { username })
+      .leftJoin('service_session_user.service_session', 'service_session')
+      .addSelect([
+        'service_session.service_id',
+        'service_session.start_time',
+        'service_session.end_time',
+      ])
+      .leftJoin('service_session.service', 'service')
+      .addSelect(['service.name', 'service.promotional_image'])
+      .getMany()) as unknown as getAllServiceSessionsByUserResult[];
 
     if (!serviceSessions) {
       throw new HTTPError(
@@ -409,7 +427,46 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     }
-    return serviceSessions;
+
+    for (const session of serviceSessions) {
+      if (session.service_session.service.promotional_image) {
+        const url = await minioClient.presignedGetObject(
+          process.env.MINIO_BUCKETNAME as string,
+          session.service_session.service.promotional_image,
+        );
+        session.service_session.service.promotional_image = url;
+      }
+    }
+    let parsed: {
+      service_id: number;
+      start_time: string;
+      end_time: string;
+      name: string;
+      promotional_image?: string | null;
+      service_session_id: number;
+      username: string;
+      ad_hoc: boolean;
+      attended: string;
+      is_ic: boolean;
+      service_session?: any;
+    
+    }[] = serviceSessions.map((session) => ({
+      ...session,
+      service_id: session.service_session.service_id,
+      start_time: session.service_session.start_time,
+      end_time: session.service_session.end_time,
+      name: session.service_session.service.name,
+      promotional_image: session.service_session.service.promotional_image,
+      
+    }));
+
+    for (const sess of parsed) {
+      delete sess.service_session;
+    }
+
+    
+
+    return parsed;
   }
   public static async getAllUsersByService(service_id: number) {
     const service_users = await appDataSource

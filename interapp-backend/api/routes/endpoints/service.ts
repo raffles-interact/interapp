@@ -307,7 +307,6 @@ serviceRouter.get(
   '/session_user_bulk',
   validateRequiredFields([], ['service_session_id', 'username']),
   async (req, res) => {
-
     if (req.query.username && req.query.service_session_id) {
       throw new HTTPError(
         'Invalid field type',
@@ -320,7 +319,6 @@ serviceRouter.get(
       const session_users = await UserModel.getAllServiceSessionsByUser(String(req.query.username));
       res.status(200).send(session_users);
     } else if (req.query.service_session_id) {
-
       const session_users = await ServiceModel.getServiceSessionUsers(
         Number(req.query.service_session_id),
       );
