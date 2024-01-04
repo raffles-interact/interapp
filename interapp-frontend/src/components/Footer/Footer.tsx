@@ -1,9 +1,10 @@
-import { memo, useMemo } from 'react';
+import { memo } from 'react';
 import { Group, Text } from '@mantine/core';
 import './styles.css';
 
+const year = new Date().getFullYear();
+
 const footer = () => {
-  const year = useMemo(() => new Date().getFullYear(), []);
   return (
     <footer>
       <Group className='footer' justify='center'>
