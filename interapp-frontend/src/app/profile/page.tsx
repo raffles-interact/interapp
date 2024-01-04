@@ -19,6 +19,5 @@ export default function Profile() {
       return <UnderConstruction />;
     case 'Service Sessions':
       return <ServiceSessionsPage username={user?.username ?? ''} />;
-    
   }
 }

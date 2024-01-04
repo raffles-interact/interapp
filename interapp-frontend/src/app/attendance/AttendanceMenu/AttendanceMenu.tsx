@@ -42,7 +42,7 @@ const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
           <Title>Verify Attendance</Title>
           <Text>There are no active service sessions.</Text>
         </Stack>
-      )
+      );
     }
 
     const destructuredActiveSessions = activeSessions.map((session) => {

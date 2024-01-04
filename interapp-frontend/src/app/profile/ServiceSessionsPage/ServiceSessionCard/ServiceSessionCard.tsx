@@ -1,6 +1,6 @@
-
-import { Card, Text, Badge, Button, Group } from '@mantine/core';
+import { Card, Text, Badge, Button, Group, Image, Grid } from '@mantine/core';
 import { memo, useEffect, useState } from 'react';
+import { IconFlag } from '@tabler/icons-react';
 
 interface ServiceSessionCardProps {
   start_time: string;
@@ -10,9 +10,30 @@ interface ServiceSessionCardProps {
   service_session_id: number;
 
   ad_hoc: boolean;
-  attended: string;
+  attended: 'Absent' | 'Attended' | 'Valid Reason';
   is_ic: boolean;
 }
+
+const generateAttendedBadge = (attended: 'Absent' | 'Attended' | 'Valid Reason') => {
+  switch (attended) {
+    case 'Absent':
+      return <Badge color='red'>Absent</Badge>;
+    case 'Attended':
+      return <Badge color='green'>Attended</Badge>;
+    case 'Valid Reason':
+      return <Badge color='yellow'>Valid Reason</Badge>;
+  }
+};
+
+const generateTimeInterval = (start_time: string, end_time: string) => {
+  const start = new Date(start_time);
+  const end = new Date(end_time);
+  return `${start.toLocaleString()} - ${end.toLocaleString()}`;
+};
+
+const generateBoolean = (value: boolean) => {
+  return value ? <Text color='green'>Yes</Text> : <Text color='red'>No</Text>;
+};
 
 const ServiceSessionCard = ({
   start_time,
@@ -24,20 +45,36 @@ const ServiceSessionCard = ({
   attended,
   is_ic,
 }: ServiceSessionCardProps) => {
-  
-
   return (
     <Card shadow='sm' padding='md' radius='md'>
-      <Text>{name}</Text>
-      <Text>{start_time}</Text>
-      <Text>{end_time}</Text>
-      <Text>{attended}</Text>
-      <Text>{is_ic}</Text>
-      <Text>{ad_hoc}</Text>
-      <Text>{service_session_id}</Text>
-      <Text>{promotional_image}</Text>
+      <Card.Section>
+        <Image
+          src={promotional_image ?? '/placeholder-image.jpg'}
+          height={160}
+          alt='promotional image'
+          fit='contain'
+        />
+      </Card.Section>
+      <Group justify='space-between' mt='md' mb='xs'>
+        <Text fw={500}>{name}</Text>
+        {generateAttendedBadge(attended)}
+      </Group>
 
-      
+      <Text size='sm' c='dimmed' mb={10}>
+        {generateTimeInterval(start_time, end_time)}
+      </Text>
+      <Grid>
+        <Grid.Col span={6}>Session ID</Grid.Col>
+        <Grid.Col span={6}>{service_session_id}</Grid.Col>
+        <Grid.Col span={6}>In charge?</Grid.Col>
+        <Grid.Col span={6}>{generateBoolean(is_ic)}</Grid.Col>
+        <Grid.Col span={6}>Ad hoc?</Grid.Col>
+        <Grid.Col span={6}>{generateBoolean(ad_hoc)}</Grid.Col>
+      </Grid>
+
+      <Button color='blue' fullWidth mt='md' radius='md' variant='outline'>
+        Request for absence
+      </Button>
     </Card>
   );
 };
