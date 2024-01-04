@@ -4,7 +4,17 @@ import { useState, useEffect } from 'react';
 import { User, UserWithProfilePicture, validateUserType } from '@providers/AuthProvider/types';
 import { Permissions } from '../../route_permissions';
 import { remapAssetUrl } from '@api/utils';
-import { Skeleton, Text, Title, Group, Stack, Badge, ActionIcon, Paper, Button } from '@mantine/core';
+import {
+  Skeleton,
+  Text,
+  Title,
+  Group,
+  Stack,
+  Badge,
+  ActionIcon,
+  Paper,
+  Button,
+} from '@mantine/core';
 import './styles.css';
 import { permissionsMap } from '@/app/admin/AdminTable/PermissionsInput/PermissionsInput';
 import { IconEdit } from '@tabler/icons-react';
@@ -70,7 +80,11 @@ const Overview = ({ username, updateUser }: OverviewProps) => {
             alt='Profile picture'
             className='profile-picture'
           />
-          <ActionIcon variant='filled' className='profile-editbutton' onClick={() => router.push('/settings')}>
+          <ActionIcon
+            variant='filled'
+            className='profile-editbutton'
+            onClick={() => router.push('/settings')}
+          >
             <IconEdit />
           </ActionIcon>
         </div>

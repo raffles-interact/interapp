@@ -1,6 +1,7 @@
 import { Text, Title } from '@mantine/core';
 import ChangeEmail from './ChangeEmail/ChangeEmail';
 import ChangePassword from './ChangePassword/ChangePassword';
+import ChangeProfilePicture from './ChangeProfilePicture/ChangeProfilePicture';
 import './styles.css';
 
 export default function SettingsPage() {
@@ -19,6 +20,7 @@ export default function SettingsPage() {
         </div>
 
         <div className='account-container'>
+          <ChangeProfilePicture />
           <ChangeEmail />
           <ChangePassword />
         </div>
