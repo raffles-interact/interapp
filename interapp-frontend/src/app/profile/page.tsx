@@ -1,10 +1,11 @@
 'use client';
 import { useContext } from 'react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
-import { ActiveTabContext } from './layout';
+import { ActiveTabContext } from './utils';
 
 import UnderConstruction from '@components/UnderConstruction/UnderContruction';
 import Overview from './Overview/Overview';
+import ServiceSessionsPage from './ServiceSessionsPage/ServiceSessionsPage';
 
 export default function Profile() {
   const activeTab = useContext(ActiveTabContext);
@@ -17,8 +18,7 @@ export default function Profile() {
     case 'Services':
       return <UnderConstruction />;
     case 'Service Sessions':
-      return <UnderConstruction />;
-    default:
-      return <UnderConstruction />;
+      return <ServiceSessionsPage username={user?.username ?? ''} />;
+    
   }
 }
