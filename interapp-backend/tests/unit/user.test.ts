@@ -256,7 +256,6 @@ describe('Unit (user)', () => {
   });
 
   test('create service sessions and add users', async () => {
-
     await ServiceModel.createServiceSession({
       service_id: 1,
       start_time: new Date().toISOString(),
@@ -303,11 +302,9 @@ describe('Unit (user)', () => {
     expect(serviceSessionUserId.service_session_id).toBe(1);
     expect(serviceSessionUserId2.service_session_id).toBe(2);
     expect(serviceSessionUserId3.service_session_id).toBe(3);
-
   });
 
-  test('get user\'s registered service sessions', async () => {
-
+  test("get user's registered service sessions", async () => {
     const res = await UserModel.getAllServiceSessionsByUser('testuser');
     expect(res).toBeArrayOfSize(3);
     expect(res[0]).toMatchObject({
@@ -316,11 +313,13 @@ describe('Unit (user)', () => {
       is_ic: true,
       attended: AttendanceStatus.Attended,
       ad_hoc: false,
+      service_id: 1,
+      start_time: expect.any(Object),
+      end_time: expect.any(Object),
+      name: 'testservice',
+      promotional_image: null
     });
-
   });
-
-
 
   test('delete user', async () => {
     await UserModel.deleteUser('testuser');

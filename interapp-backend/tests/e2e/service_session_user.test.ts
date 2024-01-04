@@ -202,10 +202,14 @@ describe('API (service session user)', async () => {
         ad_hoc: false,
         attended: 'Attended',
         is_ic: true,
+        service_id: 1,
+        start_time: '2023-11-27T16:42:00.000Z',
+        end_time: '2023-11-27T17:42:00.000Z',
+        name: 'L bozo',
+        promotional_image: null,
       },
     ]);
   });
-
 
   test('get individual service session user', async () => {
     const res = await fetch(
