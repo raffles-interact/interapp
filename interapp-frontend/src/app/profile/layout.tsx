@@ -3,7 +3,7 @@ import { Tabs, Stack, ScrollArea } from '@mantine/core';
 import { useState } from 'react';
 import { TabLabel, tabs, ActiveTabContext } from './utils';
 
-export default function ProfileLayout({ children }: { children: React.ReactNode }) {
+export default function ProfileLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   const [activeTab, setActiveTab] = useState<TabLabel | null>('Overview');
 
   return (

@@ -1,6 +1,5 @@
 import { Card, Text, Badge, Button, Group, Image, Grid } from '@mantine/core';
-import { memo, useEffect, useState } from 'react';
-import { IconFlag } from '@tabler/icons-react';
+import { memo } from 'react';
 
 interface ServiceSessionCardProps {
   start_time: string;
@@ -72,7 +71,15 @@ const ServiceSessionCard = ({
         <Grid.Col span={6}>{generateBoolean(ad_hoc)}</Grid.Col>
       </Grid>
 
-      <Button color='blue' fullWidth mt='md' radius='md' variant='outline'>
+      <Button
+        color='blue'
+        fullWidth
+        mt='md'
+        radius='md'
+        variant='outline'
+        component='a'
+        href={'/service_sessions/absence?id=' + service_session_id}
+      >
         Request for absence
       </Button>
     </Card>

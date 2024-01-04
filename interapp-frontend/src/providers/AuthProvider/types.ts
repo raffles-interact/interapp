@@ -53,7 +53,7 @@ export function validateUserType(user: User | null): boolean {
     user.permissions !== undefined &&
       Array.isArray(user.permissions) &&
       user.permissions.length > 0 &&
-      user.permissions.every((permission) => permission in Object.values(Permissions)),
+      user.permissions.every((permission) => Object.values(Permissions).includes(permission)),
     user.verified !== undefined && typeof user.verified === 'boolean',
     user.service_hours !== undefined && typeof user.service_hours === 'number',
   ];
