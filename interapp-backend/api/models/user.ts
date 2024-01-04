@@ -1,5 +1,5 @@
 import appDataSource from '@utils/init_datasource';
-import { User, UserPermission, UserService, Service } from '@db/entities';
+import { User, UserPermission, UserService, Service, ServiceSessionUser } from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
@@ -393,6 +393,23 @@ export class UserModel {
       .from(Service, 'service')
       .where('service.service_id IN (:...services)', { services: service_ids })
       .getMany();
+  }
+  public static async getAllServiceSessionsByUser(username: string) {
+    const serviceSessions: Omit<ServiceSessionUser, 'service_session' | 'user'>[] = await appDataSource.manager
+    .createQueryBuilder()
+    .select(['service_session'])
+    .from(ServiceSessionUser, 'service_session')
+    .where('service_session.username = :username', { username })
+    .getMany();
+
+    if (!serviceSessions) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} has no service sessions`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+    return serviceSessions;
   }
   public static async getAllUsersByService(service_id: number) {
     const service_users = await appDataSource

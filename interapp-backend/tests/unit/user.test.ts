@@ -1,6 +1,7 @@
 import { UserModel } from '@models/user';
 import { AuthModel } from '@models/auth';
 import { ServiceModel } from '@models/service';
+import { AttendanceStatus } from '@db/entities/service_session_user';
 import { User } from '@db/entities/user';
 import { Service } from '@db/entities/service';
 import { describe, expect, test, afterAll, beforeAll } from 'bun:test';
@@ -254,12 +255,80 @@ describe('Unit (user)', () => {
     );
   });
 
+  test('create service sessions and add users', async () => {
+
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      ad_hoc_enabled: false,
+    });
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      ad_hoc_enabled: false,
+    });
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: new Date().toISOString(),
+      end_time: new Date().toISOString(),
+      ad_hoc_enabled: false,
+    });
+
+    const serviceSessionUserId = await ServiceModel.createServiceSessionUser({
+      service_session_id: 1,
+      username: 'testuser',
+      is_ic: true,
+      attended: AttendanceStatus.Attended,
+      ad_hoc: false,
+    });
+
+    const serviceSessionUserId2 = await ServiceModel.createServiceSessionUser({
+      service_session_id: 2,
+      username: 'testuser',
+      is_ic: true,
+      attended: AttendanceStatus.Attended,
+      ad_hoc: false,
+    });
+
+    const serviceSessionUserId3 = await ServiceModel.createServiceSessionUser({
+      service_session_id: 3,
+      username: 'testuser',
+      is_ic: true,
+      attended: AttendanceStatus.Attended,
+      ad_hoc: false,
+    });
+
+    expect(serviceSessionUserId.service_session_id).toBe(1);
+    expect(serviceSessionUserId2.service_session_id).toBe(2);
+    expect(serviceSessionUserId3.service_session_id).toBe(3);
+
+  });
+
+  test('get user\'s registered service sessions', async () => {
+
+    const res = await UserModel.getAllServiceSessionsByUser('testuser');
+    expect(res).toBeArrayOfSize(3);
+    expect(res[0]).toMatchObject({
+      service_session_id: 1,
+      username: 'testuser',
+      is_ic: true,
+      attended: AttendanceStatus.Attended,
+      ad_hoc: false,
+    });
+
+  });
+
+
+
   test('delete user', async () => {
     await UserModel.deleteUser('testuser');
     await expect(async () => await UserModel.getUser('testuser')).toThrow(
       'The user with username testuser was not found in the database',
     );
   });
+
   afterAll(async () => {
     await recreateDB();
   });
