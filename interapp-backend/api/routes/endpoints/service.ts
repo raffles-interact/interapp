@@ -302,14 +302,36 @@ serviceRouter.get(
   },
 );
 
+// gets service session user by service_session_id or by username
 serviceRouter.get(
   '/session_user_bulk',
-  validateRequiredFields(['service_session_id']),
+  validateRequiredFields([], ['service_session_id', 'username']),
   async (req, res) => {
-    const session_users = await ServiceModel.getServiceSessionUsers(
-      Number(req.query.service_session_id),
-    );
-    res.status(200).send(session_users);
+
+    if (req.query.username && req.query.service_session_id) {
+      throw new HTTPError(
+        'Invalid field type',
+        'Cannot query by both service_session_id and username -- use /session_user instead',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+
+    if (req.query.username) {
+      const session_users = await UserModel.getAllServiceSessionsByUser(String(req.query.username));
+      res.status(200).send(session_users);
+    } else if (req.query.service_session_id) {
+
+      const session_users = await ServiceModel.getServiceSessionUsers(
+        Number(req.query.service_session_id),
+      );
+      res.status(200).send(session_users);
+    } else {
+      throw new HTTPError(
+        'Invalid field type',
+        'Must query by either service_session_id or username',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
   },
 );
 

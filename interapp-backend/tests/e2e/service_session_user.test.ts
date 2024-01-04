@@ -165,7 +165,7 @@ describe('API (service session user)', async () => {
     expect(res.status).toBe(201);
   });
 
-  test('get service session users', async () => {
+  test('get service session users by service session id', async () => {
     const res = await fetch(`${API_URL}/service/session_user_bulk?service_session_id=1`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -188,6 +188,24 @@ describe('API (service session user)', async () => {
       },
     ]);
   });
+
+  test('get service session users by username', async () => {
+    const res = await fetch(`${API_URL}/service/session_user_bulk?username=testuser`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject([
+      {
+        service_session_id: 1,
+        username: 'testuser',
+        ad_hoc: false,
+        attended: 'Attended',
+        is_ic: true,
+      },
+    ]);
+  });
+
 
   test('get individual service session user', async () => {
     const res = await fetch(
