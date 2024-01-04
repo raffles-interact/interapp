@@ -37,7 +37,12 @@ const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
   }, []);
   if (id === undefined) {
     if (Object.keys(activeSessions).length === 0) {
-      return <Text m='1rem'>No active sessions!</Text>;
+      return (
+        <Stack gap={3} m={20}>
+          <Title>Verify Attendance</Title>
+          <Text>There are no active service sessions.</Text>
+        </Stack>
+      )
     }
 
     const destructuredActiveSessions = activeSessions.map((session) => {
