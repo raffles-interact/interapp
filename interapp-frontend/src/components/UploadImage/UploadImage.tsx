@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Text, ActionIcon } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { IconX } from '@tabler/icons-react';
@@ -72,8 +72,12 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
     onChange(blob, file);
   };
 
+  useEffect(() => {
+    if (defaultImageURL) setImageURL(defaultImageURL);
+  }, [defaultImageURL]);
+
   return (
-    <div className={className}>
+    <div className={`upload-image ${className}`}>
       <input
         ref={inputRef}
         type='file'
@@ -100,20 +104,23 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
             className='upload-image-remove-button'
             onClick={() => {
               setImageURL('');
+              if (inputRef.current) inputRef.current.value = '';
               onChange('', null);
             }}
           >
             <IconX />
           </ActionIcon>
-          <img
-            src={imageURL}
-            className='upload-image-preview'
-            onClick={() => inputRef.current?.click()}
-            onKeyDown={(e) => {
-              if (e.key === 'F1') inputRef.current?.click();
-            }}
-            alt='upload-service-preview'
-          />
+          <div className={`upload-image-preview-wrapper ${className}`}>
+            <img
+              src={imageURL}
+              className='upload-image-preview'
+              onClick={() => inputRef.current?.click()}
+              onKeyDown={(e) => {
+                if (e.key === 'F1') inputRef.current?.click();
+              }}
+              alt='upload-service-preview'
+            />
+          </div>
         </>
       )}
     </div>

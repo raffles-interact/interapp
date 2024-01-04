@@ -1,0 +1,6 @@
+.change-profile-picture {
+  border-radius: 50%;
+  aspect-ratio: 1/1;
+  width: 12rem;
+  border: 1px solid var(--mantine-color-dark-6);
+}
