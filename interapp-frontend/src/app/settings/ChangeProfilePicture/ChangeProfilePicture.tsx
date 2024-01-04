@@ -73,7 +73,7 @@ const ChangeProfilePicture = () => {
         .catch((error) => {
           notifications.show({
             title: 'Failed to update profile picture',
-            message: 'Please try again later. Error: ' + error.message ?? 'Unknown error',
+            message: 'Please try again later. Error: ' + error.message,
             color: 'red',
           });
         });
