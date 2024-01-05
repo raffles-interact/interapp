@@ -1,0 +1,10 @@
+.body {
+    display: flex;
+    flex-direction:column;
+    justify-content:space-between;
+    padding:0 2%;
+}
+
+.body > div {
+    margin-top: 1%;
+}
