@@ -30,7 +30,7 @@ const handleFetchServiceSessionsData = async (
   // we return the data and map the services to the format that the select component expects
   const parsed = [
     res.data as ServiceSessionsWithMeta,
-    (res2.data.services as Service[]).map((service) => ({
+    (res2.data as Service[]).map((service) => ({
       name: service.name,
       service_id: service.service_id,
       promotional_image: service.promotional_image

@@ -15,7 +15,7 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
   const get_users_by_service = await apiClient.get(
     `/service/get_users_by_service?service_id=${service_id}`,
   );
-  const users: Omit<UserWithProfilePicture, 'permissions'>[] = get_users_by_service.data.users;
+  const users: Omit<UserWithProfilePicture, 'permissions'>[] = get_users_by_service.data;
   const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
 
   const get_all_users = await apiClient.get('/user');
