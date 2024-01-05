@@ -673,6 +673,16 @@ describe('API (service session)', async () => {
     expect(res2.status).toBe(204);
   });
 
+  test('get ad hoc service sessions', async () => {
+    const res = await fetch(`${API_URL}/service/ad_hoc_sessions`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    const res_json = await res.json();
+    expect(res_json).toBeArrayOfSize(8);
+  });
+
   afterAll(async () => {
     await recreateDB();
     await recreateRedis();

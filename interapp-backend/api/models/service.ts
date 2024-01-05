@@ -396,4 +396,13 @@ export class ServiceModel {
     await this.updateServiceSessionUser(service_session_user);
     return service_session_user;
   }
+  public static async getAdHocServiceSessions() {
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where('service_session.ad_hoc_enabled = true')
+      .getMany();
+    return res;
+  }
 }

@@ -393,6 +393,15 @@ serviceRouter.get(
   },
 );
 
+serviceRouter.get(
+  '/ad_hoc_sessions',
+  verifyJWT,
+  async (req, res) => {
+    const sessions = await ServiceModel.getAdHocServiceSessions();
+    res.status(200).send(sessions);
+  }
+)
+
 serviceRouter.post(
   '/verify_attendance',
   validateRequiredFields(['hash']),
