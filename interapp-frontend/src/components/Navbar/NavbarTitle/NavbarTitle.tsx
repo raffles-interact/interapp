@@ -13,7 +13,7 @@ import {
   IconTableOptions,
   IconSpeakerphone,
   IconPlaylistAdd,
-  IconMenu2,
+  IconHomeQuestion,
   IconHeart,
   IconQuestionMark,
 } from '@tabler/icons-react';
@@ -80,6 +80,11 @@ export const getNavbarTitle = (pathname: string) => {
       return {
         title: 'Verify Attendance',
         Icon: IconCheck,
+      };
+    case '/attendance/absence':
+      return {
+        title: 'Request for Absence',
+        Icon: IconHomeQuestion,
       };
     case '/announcements':
       return {
