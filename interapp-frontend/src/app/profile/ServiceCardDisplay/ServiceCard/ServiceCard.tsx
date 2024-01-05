@@ -12,6 +12,17 @@ interface ServiceCardProps {
   children: React.ReactNode;
 }
 
+const generateBadge = (participantType: ParticipantType) => {
+  switch (participantType) {
+    case 'IC':
+      return <Badge color='red'>IC</Badge>;
+    case 'Participant':
+      return <Badge color='blue'>Participant</Badge>;
+    default:
+      return null;
+  }
+};
+
 const ServiceCard = ({ participantType, service, children }: ServiceCardProps) => {
   return (
     <Card shadow='sm' padding='md' radius='md'>
@@ -26,11 +37,7 @@ const ServiceCard = ({ participantType, service, children }: ServiceCardProps) =
       <Stack align='center' justify='center' m={10} gap={20}>
         <Group justify='center'>
           <Text fw={500}>{service.name}</Text>
-          {participantType === 'IC' ? (
-            <Badge color='red'>IC</Badge>
-          ) : participantType === 'Participant' ? (
-            <Badge color='blue'>Participant</Badge>
-          ) : null}
+          {generateBadge(participantType)}
         </Group>
         <Text size='sm' c='dimmed'>
           {service.description ?? 'No description provided :('}
