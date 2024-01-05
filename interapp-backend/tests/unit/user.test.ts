@@ -307,8 +307,9 @@ describe('Unit (user)', () => {
   test("get user's registered service sessions", async () => {
     const res = await UserModel.getAllServiceSessionsByUser('testuser');
     expect(res).toBeArrayOfSize(3);
+    // res is sorted in descending start time, so first entry will be the latest created
     expect(res[0]).toMatchObject({
-      service_session_id: 1,
+      service_session_id: 3,
       username: 'testuser',
       is_ic: true,
       attended: AttendanceStatus.Attended,
