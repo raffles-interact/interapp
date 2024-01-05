@@ -18,7 +18,7 @@ export const fetchActiveServiceSessions = async () => {
   const data: {
     [hash: string]: {
       service_session_id: number;
-      ICs: string[];
+      ICs?: string[];
     };
   }[] = response.data;
   return data;
@@ -52,6 +52,7 @@ const AttendanceMenu = ({ id }: AttendanceMenuProps) => {
     });
 
     const visibleActiveSessions = destructuredActiveSessions.filter(({ ICs }) => {
+      if (ICs === undefined) return true;
       return ICs.includes(user?.username ?? '');
     });
 
