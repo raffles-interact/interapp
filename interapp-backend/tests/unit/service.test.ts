@@ -111,7 +111,7 @@ describe('Unit (service)', () => {
       service_id: 1,
       start_time: now.toISOString(),
       end_time: inOneHour.toISOString(),
-      ad_hoc_enabled: false,
+      ad_hoc_enabled: true,
     });
     expect(serviceSessionId).toBe(1);
   });
@@ -120,7 +120,7 @@ describe('Unit (service)', () => {
     const serviceSession = await ServiceModel.getServiceSession(1);
     expect(serviceSession).toMatchObject({
       service_id: 1,
-      ad_hoc_enabled: false,
+      ad_hoc_enabled: true,
     });
   });
 
@@ -347,6 +347,11 @@ describe('Unit (service)', () => {
       AttendanceStatus.Attended,
     );
   });
+
+  test('get all ad hoc service sessions', async () => {
+    const adHocServiceSessions = await ServiceModel.getAdHocServiceSessions();
+    expect(adHocServiceSessions).toBeArrayOfSize(1);
+  })
 
   afterAll(async () => {
     await recreateDB();
