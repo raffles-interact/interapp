@@ -1,6 +1,6 @@
 'use client';
 import APIClient from '@api/api_client';
-import { useEffect, useContext, useRef } from 'react';
+import { useContext, useRef } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { Skeleton, Text, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
@@ -53,6 +53,7 @@ const AbsenceForm = ({ id }: AbsenceFormProps) => {
         src='https://form.gov.sg/6566aa8a01ba2500110fc943'
         style={{ width: '100%', height: '500px' }}
         ref={iframeRef}
+        title='Absence Form'
       />
 
       <div
