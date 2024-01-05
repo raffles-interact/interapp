@@ -418,6 +418,7 @@ export class UserModel {
       ])
       .leftJoin('service_session.service', 'service')
       .addSelect(['service.name', 'service.promotional_image'])
+      .orderBy('service_session.start_time', 'DESC')
       .getMany()) as unknown as getAllServiceSessionsByUserResult[];
 
     if (!serviceSessions) {
