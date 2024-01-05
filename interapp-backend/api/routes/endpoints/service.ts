@@ -141,9 +141,7 @@ serviceRouter.delete(
 serviceRouter.get('/get_all', async (req, res) => {
   const services = await ServiceModel.getAllServices();
 
-  res.status(200).send({
-    services,
-  });
+  res.status(200).send(services);
 });
 
 serviceRouter.get(
@@ -154,9 +152,7 @@ serviceRouter.get(
   async (req, res) => {
     const users = await UserModel.getAllUsersByService(Number(req.query.service_id));
 
-    res.status(200).send({
-      users,
-    });
+    res.status(200).send(users);
   },
 );
 

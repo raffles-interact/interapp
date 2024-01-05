@@ -217,17 +217,16 @@ describe('API (user service)', async () => {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(200);
-    expect(await res.json()).toMatchObject({
-      users: [
-        {
-          user_id: 1,
-          username: 'testuser',
-          email: 'test@example.com',
-          verified: false,
-          service_hours: 0,
-        },
-      ],
+    const res_as_json = await res.json() as Array<Object>
+    expect(res_as_json).toHaveLength(1);
+    expect(res_as_json[0]).toMatchObject({
+      user_id: 1,
+      username: 'testuser',
+      email: 'test@example.com',
+      verified: false,
+      service_hours: 0,
     });
+    
   });
 
   test('bulk update service users (add)', async () => {

@@ -23,7 +23,7 @@ const fetchAllServices = async () => {
         throw new Error('Unknown error');
     }
 
-    const allServices: Service[] = res.data.services;
+    const allServices: Service[] = res.data;
     // promotional image url will look like this:
     // http://interapp-minio:9000/interapp-minio/service/yes677?X-Amz-Algorithm=...
     // we need to remove the bit before the 'service' part

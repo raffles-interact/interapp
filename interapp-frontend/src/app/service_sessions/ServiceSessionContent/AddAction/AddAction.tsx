@@ -24,7 +24,7 @@ const getAllServices = async () => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/get_all');
   if (response.status !== 200) throw new Error('Could not fetch services');
-  const services: Service[] = response.data.services;
+  const services: Service[] = response.data;
   return services.map((service) => ({ service_id: service.service_id, name: service.name }));
 };
 
