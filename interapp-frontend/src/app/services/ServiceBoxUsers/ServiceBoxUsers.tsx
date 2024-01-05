@@ -2,7 +2,7 @@
 import APIClient from '@api/api_client';
 import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
-import { User } from '@providers/AuthProvider/types';
+import { UserWithProfilePicture } from '@providers/AuthProvider/types';
 import { AxiosInstance } from 'axios';
 import { useState, useEffect, useContext } from 'react';
 import { Modal, Button, Text } from '@mantine/core';
@@ -15,19 +15,21 @@ const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
   const get_users_by_service = await apiClient.get(
     `/service/get_users_by_service?service_id=${service_id}`,
   );
-  const users: Omit<User, 'permissions'>[] = get_users_by_service.data.users;
+  const users: Omit<UserWithProfilePicture, 'permissions'>[] = get_users_by_service.data;
   const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
 
-  const get_all_users = await apiClient.get(`/user`);
-  const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
-  const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
+  const get_all_users = await apiClient.get('/user');
+  if (get_all_users.status !== 200) throw new Error('Could not get all users');
+  const all_users: Omit<UserWithProfilePicture, 'permissions'>[] = get_all_users.data;
+  const allUsernames = all_users !== undefined ? all_users.map((user) => user.username) : [];
 
-  return [serviceUsers, allUsersNames];
+  return [serviceUsers, allUsernames];
 };
 
 interface ServiceBoxUsersProps {
   service_id: number;
   service_ic: string;
+  alreadyServiceICUsernames: string[];
   handleChangeServiceIc: (service_ic: string) => void;
   handleChangeServiceUsers: (old_service_users: string[], service_users: string[]) => void;
 }
@@ -35,6 +37,7 @@ interface ServiceBoxUsersProps {
 const ServiceBoxUsers = ({
   service_id,
   service_ic,
+  alreadyServiceICUsernames,
   handleChangeServiceIc,
   handleChangeServiceUsers,
 }: ServiceBoxUsersProps) => {
@@ -42,7 +45,8 @@ const ServiceBoxUsers = ({
   const { user } = useContext(AuthContext);
 
   const [serviceUsers, setServiceUsers] = useState<string[]>([]);
-  const [allUsersNames, setAllUsersNames] = useState<string[]>([]);
+  const [allUsernames, setAllUsernames] = useState<string[]>([]);
+  const [allValidServiceICUsernames, setAllValidServiceICUsernames] = useState<string[]>([]);
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -52,9 +56,13 @@ const ServiceBoxUsers = ({
 
   useEffect(() => {
     if (!open) return;
-    handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsersNames]) => {
+    handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsernames]) => {
       setServiceUsers(serviceUsers);
-      setAllUsersNames(allUsersNames);
+      setAllUsernames(allUsernames);
+      setAllValidServiceICUsernames([
+        ...allUsernames.filter((username) => !alreadyServiceICUsernames.includes(username)),
+        service_ic,
+      ]);
     });
   }, [open]);
 
@@ -81,14 +89,14 @@ const ServiceBoxUsers = ({
 
           <SearchableSelect
             defaultValue={newServiceIc}
-            allValues={allUsersNames}
+            allValues={allValidServiceICUsernames}
             onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
             label='Service IC'
           />
 
           <PillsInputWithSearch
             defaultValues={serviceUsers}
-            allValues={allUsersNames}
+            allValues={allUsernames}
             onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
             label='Regular service participants'
           />

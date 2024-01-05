@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateRequiredFields, verifyJWT, verifyRequiredRole } from '../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
 import { ServiceModel } from '@models/service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
@@ -15,7 +15,7 @@ serviceRouter.post(
     ['description', 'contact_number', 'website', 'promotional_image'],
   ),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     if (req.body.contact_number) {
       if (typeof req.body.contact_number !== 'number') {
@@ -103,7 +103,7 @@ serviceRouter.patch(
     ],
   ),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     if (Number.isNaN(req.body.service_id)) {
       throw new HTTPError(
@@ -123,7 +123,7 @@ serviceRouter.delete(
   '/',
   validateRequiredFields(['service_id']),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     if (Number.isNaN(req.body.service_id)) {
       throw new HTTPError(
@@ -141,22 +141,18 @@ serviceRouter.delete(
 serviceRouter.get('/get_all', async (req, res) => {
   const services = await ServiceModel.getAllServices();
 
-  res.status(200).send({
-    services,
-  });
+  res.status(200).send(services);
 });
 
 serviceRouter.get(
   '/get_users_by_service',
   validateRequiredFields(['service_id']),
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
     const users = await UserModel.getAllUsersByService(Number(req.query.service_id));
 
-    res.status(200).send({
-      users,
-    });
+    res.status(200).send(users);
   },
 );
 
@@ -164,17 +160,8 @@ serviceRouter.post(
   '/session',
   validateRequiredFields(['service_id', 'start_time', 'end_time', 'ad_hoc_enabled']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const ISO8601Regex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)/;
-    if (!ISO8601Regex.test(req.body.start_time) || !ISO8601Regex.test(req.body.end_time)) {
-      throw new HTTPError(
-        'Invalid field type',
-        'start_time and end_time must be in the format YYYY-MM-DDTHH:MMZ',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
-
     if (req.body.start_time >= req.body.end_time) {
       throw new HTTPError(
         'Invalid field type',
@@ -202,7 +189,7 @@ serviceRouter.patch(
     ['service_id', 'start_time', 'end_time', 'ad_hoc_enabled'],
   ),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     const session = await ServiceModel.getServiceSession(Number(req.body.service_session_id));
     const updated = await ServiceModel.updateServiceSession({ ...session, ...req.body });
@@ -213,9 +200,32 @@ serviceRouter.patch(
 serviceRouter.delete(
   '/session',
   validateRequiredFields(['service_session_id']),
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     await ServiceModel.deleteServiceSession(Number(req.body.service_session_id));
     res.status(204).send();
+  },
+);
+
+serviceRouter.get(
+  '/session/get_all',
+  validateRequiredFields(['page', 'page_size'], ['service_id']),
+  async (req, res) => {
+    let sessions;
+    if (req.query.service_id) {
+      sessions = await ServiceModel.getAllServiceSessions(
+        Number(req.query.page),
+        Number(req.query.page_size),
+        Number(req.query.service_id),
+      );
+    } else {
+      sessions = await ServiceModel.getAllServiceSessions(
+        Number(req.query.page),
+        Number(req.query.page_size),
+      );
+    }
+    res.status(200).send(sessions);
   },
 );
 
@@ -223,7 +233,7 @@ serviceRouter.post(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username', 'ad_hoc', 'attended', 'is_ic']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     if (!(req.body.attended in AttendanceStatus)) {
       throw new HTTPError(
@@ -241,7 +251,7 @@ serviceRouter.post(
   '/session_user_bulk',
   validateRequiredFields(['service_session_id', 'users']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     if (!Array.isArray(req.body.users)) {
       throw new HTTPError(
@@ -258,7 +268,7 @@ serviceRouter.post(
           'ad_hoc' in user &&
           'attended' in user &&
           'is_ic' in user &&
-          user.attended in AttendanceStatus
+          Object.values(AttendanceStatus).some((status) => status === user.attended)
         )
       ) {
         throw new HTTPError(
@@ -288,14 +298,34 @@ serviceRouter.get(
   },
 );
 
+// gets service session user by service_session_id or by username
 serviceRouter.get(
   '/session_user_bulk',
-  validateRequiredFields(['service_session_id']),
+  validateRequiredFields([], ['service_session_id', 'username']),
   async (req, res) => {
-    const session_users = await ServiceModel.getServiceSessionUsers(
-      Number(req.query.service_session_id),
-    );
-    res.status(200).send(session_users);
+    if (req.query.username && req.query.service_session_id) {
+      throw new HTTPError(
+        'Invalid field type',
+        'Cannot query by both service_session_id and username -- use /session_user instead',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+
+    if (req.query.username) {
+      const session_users = await UserModel.getAllServiceSessionsByUser(String(req.query.username));
+      res.status(200).send(session_users);
+    } else if (req.query.service_session_id) {
+      const session_users = await ServiceModel.getServiceSessionUsers(
+        Number(req.query.service_session_id),
+      );
+      res.status(200).send(session_users);
+    } else {
+      throw new HTTPError(
+        'Invalid field type',
+        'Must query by either service_session_id or username',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
   },
 );
 
@@ -303,9 +333,9 @@ serviceRouter.patch(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username'], ['ad_hoc', 'attended', 'is_ic']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    if (req.body.attended && !(req.body.attended in AttendanceStatus)) {
+    if (req.body.attended && !(Object.values(AttendanceStatus).includes(req.body.attended))) {
       throw new HTTPError(
         'Invalid field type',
         `attended must be one of ${Object.values(AttendanceStatus)}`,
@@ -325,7 +355,7 @@ serviceRouter.delete(
   '/session_user',
   validateRequiredFields(['service_session_id', 'username']),
   verifyJWT,
-  verifyRequiredRole(Permissions.SERVICE_IC),
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     await ServiceModel.deleteServiceSessionUser(
       Number(req.body.service_session_id),
@@ -334,4 +364,48 @@ serviceRouter.delete(
     res.status(204).send();
   },
 );
+
+serviceRouter.delete(
+  '/session_user_bulk',
+  validateRequiredFields(['service_session_id', 'usernames']),
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
+  async (req, res) => {
+    await ServiceModel.deleteServiceSessionUsers(
+      Number(req.body.service_session_id),
+      req.body.usernames,
+    );
+    res.status(204).send();
+  },
+);
+
+serviceRouter.get(
+  '/active_sessions',
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
+  async (req, res) => {
+    const sessions = await ServiceModel.getActiveServiceSessions();
+    res.status(200).send(sessions);
+  },
+);
+
+serviceRouter.get(
+  '/ad_hoc_sessions',
+  verifyJWT,
+  async (req, res) => {
+    const sessions = await ServiceModel.getAdHocServiceSessions();
+    res.status(200).send(sessions);
+  }
+)
+
+serviceRouter.post(
+  '/verify_attendance',
+  validateRequiredFields(['hash']),
+  verifyJWT,
+  async (req, res) => {
+    await ServiceModel.verifyAttendance(req.body.hash, req.headers.username as string);
+    res.status(204).send();
+  },
+);
+
 export default serviceRouter;

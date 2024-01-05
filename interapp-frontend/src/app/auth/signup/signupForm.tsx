@@ -40,7 +40,7 @@ export default function SignUpForm() {
         )
           return 'Email cannot be a school email address';
       },
-      username: (value) => value.length < 5 && 'Username must be at least 5 characters long',
+      username: (value) => value.trim().length < 5 && 'Username must be at least 5 characters long',
       password: (value) => {
         if (value.length < 8) return 'Password must be at least 8 characters long';
         if (!/\d/.test(value)) return 'Password must include a number';
@@ -83,7 +83,7 @@ export default function SignUpForm() {
     registerUserAccount({
       user_id: Number(values.user_id),
       email: values.email,
-      username: values.username,
+      username: values.username.trim(),
       password: values.password,
     }).then(handleSubmitStatus);
     setLoading(false);

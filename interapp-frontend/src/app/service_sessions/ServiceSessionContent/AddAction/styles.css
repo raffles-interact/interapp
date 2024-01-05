@@ -1,0 +1,30 @@
+.add-modal-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.add-modal-form-datetime {
+  width: 100%;
+}
+
+.add-modal-form-datetime > * {
+  flex-grow: 1;
+}
+
+.add-modal-form-attendees {
+  width: 100%;
+  flex-grow: 1;
+}
+.add-modal-form-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: 1rem;
+  width: 100%;
+}
+.add-modal-form-service {
+  width: 100%;
+  flex-grow: 1;
+}

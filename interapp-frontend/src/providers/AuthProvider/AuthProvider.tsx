@@ -6,6 +6,7 @@ import {
   User,
   AuthContextType,
   UserWithJWT,
+  validateUserType,
 } from './types';
 import APIClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
@@ -34,6 +35,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (justLoggedIn) {
       setJustLoggedIn(false);
       return;
+    }
+
+    const validUser = validateUserType(user);
+    if (!validUser) {
+      logout();
+      throw new Error('Invalid user type in local storage\n' + JSON.stringify(user));
     }
 
     if (!user) {

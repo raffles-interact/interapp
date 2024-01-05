@@ -12,6 +12,12 @@
   gap: 1rem;
 }
 
-.action-icon {
-  padding: 0.2rem;
+.add-service-times {
+  display: flex;
+  gap: 1rem;
+  justify-content: space-around;
+}
+
+.add-service-times > * {
+  width: 100%;
 }

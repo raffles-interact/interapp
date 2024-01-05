@@ -1,13 +1,40 @@
 import { Router } from 'express';
-import { validateRequiredFields, verifyJWT, verifyRequiredRole } from '../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
 import { UserModel } from '@models/user';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
-userRouter.get('/', verifyJWT, verifyRequiredRole(Permissions.ADMIN), async (req, res) => {
-  const users = await UserModel.getAllUsers();
+userRouter.get('/', validateRequiredFields([], ['username']), verifyJWT, async (req, res) => {
+  const username = req.query.username as string | undefined;
+
+  if (username !== undefined) {
+    const user = await UserModel.getUserDetails(username);
+    res.status(200).send(user);
+    return;
+  }
+
+  const requesterUsername = req.headers.username as string;
+  const requesterPerms = await UserModel.checkPermissions(requesterUsername);
+
+  // need 1 of these permissions to get all users
+  const neededPerms = [
+    Permissions.ADMIN,
+    Permissions.EXCO,
+    Permissions.SERVICE_IC,
+    Permissions.MENTORSHIP_IC,
+  ];
+
+  if (!requesterPerms.some((perm) => neededPerms.includes(perm))) {
+    throw new HTTPError(
+      'Insufficient permissions',
+      'Only admins can get all users',
+      HTTPErrorCode.UNAUTHORIZED_ERROR,
+    );
+  }
+
+  const users = await UserModel.getUserDetails();
   res.status(200).send(users);
 });
 
@@ -15,7 +42,7 @@ userRouter.delete(
   '/',
   validateRequiredFields(['username']),
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
+  verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
     await UserModel.deleteUser(req.body.username as string);
     res.status(204).send();
@@ -79,15 +106,10 @@ userRouter.patch(
   },
 );
 
-userRouter.post(
-  '/verify_email',
-  validateRequiredFields(['username']),
-  verifyJWT,
-  async (req, res) => {
-    await UserModel.sendVerifyEmail(req.body.username);
-    res.status(204).send();
-  },
-);
+userRouter.post('/verify_email', verifyJWT, async (req, res) => {
+  await UserModel.sendVerifyEmail(req.headers.username as string);
+  res.status(204).send();
+});
 
 userRouter.patch('/verify', validateRequiredFields(['token']), verifyJWT, async (req, res) => {
   await UserModel.verifyEmail(req.body.token);
@@ -98,7 +120,7 @@ userRouter.patch(
   '/permissions',
   validateRequiredFields(['username', 'permissions']),
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
+  verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
     if (
       !Array.isArray(req.body.permissions) ||
@@ -127,7 +149,6 @@ userRouter.get(
   '/permissions',
   validateRequiredFields([], ['username']),
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
   async (req, res) => {
     const username = req.query.username as string | undefined;
     const permissions = await UserModel.getPermissions(username);
@@ -148,7 +169,7 @@ userRouter.get(
 userRouter.post(
   '/userservices',
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(['username', 'service_id']),
   async (req, res) => {
     await UserModel.addServiceUser(req.body.service_id, req.body.username);
@@ -159,7 +180,7 @@ userRouter.post(
 userRouter.delete(
   '/userservices',
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(['username', 'service_id']),
   async (req, res) => {
     await UserModel.removeServiceUser(req.body.service_id, req.body.username);
@@ -170,7 +191,7 @@ userRouter.delete(
 userRouter.patch(
   '/userservices',
   verifyJWT,
-  verifyRequiredRole(Permissions.EXCO),
+  verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(['service_id', 'data']),
   async (req, res) => {
     //validate data to be of shape {action: 'add' | 'remove', username: string}[]
@@ -194,11 +215,40 @@ userRouter.patch(
 userRouter.patch(
   '/service_hours',
   verifyJWT,
-  verifyRequiredRole(Permissions.ADMIN),
-  validateRequiredFields(['username', 'hours']),
+  validateRequiredFields(['hours'], ['username']),
   async (req, res) => {
-    await UserModel.updateServiceHours(req.body.username, req.body.hours);
+    if (req.body.username) {
+      // we are changing someone else's service hours
+      const perms = await UserModel.checkPermissions(req.headers.username as string);
+      if (!perms.includes(Permissions.ADMIN)) {
+        throw new HTTPError(
+          'Insufficient permissions',
+          "Only admins can change other users' service hours",
+          HTTPErrorCode.UNAUTHORIZED_ERROR,
+        );
+      }
+      await UserModel.updateServiceHours(req.body.username, req.body.hours);
+      res.status(204).send();
+    } else {
+      // we are changing our own service hours
+      await UserModel.updateServiceHours(req.headers.username as string, req.body.hours);
+      res.status(204).send();
+    }
+  },
+);
+
+userRouter.patch(
+  '/profile_picture',
+  verifyJWT,
+  validateRequiredFields(['profile_picture']),
+  async (req, res) => {
+    await UserModel.updateProfilePicture(req.headers.username as string, req.body.profile_picture);
     res.status(204).send();
   },
 );
+
+userRouter.delete('/profile_picture', verifyJWT, async (req, res) => {
+  await UserModel.deleteProfilePicture(req.headers.username as string);
+  res.status(204).send();
+});
 export default userRouter;

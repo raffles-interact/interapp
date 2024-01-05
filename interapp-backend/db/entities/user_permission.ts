@@ -9,6 +9,9 @@ export class UserPermission {
   @PrimaryColumn()
   permission_id: number;
 
-  @ManyToOne(() => User, (user) => user.user_permissions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.user_permissions, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: Relation<User>;
 }

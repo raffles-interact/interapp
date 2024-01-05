@@ -10,9 +10,12 @@ export class UserService {
   @PrimaryColumn()
   service_id: number;
 
-  @ManyToOne(() => User, (user) => user.user_services, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.user_services, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   user: Relation<User>;
 
-  @ManyToOne(() => Service, (service) => service.user_service, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Service, (service) => service.user_service, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   service: Relation<Service>;
 }

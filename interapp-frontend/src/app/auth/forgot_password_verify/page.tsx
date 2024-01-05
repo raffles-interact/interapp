@@ -19,7 +19,7 @@ export default async function ForgotPasswordVerifyPage({
       </div>
     );
   }
-  const res = await apiClient.patch(`/user/password/reset`, { token });
+  const res = await apiClient.patch('/user/password/reset', { token });
   switch (res.status) {
     case 200:
       return (

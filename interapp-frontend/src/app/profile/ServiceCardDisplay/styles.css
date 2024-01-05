@@ -1,0 +1,12 @@
+.service-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-gap: 1rem;
+}
+
+.service-cards-container {
+  margin: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}

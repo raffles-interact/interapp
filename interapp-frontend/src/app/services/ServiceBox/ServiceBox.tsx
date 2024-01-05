@@ -1,7 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
-import { Service } from '../page';
-import { Suspense, memo, useState } from 'react';
+import { Service } from '../types';
+import { Suspense, memo } from 'react';
 import { Text, Title, Skeleton } from '@mantine/core';
 import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
 import APIClient from '@api/api_client';
@@ -9,7 +9,9 @@ import APIClient from '@api/api_client';
 const ServiceBoxUsers = dynamic(() => import('../ServiceBoxUsers/ServiceBoxUsers'));
 import './styles.css';
 import { notifications } from '@mantine/notifications';
+import { useRouter } from 'next/navigation';
 const DeleteService = dynamic(() => import('../DeleteService/DeleteService'));
+const EditService = dynamic(() => import('../EditService/EditService'));
 
 export const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 export const roundTimeToMinutes = (time: string) => {
@@ -17,10 +19,10 @@ export const roundTimeToMinutes = (time: string) => {
   return `${hours}:${minutes}`;
 };
 
-const ServiceBox = (service: Service) => {
+const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) => {
   const apiClient = new APIClient().instance;
+  const router = useRouter();
 
-  const [serviceInfo, setServiceInfo] = useState<Service>(service);
   const handleChangeServiceIc = async (service_ic: string) => {
     const res = await apiClient.patch('/service', {
       service_id: service.service_id,
@@ -29,7 +31,8 @@ const ServiceBox = (service: Service) => {
 
     switch (res.status) {
       case 200:
-        setServiceInfo(res.data);
+        router.refresh();
+
         notifications.show({
           title: 'Success',
           message: 'Service IC updated',
@@ -39,7 +42,7 @@ const ServiceBox = (service: Service) => {
       case 400:
         notifications.show({
           title: 'Error',
-          message: 'Service IC must be unique -- they cannot manage multiple services',
+          message: res.data.message,
           color: 'red',
         });
         break;
@@ -96,25 +99,37 @@ const ServiceBox = (service: Service) => {
       <div className='service-box-image-container'>
         <Suspense fallback={<Skeleton className='service-box-image-skeleton' />}>
           <img
-            src={serviceInfo.promotional_image ?? '/placeholder-image.jpg'}
-            alt={serviceInfo.name}
+            src={service.promotional_image ?? '/placeholder-image.jpg'}
+            alt={service.name}
             className='service-box-image'
           />
         </Suspense>
 
-        <DeleteService
-          service_id={serviceInfo.service_id}
-          service_name={serviceInfo.name}
-          className='service-box-delete'
-        />
+        <div className='service-box-actions'>
+          <DeleteService service_id={service.service_id} service_name={service.name} />
+          <EditService
+            service_id={service.service_id}
+            name={service.name}
+            description={service.description}
+            promotional_image={service.promotional_image}
+            contact_email={service.contact_email}
+            contact_number={service.contact_number}
+            website={service.website}
+            start_time={service.start_time}
+            end_time={service.end_time}
+            day_of_week={service.day_of_week}
+          />
+        </div>
       </div>
 
       <div className='service-box-info'>
         <div className='service-box-info-headers'>
           <Title order={3} className='service-box-info-title'>
-            {serviceInfo.name}
+            {service.name}
           </Title>
-          <Text>{serviceInfo.description ?? 'No description provided :('}</Text>
+          <Text size='sm' c='dimmed'>
+            {service.description ?? 'No description provided :('}
+          </Text>
         </div>
 
         <div className='service-box-info-content'>
@@ -122,18 +137,18 @@ const ServiceBox = (service: Service) => {
             <Text className='service-box-info-title'>Contact Info:</Text>
             <div className='service-box-info-content-inner'>
               <IconMail size={20} />
-              <Text>{serviceInfo.contact_email}</Text>
+              <Text>{service.contact_email}</Text>
 
-              {serviceInfo.contact_number && (
+              {service.contact_number && (
                 <>
                   <IconPhoneCall size={20} />
-                  <Text>{serviceInfo.contact_number}</Text>
+                  <Text>{service.contact_number}</Text>
                 </>
               )}
-              {serviceInfo.website && (
+              {service.website && (
                 <>
                   <IconNetwork size={20} />
-                  <Text>{serviceInfo.website}</Text>
+                  <Text>{service.website}</Text>
                 </>
               )}
             </div>
@@ -142,19 +157,20 @@ const ServiceBox = (service: Service) => {
             <Text className='service-box-info-title'>Service Info:</Text>
             <div className='service-box-info-content-inner'>
               <IconCalendar size={20} />
-              <Text>{daysOfWeek[serviceInfo.day_of_week]}</Text>
+              <Text>{daysOfWeek[service.day_of_week]}</Text>
               <IconClock size={20} />
               <Text>
-                {roundTimeToMinutes(serviceInfo.start_time) +
+                {roundTimeToMinutes(service.start_time) +
                   ' - ' +
-                  roundTimeToMinutes(serviceInfo.end_time)}
+                  roundTimeToMinutes(service.end_time)}
               </Text>
             </div>
           </div>
         </div>
         <ServiceBoxUsers
-          service_id={serviceInfo.service_id}
-          service_ic={serviceInfo.service_ic_username}
+          service_id={service.service_id}
+          service_ic={service.service_ic_username}
+          alreadyServiceICUsernames={service.alreadyServiceICUsernames}
           handleChangeServiceIc={handleChangeServiceIc}
           handleChangeServiceUsers={handleChangeServiceUsers}
         />

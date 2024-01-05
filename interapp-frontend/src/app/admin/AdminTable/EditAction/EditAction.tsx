@@ -22,7 +22,7 @@ function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: (
     },
     validate: {
       permissions: (value) => !value.includes(Permissions.VISTOR) && 'Must have visitor permission',
-    }
+    },
   });
 
   const handleSubmit = async (values: Pick<User, 'email' | 'permissions' | 'service_hours'>) => {
@@ -56,7 +56,7 @@ function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: (
       <Modal
         opened={opened}
         onClose={close}
-        title='Edit User Data'
+        title={`Edit ${user.username}`}
         className='edit-modal'
         closeOnClickOutside={false}
         closeOnEscape={false}

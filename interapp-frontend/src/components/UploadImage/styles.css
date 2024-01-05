@@ -1,10 +1,24 @@
+.upload-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.upload-image-preview-wrapper {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  border: none !important;
+}
+
 .upload-image-file-input {
   display: none;
 }
 .upload-image-preview {
   width: 100%;
+  height: 100%;
   aspect-ratio: 5/3;
-
   object-fit: scale-down;
 
   cursor: pointer;
@@ -15,4 +29,14 @@
   align-items: center;
   justify-content: center;
   height: 100%;
+  width: 100%;
+
+  cursor: pointer;
+}
+
+.upload-image-remove-button {
+  margin: 0.5rem;
+  position: absolute;
+  right: 0;
+  top: 0;
 }

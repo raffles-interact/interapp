@@ -15,9 +15,10 @@ export class AnnouncementCompletion {
 
   @ManyToOne(() => Announcement, (announcement) => announcement.announcement_completions, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   announcement: Relation<Announcement>;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   user: Relation<User>;
 }

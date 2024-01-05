@@ -165,7 +165,7 @@ describe('API (service session user)', async () => {
     expect(res.status).toBe(201);
   });
 
-  test('get service session users', async () => {
+  test('get service session users by service session id', async () => {
     const res = await fetch(`${API_URL}/service/session_user_bulk?service_session_id=1`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
@@ -185,6 +185,28 @@ describe('API (service session user)', async () => {
         ad_hoc: false,
         attended: 'Attended',
         is_ic: false,
+      },
+    ]);
+  });
+
+  test('get service session users by username', async () => {
+    const res = await fetch(`${API_URL}/service/session_user_bulk?username=testuser`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject([
+      {
+        service_session_id: 1,
+        username: 'testuser',
+        ad_hoc: false,
+        attended: 'Attended',
+        is_ic: true,
+        service_id: 1,
+        start_time: '2023-11-27T16:42:00.000Z',
+        end_time: '2023-11-27T17:42:00.000Z',
+        name: 'L bozo',
+        promotional_image: null,
       },
     ]);
   });
@@ -234,6 +256,17 @@ describe('API (service session user)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('delete service session users', async () => {
+    const res = await fetch(`${API_URL}/service/session_user_bulk`, {
+      method: 'DELETE',
+      body: JSON.stringify({
+        service_session_id: 1,
+        usernames: ['testuser2'],
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(204);
+  });
   afterAll(async () => {
     await recreateDB();
   });

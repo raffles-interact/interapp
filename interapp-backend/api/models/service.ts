@@ -2,8 +2,9 @@ import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
 import minioClient from '@utils/init_minio';
 import dataUrlToBuffer from '@utils/dataUrlToBuffer';
-import { Service, ServiceSession, ServiceSessionUser } from '@db/entities';
+import { AttendanceStatus, Service, ServiceSession, ServiceSessionUser } from '@db/entities';
 import { UserModel } from './user';
+import redisClient from '@utils/init_redis';
 
 export class ServiceModel {
   public static async createService(
@@ -79,19 +80,25 @@ export class ServiceModel {
     const service_ic = await UserModel.getUser(service.service_ic_username);
     if (!service.promotional_image) service.promotional_image = null;
     else {
-      const convertedFile = dataUrlToBuffer(service.promotional_image);
-      if (!convertedFile) {
-        throw new HTTPError(
-          'Invalid promotional image',
-          'Promotional image is not a valid data URL',
-          HTTPErrorCode.BAD_REQUEST_ERROR,
+      // why we do this:
+      // if promotional_image is a URL, then it is not changed
+      // if promotional_image is a data:image/gif...., then it is changed to a URL and dumped into minio
+      // in either case, service.promotional_image points to the location of the image in minio
+      if (service.promotional_image.startsWith('data:')) {
+        const convertedFile = dataUrlToBuffer(service.promotional_image);
+        if (!convertedFile) {
+          throw new HTTPError(
+            'Invalid promotional image',
+            'Promotional image is not a valid data URL',
+            HTTPErrorCode.BAD_REQUEST_ERROR,
+          );
+        }
+        await minioClient.putObject(
+          process.env.MINIO_BUCKETNAME as string,
+          'service/' + service.name,
+          convertedFile.buffer,
         );
       }
-      await minioClient.putObject(
-        process.env.MINIO_BUCKETNAME as string,
-        'service/' + service.name,
-        convertedFile.buffer,
-      );
       service.promotional_image = 'service/' + service.name;
     }
 
@@ -287,5 +294,115 @@ export class ServiceModel {
   }
   public static async deleteServiceSessionUser(service_session_id: number, username: string) {
     await appDataSource.manager.delete(ServiceSessionUser, { service_session_id, username });
+  }
+  public static async deleteServiceSessionUsers(service_session_id: number, usernames: string[]) {
+    await appDataSource.manager
+      .createQueryBuilder()
+      .delete()
+      .from(ServiceSessionUser)
+      .where('service_session_id = :service_session_id', { service_session_id })
+      .andWhere('username IN (:...usernames)', { usernames })
+      .execute();
+  }
+  public static async getAllServiceSessions(page?: number, perPage?: number, service_id?: number) {
+    const parseRes = (res: (Omit<ServiceSession, 'service'> & { service?: Service })[]) =>
+      res.map((session) => {
+        const service_name = session.service?.name;
+        delete session.service;
+        return { ...session, service_name };
+      });
+    const condition = service_id ? 'service_session.service_id = :service_id' : '1 = 1';
+
+    const total_entries = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where(condition, { service_id })
+      .getCount();
+
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where(condition, { service_id })
+
+      .leftJoinAndSelect('service_session.service_session_users', 'service_session_users')
+      .leftJoin('service_session.service', 'service')
+      .addSelect('service.name')
+      .take(page && perPage ? perPage : undefined)
+      .skip(page && perPage ? (page - 1) * perPage : undefined)
+      .orderBy('service_session.start_time', 'DESC')
+      .getMany();
+
+    return { data: parseRes(res), total_entries, length_of_page: res.length };
+  }
+  public static async getActiveServiceSessions() {
+    const active = await redisClient.hGetAll('service_session');
+
+    if (Object.keys(active).length === 0) return [];
+
+    const ICs: {
+      username: string;
+      service_session_id: number;
+    }[] = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['service_session_user.username', 'service_session_user.service_session_id'])
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_id IN (:...service_session_ids)', {
+        service_session_ids: Object.values(active).map((v) => parseInt(v)),
+      })
+      .andWhere('service_session_user.is_ic = true')
+      .getMany();
+
+    // sort by service_session_id
+    const sortedICs = ICs.reduce(
+      (acc, cur) => {
+        acc[cur.service_session_id] = acc[cur.service_session_id] ?? [];
+        acc[cur.service_session_id].push(cur.username);
+        return acc;
+      },
+      {} as { [key: number]: string[] },
+    );
+
+    return Object.entries(active).map(([hash, id]) => ({
+      [hash]: {
+        service_session_id: parseInt(id),
+        ICs: sortedICs[parseInt(id)],
+      },
+    }));
+  }
+  public static async verifyAttendance(hash: string, username: string) {
+    const service_session_id = await redisClient.hGet('service_session', hash);
+    if (!service_session_id) {
+      throw new HTTPError(
+        'Invalid hash',
+        `Hash ${hash} is not a valid hash`,
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+    const service_session_user = await this.getServiceSessionUser(
+      parseInt(service_session_id),
+      username,
+    );
+
+    if (service_session_user.attended === AttendanceStatus.Attended) {
+      throw new HTTPError(
+        'Already attended',
+        `User ${username} has already attended service session with service_session_id ${service_session_id}`,
+        HTTPErrorCode.CONFLICT_ERROR,
+      );
+    }
+    service_session_user.attended = AttendanceStatus.Attended;
+    await this.updateServiceSessionUser(service_session_user);
+    return service_session_user;
+  }
+  public static async getAdHocServiceSessions() {
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select('service_session')
+      .from(ServiceSession, 'service_session')
+      .where('service_session.ad_hoc_enabled = true')
+      .getMany();
+    return res;
   }
 }

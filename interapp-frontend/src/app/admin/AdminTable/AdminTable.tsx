@@ -88,11 +88,12 @@ const AdminTable = () => {
                       </Table.Td>
                       <Table.Td>
                         <div className='admin-table-permissions'>
-                          {user.permissions.map((perm) => (
-                            <Pill key={perm} className='admin-table-permission'>
-                              {permissionsMap[perm]}
-                            </Pill>
-                          ))}
+                          {user.permissions &&
+                            user.permissions.map((perm) => (
+                              <Pill key={perm} className='admin-table-permission'>
+                                {permissionsMap[perm]}
+                              </Pill>
+                            ))}
                         </div>
                       </Table.Td>
                       <Table.Td>{user.service_hours}</Table.Td>

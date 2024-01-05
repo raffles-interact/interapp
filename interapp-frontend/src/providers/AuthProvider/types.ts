@@ -29,6 +29,10 @@ export interface User {
   service_hours: number;
 }
 
+export interface UserWithProfilePicture extends User {
+  profile_picture: string | null;
+}
+
 export interface AuthProviderProps {
   children: ReactNode;
 }
@@ -37,4 +41,23 @@ export interface UserWithJWT {
   user: User;
   access_token: string;
   expire: number;
+}
+
+export function validateUserType(user: User | null): boolean {
+  if (user === null) return true;
+
+  const conditions = [
+    user.username !== undefined && typeof user.username === 'string',
+    user.user_id !== undefined && typeof user.user_id === 'number',
+    user.email !== undefined && typeof user.email === 'string',
+    user.permissions !== undefined &&
+      Array.isArray(user.permissions) &&
+      user.permissions.length > 0 &&
+      user.permissions.every((permission) => Object.values(Permissions).includes(permission)),
+    user.verified !== undefined && typeof user.verified === 'boolean',
+    user.service_hours !== undefined && typeof user.service_hours === 'number',
+  ];
+
+  if (conditions.every((condition) => condition)) return true;
+  return false;
 }

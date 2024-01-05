@@ -13,7 +13,7 @@ import {
   IconTableOptions,
   IconSpeakerphone,
   IconPlaylistAdd,
-  IconMenu2,
+  IconHomeQuestion,
   IconHeart,
   IconQuestionMark,
 } from '@tabler/icons-react';
@@ -65,6 +65,36 @@ export const getNavbarTitle = (pathname: string) => {
       return {
         title: 'Services',
         Icon: IconHeart,
+      };
+    case '/service_sessions':
+      return {
+        title: 'Service Sessions',
+        Icon: IconPlaylistAdd,
+      };
+    case '/attendance':
+      return {
+        title: 'Attendance',
+        Icon: IconCheck,
+      };
+    case '/attendance/verify':
+      return {
+        title: 'Verify Attendance',
+        Icon: IconCheck,
+      };
+    case '/attendance/absence':
+      return {
+        title: 'Request for Absence',
+        Icon: IconHomeQuestion,
+      };
+    case '/announcements':
+      return {
+        title: 'Announcements',
+        Icon: IconSpeakerphone,
+      };
+    case '/profile':
+      return {
+        title: 'Profile',
+        Icon: IconUserSquare,
       };
     default:
       return {

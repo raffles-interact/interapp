@@ -1,10 +1,19 @@
 import appDataSource from '@utils/init_datasource';
-import { User, UserPermission, UserService, Service } from '@db/entities';
+import {
+  User,
+  UserPermission,
+  UserService,
+  Service,
+  ServiceSessionUser,
+  ServiceSession,
+} from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import transporter from '@email_handler/index';
 import Mail from 'nodemailer/lib/mailer';
+import dataUrlToBuffer from '@utils/dataUrlToBuffer';
+import minioClient from '@utils/init_minio';
 
 interface EmailOptions extends Mail.Options {
   template: string;
@@ -31,7 +40,9 @@ export class UserModel {
   public static async deleteUser(username: string) {
     await appDataSource.manager.delete(User, { username });
   }
-  public static async getAllUsers() {
+  // the following function does not expose sensitive information
+  public static async getUserDetails(username?: string) {
+    const condition = username ? 'user.username = :username' : '1=1';
     const users = await appDataSource.manager
       .createQueryBuilder()
       .select([
@@ -40,9 +51,48 @@ export class UserModel {
         'user.verified',
         'user.user_id',
         'user.service_hours',
+        'user.profile_picture',
       ])
+      .where(condition, { username })
       .from(User, 'user')
       .getMany();
+
+    for (const user of users) {
+      if (user.profile_picture) {
+        const url = await minioClient.presignedGetObject(
+          process.env.MINIO_BUCKETNAME as string,
+          user.profile_picture,
+        );
+        user.profile_picture = url;
+      }
+    }
+
+    if (username) {
+      switch (users.length) {
+        case 0:
+          throw new HTTPError(
+            'User not found',
+            `The user with username ${username} was not found in the database`,
+            HTTPErrorCode.NOT_FOUND_ERROR,
+          );
+        case 1:
+          return users[0] as Omit<
+            User,
+            | 'password_hash'
+            | 'refresh_token'
+            | 'user_permissions'
+            | 'user_services'
+            | 'service_session_users'
+          >;
+        default:
+          throw new HTTPError(
+            'Multiple users found',
+            `Multiple users with username ${username} were found in the database`,
+            HTTPErrorCode.INTERNAL_SERVER_ERROR,
+          );
+      }
+    }
+
     return users as Omit<
       User,
       | 'password_hash'
@@ -351,6 +401,74 @@ export class UserModel {
       .where('service.service_id IN (:...services)', { services: service_ids })
       .getMany();
   }
+  public static async getAllServiceSessionsByUser(username: string) {
+    type getAllServiceSessionsByUserResult = Omit<ServiceSessionUser, 'service_session' | 'user'> &
+      {service_session: Pick<ServiceSession, 'start_time' | 'end_time' | 'service_id'> & {service: Pick<Service, 'name' | 'promotional_image'>}};
+      
+    const serviceSessions = (await appDataSource.manager
+      .createQueryBuilder()
+      .select(['service_session_user'])
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_user.username = :username', { username })
+      .leftJoin('service_session_user.service_session', 'service_session')
+      .addSelect([
+        'service_session.service_id',
+        'service_session.start_time',
+        'service_session.end_time',
+      ])
+      .leftJoin('service_session.service', 'service')
+      .addSelect(['service.name', 'service.promotional_image'])
+      .orderBy('service_session.start_time', 'DESC')
+      .getMany()) as unknown as getAllServiceSessionsByUserResult[];
+
+    if (!serviceSessions) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} has no service sessions`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    for (const session of serviceSessions) {
+      if (session.service_session.service.promotional_image) {
+        const url = await minioClient.presignedGetObject(
+          process.env.MINIO_BUCKETNAME as string,
+          session.service_session.service.promotional_image,
+        );
+        session.service_session.service.promotional_image = url;
+      }
+    }
+    let parsed: {
+      service_id: number;
+      start_time: string;
+      end_time: string;
+      name: string;
+      promotional_image?: string | null;
+      service_session_id: number;
+      username: string;
+      ad_hoc: boolean;
+      attended: string;
+      is_ic: boolean;
+      service_session?: any;
+    
+    }[] = serviceSessions.map((session) => ({
+      ...session,
+      service_id: session.service_session.service_id,
+      start_time: session.service_session.start_time,
+      end_time: session.service_session.end_time,
+      name: session.service_session.service.name,
+      promotional_image: session.service_session.service.promotional_image,
+      
+    }));
+
+    for (const sess of parsed) {
+      delete sess.service_session;
+    }
+
+    
+
+    return parsed;
+  }
   public static async getAllUsersByService(service_id: number) {
     const service_users = await appDataSource
       .createQueryBuilder()
@@ -491,6 +609,59 @@ export class UserModel {
         HTTPErrorCode.NOT_FOUND_ERROR,
       );
     user.service_hours = hours;
+    await appDataSource.manager.update(User, { username }, user);
+  }
+  public static async updateProfilePicture(username: string, profile_picture: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!user)
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    const converted = dataUrlToBuffer(profile_picture);
+
+    if (!converted)
+      throw new HTTPError(
+        'Invalid image',
+        'The image you provided is invalid',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    await minioClient.putObject(
+      process.env.MINIO_BUCKETNAME as string,
+      `profile_pictures/${username}`,
+      converted.buffer,
+      { 'Content-Type': converted.mimetype },
+    );
+    user.profile_picture = `profile_pictures/${username}`;
+
+    await appDataSource.manager.update(User, { username }, user);
+  }
+  public static async deleteProfilePicture(username: string) {
+    const user = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['user'])
+      .from(User, 'user')
+      .where('user.username = :username', { username })
+      .getOne();
+    if (!user)
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+
+    await minioClient.removeObject(
+      process.env.MINIO_BUCKETNAME as string,
+      `profile_pictures/${username}`,
+    );
+    user.profile_picture = null;
+
     await appDataSource.manager.update(User, { username }, user);
   }
 }

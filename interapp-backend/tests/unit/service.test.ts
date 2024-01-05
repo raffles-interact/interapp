@@ -3,6 +3,9 @@ import { ServiceModel } from '@models/service';
 import { describe, expect, test, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
 import { AttendanceStatus } from '@db/entities';
+import { randomBytes } from 'crypto';
+import redisClient from '@utils/init_redis';
+import { recreateRedis } from '../utils/recreate_redis';
 
 describe('Unit (service)', () => {
   beforeAll(async () => {
@@ -108,7 +111,7 @@ describe('Unit (service)', () => {
       service_id: 1,
       start_time: now.toISOString(),
       end_time: inOneHour.toISOString(),
-      ad_hoc_enabled: false,
+      ad_hoc_enabled: true,
     });
     expect(serviceSessionId).toBe(1);
   });
@@ -117,7 +120,7 @@ describe('Unit (service)', () => {
     const serviceSession = await ServiceModel.getServiceSession(1);
     expect(serviceSession).toMatchObject({
       service_id: 1,
-      ad_hoc_enabled: false,
+      ad_hoc_enabled: true,
     });
   });
 
@@ -249,7 +252,109 @@ describe('Unit (service)', () => {
       'Service session user with service_session_id 1 and username testuser does not exist',
     );
   });
+
+  test('delete service session users', async () => {
+    await ServiceModel.deleteServiceSessionUsers(1, ['testuser2', 'testuser3']);
+    expect(await ServiceModel.getServiceSessionUsers(1)).toBeArrayOfSize(0);
+  });
+
+  test('get all service sessions', async () => {
+    const serviceSessions = await ServiceModel.getAllServiceSessions(1, 5);
+
+    expect(serviceSessions.data).toBeArrayOfSize(1);
+    expect(serviceSessions.total_entries).toBe(1);
+    expect(serviceSessions.length_of_page).toBe(1);
+  });
+
+  test('get all service sessions by session id', async () => {
+    const serviceSessions = await ServiceModel.getAllServiceSessions(1, 5, 1);
+    expect(serviceSessions.data).toBeArrayOfSize(1);
+  });
+
+  test('create more service sessions starting now', async () => {
+    const now = new Date();
+    const inOneHour = new Date();
+    inOneHour.setHours(now.getHours() + 1);
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: now.toISOString(),
+      end_time: inOneHour.toISOString(),
+      ad_hoc_enabled: false,
+    });
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: now.toISOString(),
+      end_time: inOneHour.toISOString(),
+      ad_hoc_enabled: false,
+    });
+    await ServiceModel.createServiceSession({
+      service_id: 1,
+      start_time: now.toISOString(),
+      end_time: inOneHour.toISOString(),
+      ad_hoc_enabled: false,
+    });
+    expect((await ServiceModel.getAllServiceSessions(1, 5)).data).toBeArrayOfSize(4);
+  });
+
+  test('dump keys into redis', async () => {
+    // get all service sessions
+    const service_sessions = (await ServiceModel.getAllServiceSessions()).data;
+    let hashes = await redisClient.hGetAll('service_session');
+    for (const session of service_sessions) {
+      // check if service session id is in redis
+
+      if (!Object.values(hashes).find((v) => v === String(session.service_session_id))) {
+        // if service session id is not in redis, generate a hash as key and service session id as value
+
+        const newHash = randomBytes(128).toString('hex');
+
+        await redisClient.hSet('service_session', newHash, session.service_session_id);
+      }
+    }
+    hashes = await redisClient.hGetAll('service_session');
+    expect(Object.entries(hashes)).toBeArrayOfSize(4);
+  });
+
+  test('get active service sessions', async () => {
+    const activeServiceSessions = await ServiceModel.getActiveServiceSessions();
+    expect(Object.entries(activeServiceSessions)).toBeArrayOfSize(4);
+  });
+
+  test('add user to active service session and verify attendance', async () => {
+    await ServiceModel.createServiceSessionUser({
+      service_session_id: 3,
+      username: 'testuser',
+      is_ic: false,
+      attended: AttendanceStatus.Absent,
+      ad_hoc: false,
+    });
+
+    const activeServiceSessions = await ServiceModel.getActiveServiceSessions();
+    expect(Object.entries(activeServiceSessions)).toBeArrayOfSize(4);
+
+    // find the service session hash that the user is in (id 3)
+    const serviceSessionHash = activeServiceSessions.find((v) =>
+      Object.values(v).find((v) => v.service_session_id === 3),
+    );
+    expect(serviceSessionHash).toBeDefined();
+
+    // get the hash
+    const hash = Object.keys(serviceSessionHash!)[0];
+
+    await ServiceModel.verifyAttendance(hash, 'testuser');
+
+    expect((await ServiceModel.getServiceSessionUser(3, 'testuser')).attended).toBe(
+      AttendanceStatus.Attended,
+    );
+  });
+
+  test('get all ad hoc service sessions', async () => {
+    const adHocServiceSessions = await ServiceModel.getAdHocServiceSessions();
+    expect(adHocServiceSessions).toBeArrayOfSize(1);
+  })
+
   afterAll(async () => {
     await recreateDB();
+    await recreateRedis();
   });
 });

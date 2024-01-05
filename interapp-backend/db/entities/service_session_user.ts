@@ -30,9 +30,13 @@ export class ServiceSessionUser {
 
   @ManyToOne(() => ServiceSession, (service_session) => service_session.service_session_users, {
     onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   })
   service_session: Relation<ServiceSession>;
 
-  @ManyToOne(() => User, (user) => user.service_session_users, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.service_session_users, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   user: Relation<User>;
 }
