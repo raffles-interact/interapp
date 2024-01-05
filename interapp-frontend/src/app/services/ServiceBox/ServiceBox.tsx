@@ -127,7 +127,7 @@ const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) 
           <Title order={3} className='service-box-info-title'>
             {service.name}
           </Title>
-          <Text>{service.description ?? 'No description provided :('}</Text>
+          <Text size='sm' c='dimmed'>{service.description ?? 'No description provided :('}</Text>
         </div>
 
         <div className='service-box-info-content'>
