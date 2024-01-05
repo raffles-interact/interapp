@@ -19,7 +19,7 @@ export default function AttendanceVerifyPage({
   if (searchParams.id instanceof Array || searchParams.id === undefined)
     return (
       <div className='error-container'>
-        <Text>Invalid hash</Text>
+        <Text>Invalid ID</Text>
         <GoHomeButton />
       </div>
     );

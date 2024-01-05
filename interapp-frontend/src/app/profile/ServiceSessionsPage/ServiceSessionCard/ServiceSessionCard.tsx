@@ -78,7 +78,7 @@ const ServiceSessionCard = ({
         radius='md'
         variant='outline'
         component='a'
-        href={'/service_sessions/absence?id=' + service_session_id}
+        href={'/attendance/absence?id=' + service_session_id}
       >
         Request for absence
       </Button>

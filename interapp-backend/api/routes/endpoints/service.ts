@@ -339,7 +339,7 @@ serviceRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    if (req.body.attended && !(req.body.attended in AttendanceStatus)) {
+    if (req.body.attended && !(Object.values(AttendanceStatus).includes(req.body.attended))) {
       throw new HTTPError(
         'Invalid field type',
         `attended must be one of ${Object.values(AttendanceStatus)}`,
