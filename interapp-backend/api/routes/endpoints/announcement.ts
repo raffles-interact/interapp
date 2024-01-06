@@ -3,24 +3,27 @@ import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
 import { AnnouncementModel } from '@models/announcement';
 import { Permissions } from '@utils/permissions';
+import multer from 'multer';
+
+const upload = multer();
 
 const announcementRouter = Router();
 
 announcementRouter.post(
   '/',
-  validateRequiredFields(['creation_date', 'title', 'description', 'username'], ['attatchment']),
+  upload.array('docs', 10),
+  validateRequiredFields(['creation_date', 'title', 'description', 'username'], ['image']),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const ISO8601Regex = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d([+-][0-2]\d:[0-5]\d|Z)/;
-    if (!ISO8601Regex.test(req.body.creation_date)) {
-      throw new HTTPError(
-        'Invalid field type',
-        'start_time and end_time must be in the format YYYY-MM-DDTHH:MMZ',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
-    const announcement_id = await AnnouncementModel.createAnnouncement(req.body);
+    const files = req.files as Express.Multer.File[] | undefined;
+
+    console.log(req.body);
+
+    const announcement_id = await AnnouncementModel.createAnnouncement({
+      ...req.body,
+      attachments: files,
+    });
     res.status(201).send({
       announcement_id,
     });
