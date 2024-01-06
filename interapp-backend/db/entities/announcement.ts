@@ -8,6 +8,7 @@ import {
 } from 'typeorm';
 import { User } from './user';
 import { AnnouncementCompletion } from './announcement_completion';
+import { AnnouncementAttachment } from './announcement_attachment';
 
 @Entity()
 export class Announcement {
@@ -17,14 +18,14 @@ export class Announcement {
   @Column({ type: 'timestamp without time zone' })
   creation_date: string;
 
-  @Column()
+  @Column({ unique: true })
   title: string;
 
   @Column()
   description: string;
 
   @Column({ nullable: true })
-  attachment?: string;
+  image?: string | null;
 
   @Column()
   username: string;
@@ -38,4 +39,11 @@ export class Announcement {
     { cascade: true },
   )
   announcement_completions: Relation<AnnouncementCompletion[]>;
+
+  @OneToMany(
+    () => AnnouncementAttachment,
+    (announcement_attachment) => announcement_attachment.announcement,
+    { cascade: true },
+  )
+  announcement_attachments: Relation<AnnouncementAttachment[]>;
 }

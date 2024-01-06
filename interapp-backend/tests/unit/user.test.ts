@@ -318,7 +318,7 @@ describe('Unit (user)', () => {
       start_time: expect.any(Object),
       end_time: expect.any(Object),
       name: 'testservice',
-      promotional_image: null
+      promotional_image: null,
     });
   });
 
