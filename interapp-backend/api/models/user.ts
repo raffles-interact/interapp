@@ -402,9 +402,15 @@ export class UserModel {
       .getMany();
   }
   public static async getAllServiceSessionsByUser(username: string) {
-    type getAllServiceSessionsByUserResult = Omit<ServiceSessionUser, 'service_session' | 'user'> &
-      {service_session: Pick<ServiceSession, 'start_time' | 'end_time' | 'service_id'> & {service: Pick<Service, 'name' | 'promotional_image'>}};
-      
+    type getAllServiceSessionsByUserResult = Omit<
+      ServiceSessionUser,
+      'service_session' | 'user'
+    > & {
+      service_session: Pick<ServiceSession, 'start_time' | 'end_time' | 'service_id'> & {
+        service: Pick<Service, 'name' | 'promotional_image'>;
+      };
+    };
+
     const serviceSessions = (await appDataSource.manager
       .createQueryBuilder()
       .select(['service_session_user'])
@@ -450,7 +456,6 @@ export class UserModel {
       attended: string;
       is_ic: boolean;
       service_session?: any;
-    
     }[] = serviceSessions.map((session) => ({
       ...session,
       service_id: session.service_session.service_id,
@@ -458,14 +463,11 @@ export class UserModel {
       end_time: session.service_session.end_time,
       name: session.service_session.service.name,
       promotional_image: session.service_session.service.promotional_image,
-      
     }));
 
     for (const sess of parsed) {
       delete sess.service_session;
     }
-
-    
 
     return parsed;
   }

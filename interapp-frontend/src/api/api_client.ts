@@ -2,15 +2,18 @@ import axios, { AxiosInstance } from 'axios';
 
 export interface APIClientConfig {
   useClient?: boolean;
+  useMultiPart?: boolean;
 }
 
 export class APIClient {
   public readonly instance: AxiosInstance;
   private readonly config: APIClientConfig;
   public constructor(config?: APIClientConfig) {
-    this.config = config ?? {
+    const defaults: APIClientConfig = {
       useClient: true,
+      useMultiPart: false,
     };
+    this.config = { ...defaults, ...config };
     this.instance = axios.create({
       timeout: 60000,
       withCredentials: true,
@@ -23,7 +26,11 @@ export class APIClient {
         : `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api`,
     });
     this.instance.interceptors.request.use((req) => {
-      req.headers['Content-Type'] = 'application/json';
+
+      if (this.config.useMultiPart) 
+        req.headers['Content-Type'] = 'multipart/form-data';
+      else
+        req.headers['Content-Type'] = 'application/json';
       return req;
     });
     if (this.config.useClient) {

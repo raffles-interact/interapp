@@ -69,14 +69,35 @@ export function verifyRequiredPermission(...required: number[]) {
   };
 }
 
-export function handleError(err: HTTPError, req: Request, res: Response, next: NextFunction) {
-  res.status(err.status);
-  res.header(err.headers);
-  res.json({
-    name: err.name,
-    message: err.message,
-    data: err.data,
-  });
+export function handleError(
+  err: HTTPError | Error,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) {
+  const handleHTTPError = (err: HTTPError) => {
+    res.status(err.status);
+    res.header(err.headers);
+    res.json({
+      name: err.name,
+      message: err.message,
+      data: err.data,
+    });
+  };
+
+  if (!(err instanceof HTTPError)) {
+    const error = new HTTPError(
+      'Internal server error',
+      'An internal server error has occurred',
+      HTTPErrorCode.INTERNAL_SERVER_ERROR,
+      {
+        name: err.name,
+        message: err.message,
+        stack: err.stack,
+      },
+    );
+    handleHTTPError(error);
+  } else handleHTTPError(err);
 
   next(err);
 }

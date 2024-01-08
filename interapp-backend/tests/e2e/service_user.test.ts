@@ -217,7 +217,7 @@ describe('API (user service)', async () => {
       headers: { Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(200);
-    const res_as_json = await res.json() as Array<Object>
+    const res_as_json = (await res.json()) as Array<Object>;
     expect(res_as_json).toHaveLength(1);
     expect(res_as_json[0]).toMatchObject({
       user_id: 1,
@@ -226,7 +226,6 @@ describe('API (user service)', async () => {
       verified: false,
       service_hours: 0,
     });
-    
   });
 
   test('bulk update service users (add)', async () => {

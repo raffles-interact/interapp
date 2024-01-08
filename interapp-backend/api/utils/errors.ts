@@ -15,8 +15,8 @@ export class HTTPError extends Error implements Partial<AppError> {
     name: string,
     message: string,
     status: HTTPErrorCode,
-    headers?: Record<string, string>,
     data?: Record<string, any>,
+    headers?: Record<string, string>,
   ) {
     super(message);
     this.name = name;
