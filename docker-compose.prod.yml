@@ -110,6 +110,19 @@ services:
     depends_on:
       - backend
       - postgres
+  
+  nginx:
+    container_name: interapp-nginx
+    build:
+      context: ./nginx
+      dockerfile: prod.Dockerfile
+    restart: always
+    ports:
+      - 80:80
+    networks:
+      - interapp-network
+    depends_on:
+      - frontend
 
 networks:
   interapp-network:

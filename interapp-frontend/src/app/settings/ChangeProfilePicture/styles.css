@@ -4,3 +4,7 @@
   width: 12rem;
   border: 1px solid var(--mantine-color-dark-6);
 }
+
+.change-profile-picture > img {
+  object-fit: cover;
+}
