@@ -107,15 +107,18 @@ interface ServicesPageProps {
 }
 
 const ServiceCardDisplay = ({ username }: ServicesPageProps) => {
+  const [loading, setLoading] = useState(true);
   const [userServices, setUserServices] = useState<FetchServicesResponse>([]);
   const [otherServices, setOtherServices] = useState<FetchServicesResponse>([]);
 
   useEffect(() => {
+    setLoading(true);
     fetchServices(username).then((data) => {
       const { userServices, otherServices } = sortServices(data);
       setUserServices(userServices);
       setOtherServices(otherServices);
     });
+    setLoading(false);
   }, []);
 
   const handleJoin = (id: number) => {
@@ -136,7 +139,7 @@ const ServiceCardDisplay = ({ username }: ServicesPageProps) => {
       });
   };
 
-  if (userServices.length === 0 && otherServices.length === 0) {
+  if (loading) {
     return <Skeleton width='100%' height={30} />;
   }
 

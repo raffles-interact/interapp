@@ -4,7 +4,6 @@ export interface APIClientConfig {
   useClient?: boolean;
 }
 
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_AXIOS_BASE_URL as string;
 export class APIClient {
   public readonly instance: AxiosInstance;
   private readonly config: APIClientConfig;
@@ -18,6 +17,10 @@ export class APIClient {
       validateStatus: (status) => status < 500,
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
+      proxy: false,
+      baseURL: this.config.useClient
+        ? process.env.NEXT_PUBLIC_AXIOS_BASE_URL
+        : `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api`,
     });
     this.instance.interceptors.request.use((req) => {
       req.headers['Content-Type'] = 'application/json';
