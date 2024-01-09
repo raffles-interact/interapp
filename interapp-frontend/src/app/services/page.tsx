@@ -12,7 +12,7 @@ import './styles.css';
 const fetchAllServices = async () => {
   const apiClient = new APIClient({ useClient: false }).instance;
   try {
-    const res = await apiClient.get('/service/get_all');
+    const res = await apiClient.get('/service/all');
 
     switch (res.status) {
       case 200:

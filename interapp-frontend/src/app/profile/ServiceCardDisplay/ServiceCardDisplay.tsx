@@ -12,7 +12,7 @@ import './styles.css';
 
 const fetchServices = async (username: string) => {
   const apiClient = new APIClient().instance;
-  const res = await apiClient.get('/service/get_all');
+  const res = await apiClient.get('/service/all');
 
   if (res.status !== 200) throw new Error('Could not fetch services');
 

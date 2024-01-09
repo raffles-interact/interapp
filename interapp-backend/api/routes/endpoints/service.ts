@@ -138,7 +138,7 @@ serviceRouter.delete(
   },
 );
 
-serviceRouter.get('/get_all', async (req, res) => {
+serviceRouter.get('/all', async (req, res) => {
   const services = await ServiceModel.getAllServices();
 
   res.status(200).send(services);
@@ -209,7 +209,7 @@ serviceRouter.delete(
 );
 
 serviceRouter.get(
-  '/session/get_all',
+  '/session/all',
   validateRequiredFields(['page', 'page_size'], ['service_id']),
   async (req, res) => {
     let sessions;
