@@ -20,12 +20,12 @@ const handleFetchServiceSessionsData = async (
     ? { service_id, page, page_size: perPage }
     : { page, page_size: perPage };
 
-  const res = await apiClient.get('/service/session/get_all', {
+  const res = await apiClient.get('/service/session/all', {
     params: params,
   });
   if (res.status !== 200) return null;
   // then we get the services for searching
-  const res2 = await apiClient.get('/service/get_all');
+  const res2 = await apiClient.get('/service/all');
   if (res2.status !== 200) return null;
   // we return the data and map the services to the format that the select component expects
   const parsed = [

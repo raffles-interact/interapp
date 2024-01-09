@@ -80,7 +80,7 @@ announcementRouter.delete(
 );
 
 announcementRouter.get(
-  '/completions',
+  '/completion',
   validateRequiredFields(['announcement_id']),
   verifyJWT,
   async (req, res) => {
