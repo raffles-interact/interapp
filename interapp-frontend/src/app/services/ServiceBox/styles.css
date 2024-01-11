@@ -3,8 +3,6 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  border-radius: 7px;
-  border: 1px solid var(--mantine-color-dark-6);
 }
 
 .service-box-image {
@@ -14,8 +12,6 @@
 }
 
 .service-box-image-container {
-  border-radius: 7px 7px 0 0;
-  border-bottom: 1px solid var(--mantine-color-dark-6);
   width: 100%;
   height: 15rem;
   position: relative;
@@ -42,24 +38,37 @@
   flex-direction: column;
   align-items: center;
   margin-bottom: 0.5rem;
+  overflow: hidden;
 }
 
 .service-box-info-title {
   font-weight: bold;
   margin-bottom: 0.2rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  width: 100%;
+  display: block;
+  overflow: hidden;
 }
 
 .service-box-info-content {
-  display: flex;
-  justify-content: space-around;
-  gap: 0.5rem;
-}
-
-.service-box-info-content-inner {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: center;
   column-gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.service-box-info-content > p {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.service-box-icon {
+  width: 1rem;
+  height: 1rem;
+  color: var(--mantine-color-teal-6);
 }
 
 .service-box-info-content-inner > svg {

@@ -26,11 +26,8 @@ export class APIClient {
         : `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api`,
     });
     this.instance.interceptors.request.use((req) => {
-
-      if (this.config.useMultiPart) 
-        req.headers['Content-Type'] = 'multipart/form-data';
-      else
-        req.headers['Content-Type'] = 'application/json';
+      if (this.config.useMultiPart) req.headers['Content-Type'] = 'multipart/form-data';
+      else req.headers['Content-Type'] = 'application/json';
       return req;
     });
     if (this.config.useClient) {

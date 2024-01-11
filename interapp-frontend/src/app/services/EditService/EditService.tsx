@@ -75,10 +75,6 @@ const EditService = ({
         if (!value) return false;
         return value.toString().length !== 8 && 'Invalid phone number';
       },
-      website: (value) => {
-        if (!value) return false;
-        return !value.includes('http') && 'Invalid website';
-      },
       end_time: (value, values) =>
         value <= values.start_time && 'End time must be after start time',
     },

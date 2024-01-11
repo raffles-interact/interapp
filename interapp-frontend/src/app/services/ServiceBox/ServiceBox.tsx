@@ -2,8 +2,8 @@
 import dynamic from 'next/dynamic';
 import { Service } from '../types';
 import { Suspense, memo } from 'react';
-import { Text, Title, Skeleton } from '@mantine/core';
-import { IconMail, IconPhoneCall, IconNetwork, IconCalendar, IconClock } from '@tabler/icons-react';
+import { Text, Title, Skeleton, Card, Image } from '@mantine/core';
+import { IconMail, IconPhoneCall, IconNetwork, IconClock } from '@tabler/icons-react';
 import APIClient from '@api/api_client';
 
 const ServiceBoxUsers = dynamic(() => import('../ServiceBoxUsers/ServiceBoxUsers'));
@@ -59,10 +59,6 @@ const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) 
     const added_users = service_users.filter((user) => !old_service_users.includes(user));
     const removed_users = old_service_users.filter((user) => !service_users.includes(user));
 
-    // sigh... this endpoint was originally not implemented at all, and i just thought to send multiple requests at once
-    // then i have to remind myself that this is not a hackathon and i can't just rush silly things like this
-    // i'm so tired
-
     const actions = [
       ...added_users.map((user) => {
         return { action: 'add', username: user };
@@ -95,10 +91,10 @@ const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) 
   };
 
   return (
-    <div className='service-box'>
+    <Card shadow='sm' padding='md' radius='md' className='service-box'>
       <div className='service-box-image-container'>
         <Suspense fallback={<Skeleton className='service-box-image-skeleton' />}>
-          <img
+          <Image
             src={service.promotional_image ?? '/placeholder-image.jpg'}
             alt={service.name}
             className='service-box-image'
@@ -133,39 +129,26 @@ const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) 
         </div>
 
         <div className='service-box-info-content'>
-          <div>
-            <Text className='service-box-info-title'>Contact Info:</Text>
-            <div className='service-box-info-content-inner'>
-              <IconMail size={20} />
-              <Text>{service.contact_email}</Text>
+          <IconClock className='service-box-icon' />
+          <Text>
+            {daysOfWeek[service.day_of_week]}{' '}
+            {roundTimeToMinutes(service.start_time) + ' - ' + roundTimeToMinutes(service.end_time)}
+          </Text>
+          <IconMail className='service-box-icon' />
+          <Text>{service.contact_email}</Text>
 
-              {service.contact_number && (
-                <>
-                  <IconPhoneCall size={20} />
-                  <Text>{service.contact_number}</Text>
-                </>
-              )}
-              {service.website && (
-                <>
-                  <IconNetwork size={20} />
-                  <Text>{service.website}</Text>
-                </>
-              )}
-            </div>
-          </div>
-          <div>
-            <Text className='service-box-info-title'>Service Info:</Text>
-            <div className='service-box-info-content-inner'>
-              <IconCalendar size={20} />
-              <Text>{daysOfWeek[service.day_of_week]}</Text>
-              <IconClock size={20} />
-              <Text>
-                {roundTimeToMinutes(service.start_time) +
-                  ' - ' +
-                  roundTimeToMinutes(service.end_time)}
-              </Text>
-            </div>
-          </div>
+          {service.contact_number && (
+            <>
+              <IconPhoneCall className='service-box-icon' />
+              <Text>{service.contact_number}</Text>
+            </>
+          )}
+          {service.website && (
+            <>
+              <IconNetwork className='service-box-icon' />
+              <Text>{service.website}</Text>
+            </>
+          )}
         </div>
         <ServiceBoxUsers
           service_id={service.service_id}
@@ -175,7 +158,7 @@ const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) 
           handleChangeServiceUsers={handleChangeServiceUsers}
         />
       </div>
-    </div>
+    </Card>
   );
 };
 
