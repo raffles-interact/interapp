@@ -1,29 +1,36 @@
 'use client';
 import APIClient from '@api/api_client';
-import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import { UserWithProfilePicture } from '@providers/AuthProvider/types';
-import { AxiosInstance } from 'axios';
+import { useDisclosure } from '@mantine/hooks';
+import { useForm } from '@mantine/form';
 import { useState, useEffect, useContext } from 'react';
-import { Modal, Button, Text } from '@mantine/core';
+import { Modal, Button, Text, TagsInput } from '@mantine/core';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
 
-const handleGetUsers = async (service_id: number, apiClient: AxiosInstance) => {
+const handleGetUsers = async (service_id: number) => {
+  const apiClient = new APIClient().instance;
+
   const get_users_by_service = await apiClient.get(
     `/service/get_users_by_service?service_id=${service_id}`,
   );
   const users: Omit<UserWithProfilePicture, 'permissions'>[] = get_users_by_service.data;
-  const serviceUsers = users !== undefined ? users.map((user) => user.username) : [];
+  let serviceUsers: string[] = [];
+  if (get_users_by_service.status === 404) {
+    serviceUsers = [];
+  } else if (get_users_by_service.status === 200) {
+    serviceUsers = users.map((user) => user.username);
+  } else throw new Error('Could not get users by service');
 
   const get_all_users = await apiClient.get('/user');
   if (get_all_users.status !== 200) throw new Error('Could not get all users');
   const all_users: Omit<UserWithProfilePicture, 'permissions'>[] = get_all_users.data;
   const allUsernames = all_users !== undefined ? all_users.map((user) => user.username) : [];
 
-  return [serviceUsers, allUsernames];
+  return [serviceUsers, allUsernames] as const;
 };
 
 interface ServiceBoxUsersProps {
@@ -41,45 +48,70 @@ const ServiceBoxUsers = ({
   handleChangeServiceIc,
   handleChangeServiceUsers,
 }: ServiceBoxUsersProps) => {
-  const apiClient = new APIClient().instance;
   const { user } = useContext(AuthContext);
 
-  const [serviceUsers, setServiceUsers] = useState<string[]>([]);
   const [allUsernames, setAllUsernames] = useState<string[]>([]);
   const [allValidServiceICUsernames, setAllValidServiceICUsernames] = useState<string[]>([]);
 
-  const [open, setOpen] = useState(false);
+  const [opened, { open, close }] = useDisclosure();
   const [loading, setLoading] = useState(false);
 
-  const [newServiceIc, setNewServiceIc] = useState(service_ic);
-  const [newServiceUsers, setNewServiceUsers] = useState<string[]>(serviceUsers);
+  // used to check for equality when saving changes
+  const [initialValues, setInitialValues] = useState({
+    service_ic: service_ic,
+    service_users: [] as string[],
+  });
+
+  const form = useForm({
+    initialValues: {
+      service_ic: service_ic,
+      service_users: [] as string[],
+    },
+  });
 
   useEffect(() => {
-    if (!open) return;
-    handleGetUsers(service_id, apiClient).then(([serviceUsers, allUsernames]) => {
-      setServiceUsers(serviceUsers);
+    if (!opened) return;
+    handleGetUsers(service_id).then(([serviceUsers, allUsernames]) => {
+      form.setFieldValue('service_users', serviceUsers);
+      setInitialValues({
+        service_ic: service_ic,
+        service_users: serviceUsers,
+      });
       setAllUsernames(allUsernames);
       setAllValidServiceICUsernames([
         ...allUsernames.filter((username) => !alreadyServiceICUsernames.includes(username)),
         service_ic,
       ]);
     });
-  }, [open]);
+  }, [opened]);
+
+  useEffect(() => {
+    if (!form.values.service_ic) return;
+    if (!form.values.service_users.includes(form.values.service_ic)) {
+      form.setFieldValue('service_users', [...form.values.service_users, form.values.service_ic]);
+    }
+  }, [form.values.service_ic]);
 
   if (!user) return null;
   if (!user.permissions.includes(Permissions.EXCO)) return null;
 
   const handleSave = () => {
     setLoading(true);
-    if (newServiceIc !== service_ic) handleChangeServiceIc(newServiceIc);
-    if (newServiceUsers !== serviceUsers) handleChangeServiceUsers(serviceUsers, newServiceUsers);
-    setOpen(false);
+
+    if (initialValues.service_ic !== form.values.service_ic)
+      handleChangeServiceIc(form.values.service_ic);
+
+    const eqSet = (as: string[], bs: string[]) =>
+      as.length === bs.length && as.every((a) => bs.includes(a));
+    if (!eqSet(initialValues.service_users, form.values.service_users))
+      handleChangeServiceUsers(initialValues.service_users, form.values.service_users);
+    close();
     setLoading(false);
   };
 
   return (
     <>
-      <Modal opened={open} onClose={() => setOpen(false)} title='Manage Users'>
+      <Modal opened={opened} onClose={close} title='Manage Users'>
         <div className='service-box-users'>
           <Text>
             Edit assigned services for Interact's members. You must assign 1 service IC to every
@@ -88,21 +120,22 @@ const ServiceBoxUsers = ({
           </Text>
 
           <SearchableSelect
-            defaultValue={newServiceIc}
+            defaultValue={service_ic}
             allValues={allValidServiceICUsernames}
-            onChange={(newServiceIc) => setNewServiceIc(newServiceIc)}
             label='Service IC'
+            {...form.getInputProps('service_ic')}
           />
 
-          <PillsInputWithSearch
-            defaultValues={serviceUsers}
-            allValues={allUsernames}
-            onChange={(newServiceUsers) => setNewServiceUsers(newServiceUsers)}
-            label='Regular service participants'
+          <TagsInput
+            label='Service Users'
+            placeholder='Users that participate in this service regularly'
+            required
+            data={allUsernames}
+            {...form.getInputProps('service_users')}
           />
 
           <div className='service-box-users-actions'>
-            <Button onClick={() => setOpen(false)} variant='outline' color='red'>
+            <Button onClick={close} variant='outline' color='red'>
               Close
             </Button>
             <Button onClick={handleSave} variant='outline' color='green' loading={loading}>
@@ -112,7 +145,7 @@ const ServiceBoxUsers = ({
         </div>
       </Modal>
 
-      <Button onClick={() => setOpen(true)} variant='outline'>
+      <Button onClick={open} variant='outline'>
         Manage Users
       </Button>
     </>
