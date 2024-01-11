@@ -1,17 +1,36 @@
 'use client';
 import APIClient from '@api/api_client';
-import UnderConstruction from '@components/UnderConstruction/UnderContruction';
-import { useState, useEffect } from 'react';
+import AnnouncementBox from './AnnouncementBox/AnnouncementBox';
+import PageController from '@components/PageController/PageController';
+import { Announcement, AnnouncementAttachment, AnnouncementCompletion } from './types';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
+import './styles.css';
 
-const handleFetch = async () => {
+const handleFetch = async (page: number) => {
   const apiClient = new APIClient().instance;
-  const res = await apiClient.get('/announcement/all', { params: { page: 1, page_size: 100 } });
-  return res.data;
+  const res = await apiClient.get('/announcement/all', { params: { page: page, page_size: 10 } });
+  if (res.status !== 200) throw new Error('Failed to fetch announcements');
+
+  const data: {
+    data: (Announcement & {
+      announcement_attachments: AnnouncementAttachment[];
+      announcement_completions: AnnouncementCompletion[];
+    })[];
+    total_entries: number;
+    length_of_page: number;
+  } = res.data;
+  return data;
 };
 
+type AllAnnouncements = Awaited<ReturnType<typeof handleFetch>>;
+
 export default function AnnouncementsPage() {
+  const { user } = useContext(AuthContext);
   const [A, setA] = useState<FileList | null>(null);
-  const [B, setB] = useState<any>(null);
+  const [data, setData] = useState<AllAnnouncements | null>(null);
+
+  const [page, setPage] = useState(1);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     const apiClient = new APIClient({ useMultiPart: true }).instance;
@@ -41,16 +60,38 @@ export default function AnnouncementsPage() {
   };
 
   useEffect(() => {
-    handleFetch().then((res) => setB(res));
-  }, []);
+    handleFetch(page).then((res) => setData(res));
+  }, [page]);
 
   return (
-    <>
+    <div className='announcement-page'>
       <form onSubmit={handleSubmit}>
         <input type='file' accept='*' multiple onChange={(e) => setA(e.currentTarget.files)} />
         <button type='submit'>Submit</button>
       </form>
-      <div>{JSON.stringify(B)}</div>
-    </>
+      <div className='announcement-cards-container'>
+        {data?.data.map((announcement) => (
+          <AnnouncementBox
+            key={announcement.announcement_id}
+            id={announcement.announcement_id}
+            title={announcement.title}
+            description={announcement.description}
+            date={new Date(announcement.creation_date)}
+            imageURL={announcement.image}
+            completed={
+              announcement.announcement_completions.find(
+                (completion) => completion.username === user?.username,
+              )?.completed ?? true
+            }
+          />
+        ))}
+      </div>
+      <PageController
+        activePage={page}
+        totalPages={data ? Math.ceil(data?.total_entries / data?.length_of_page) : 1}
+        handlePageChange={(page) => setPage(page)}
+        className='announcement-page-controller'
+      />
+    </div>
   );
 }

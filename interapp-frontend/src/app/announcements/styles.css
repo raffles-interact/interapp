@@ -1,0 +1,17 @@
+.announcement-page {
+  display: flex;
+  flex-direction: column;
+
+  margin: 2rem;
+}
+
+.announcement-cards-container {
+  margin: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  grid-gap: 1rem;
+}
+
+.announcement-page-controller {
+  align-self: center;
+}
