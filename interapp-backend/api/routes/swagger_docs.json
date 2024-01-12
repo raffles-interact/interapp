@@ -35,9 +35,7 @@
   "paths": {
     "/auth/signup": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Sign a user up for the application",
         "requestBody": {
           "content": {
@@ -84,9 +82,7 @@
     },
     "/auth/signin": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Logs user into the app",
         "requestBody": {
           "content": {
@@ -145,9 +141,7 @@
     },
     "/auth/refresh": {
       "post": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Refresh access token",
         "security": [
           {
@@ -188,9 +182,7 @@
     },
     "/auth/signout": {
       "delete": {
-        "tags": [
-          "auth"
-        ],
+        "tags": ["auth"],
         "summary": "Sign the user out by invalidating tokens",
         "security": [
           {
@@ -206,9 +198,7 @@
     },
     "/user": {
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "get all user's info, or a specific user's info",
         "parameters": [
           {
@@ -248,9 +238,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Delete user",
         "requestBody": {
           "content": {
@@ -281,9 +269,7 @@
     },
     "/user/change_email": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "change email of requested user (need admin), or user who sent the request",
         "requestBody": {
           "content": {
@@ -300,9 +286,7 @@
                     "example": "a"
                   }
                 },
-                "required": [
-                  "new_email"
-                ]
+                "required": ["new_email"]
               }
             }
           }
@@ -321,9 +305,7 @@
     },
     "/user/password/change": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Change password",
         "requestBody": {
           "content": {
@@ -364,9 +346,7 @@
     },
     "/user/password/reset_email": {
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Set a reset password email to the user's email if it exists",
         "requestBody": {
           "content": {
@@ -398,9 +378,7 @@
     },
     "/user/password/reset": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Reset password given token sent in email",
         "requestBody": {
           "content": {
@@ -441,9 +419,7 @@
     },
     "/user/verify_email": {
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Send a verification email to the user",
         "requestBody": {
           "content": {
@@ -480,9 +456,7 @@
     },
     "/user/verify": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Verify email of user",
         "requestBody": {
           "content": {
@@ -505,9 +479,7 @@
     },
     "/user/permissions": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Update permissions of user",
         "requestBody": {
           "content": {
@@ -528,12 +500,7 @@
               },
               "example": {
                 "username": "testuser",
-                "permissions": [
-                  0,
-                  1,
-                  2,
-                  3
-                ]
+                "permissions": [0, 1, 2, 3]
               }
             }
           }
@@ -556,9 +523,7 @@
         }
       },
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Get user permissions, or everyone's permissions",
         "parameters": [
           {
@@ -595,9 +560,7 @@
     },
     "/user/userservices": {
       "get": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Get user services",
         "parameters": [
           {
@@ -634,9 +597,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Submit user services",
         "requestBody": {
           "content": {
@@ -677,9 +638,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "mass edit user service",
         "requestBody": {
           "content": {
@@ -697,10 +656,7 @@
                       "properties": {
                         "action": {
                           "type": "string",
-                          "enum": [
-                            "add",
-                            "remove"
-                          ]
+                          "enum": ["add", "remove"]
                         },
                         "username": {
                           "type": "string",
@@ -727,9 +683,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Delete user service",
         "requestBody": {
           "content": {
@@ -764,9 +718,7 @@
     },
     "/user/service_hours": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Update self service hours or others' service hours",
         "requestBody": {
           "content": {
@@ -783,9 +735,7 @@
                     "example": "a"
                   }
                 },
-                "required": [
-                  "hours"
-                ]
+                "required": ["hours"]
               }
             }
           }
@@ -802,9 +752,7 @@
     },
     "/user/profile_picture": {
       "patch": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "Update self's pfp",
         "requestBody": {
           "content": {
@@ -836,9 +784,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "user"
-        ],
+        "tags": ["user"],
         "summary": "delete self's profile picture",
         "responses": {
           "204": {
@@ -857,9 +803,7 @@
     },
     "/announcement": {
       "post": {
-        "tags": [
-          "announcement"
-        ],
+        "tags": ["announcement"],
         "summary": "Create a new announcement",
         "requestBody": {
           "content": {
@@ -886,9 +830,7 @@
         ]
       },
       "get": {
-        "tags": [
-          "announcement"
-        ],
+        "tags": ["announcement"],
         "summary": "Get an announcement by ID",
         "parameters": [
           {
@@ -925,9 +867,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "announcement"
-        ],
+        "tags": ["announcement"],
         "summary": "Update an existing announcement",
         "requestBody": {
           "content": {
@@ -957,9 +897,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "announcement"
-        ],
+        "tags": ["announcement"],
         "summary": "Deletes an announcement",
         "requestBody": {
           "content": {
@@ -999,9 +937,7 @@
     },
     "/announcement/all": {
       "get": {
-        "tags": [
-          "announcement"
-        ],
+        "tags": ["announcement"],
         "summary": "Get all announcements",
         "parameters": [
           {
@@ -1053,9 +989,7 @@
     },
     "/announcement/completion": {
       "get": {
-        "tags": [
-          "announcement"
-        ],
+        "tags": ["announcement"],
         "summary": "Get all completions for a specific announcement",
         "parameters": [
           {
@@ -1092,9 +1026,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "announcement"
-        ],
+        "tags": ["announcement"],
         "summary": "Modify the viewed status of an announcement for a user",
         "requestBody": {
           "content": {
@@ -1137,9 +1069,7 @@
     },
     "/service": {
       "post": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Create a new service",
         "requestBody": {
           "content": {
@@ -1179,9 +1109,7 @@
         ]
       },
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Get a service by ID",
         "parameters": [
           {
@@ -1215,9 +1143,7 @@
         }
       },
       "patch": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Update an existing service",
         "requestBody": {
           "content": {
@@ -1249,9 +1175,7 @@
         }
       },
       "delete": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Deletes a service",
         "requestBody": {
           "content": {
@@ -1291,9 +1215,7 @@
     },
     "/service/all": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "get all services available",
         "responses": {
           "200": {
@@ -1314,9 +1236,7 @@
     },
     "/service/get_users_by_service": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "get users by service",
         "parameters": [
           {
@@ -1349,9 +1269,7 @@
     },
     "/service/session": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Get the current session user",
         "parameters": [
           {
@@ -1387,9 +1305,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Create a new session",
         "requestBody": {
           "content": {
@@ -1416,9 +1332,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Update an existing session",
         "requestBody": {
           "content": {
@@ -1448,9 +1362,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Deletes a session",
         "requestBody": {
           "content": {
@@ -1463,9 +1375,7 @@
                     "format": "int64"
                   }
                 },
-                "required": [
-                  "session_id"
-                ]
+                "required": ["session_id"]
               }
             }
           },
@@ -1491,9 +1401,7 @@
     },
     "/service/session/all": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Get some or all service sessions by service id (optional)",
         "requestBody": {
           "content": {
@@ -1512,10 +1420,7 @@
                     "format": "int64"
                   }
                 },
-                "required": [
-                  "page",
-                  "page_size"
-                ]
+                "required": ["page", "page_size"]
               }
             }
           }
@@ -1555,9 +1460,7 @@
     },
     "/service/session_user": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Get the info of service session wrt to a specific user",
         "parameters": [
           {
@@ -1605,9 +1508,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Create a new session user",
         "requestBody": {
           "content": {
@@ -1634,9 +1535,7 @@
         ]
       },
       "patch": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Update an existing session user",
         "requestBody": {
           "content": {
@@ -1666,9 +1565,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Deletes a session user",
         "requestBody": {
           "content": {
@@ -1711,9 +1608,7 @@
     },
     "/service/session_user_bulk": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Get all session users",
         "parameters": [
           {
@@ -1752,9 +1647,7 @@
         ]
       },
       "post": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "summary": "Create new session users in bulk",
         "requestBody": {
           "content": {
@@ -1781,11 +1674,7 @@
                         },
                         "attended": {
                           "type": "string",
-                          "enum": [
-                            "Attended",
-                            "Absent",
-                            "Valid Reason"
-                          ],
+                          "enum": ["Attended", "Absent", "Valid Reason"],
                           "example": "Absent"
                         },
                         "is_ic": {
@@ -1816,9 +1705,7 @@
         ]
       },
       "delete": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "description": "remove users from service session",
         "requestBody": {
           "content": {
@@ -1835,10 +1722,7 @@
                     "items": {
                       "type": "string"
                     },
-                    "example": [
-                      "joe",
-                      "joe2"
-                    ]
+                    "example": ["joe", "joe2"]
                   }
                 }
               }
@@ -1862,9 +1746,7 @@
     },
     "/service/active_sessions": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "description": "get active service sessions hash and info",
         "responses": {
           "200": {
@@ -1886,10 +1768,7 @@
                             "type": "array",
                             "items": {
                               "type": "string",
-                              "example": [
-                                "joe",
-                                "jpe2"
-                              ]
+                              "example": ["joe", "jpe2"]
                             }
                           }
                         }
@@ -1905,9 +1784,7 @@
     },
     "/service/ad_hoc_sessions": {
       "get": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "description": "get active service sessions hash and info",
         "responses": {
           "200": {
@@ -1928,9 +1805,7 @@
     },
     "/service/verify_attendance": {
       "post": {
-        "tags": [
-          "service"
-        ],
+        "tags": ["service"],
         "description": "verify hash to mark current user as attended",
         "responses": {
           "204": {
@@ -2184,11 +2059,7 @@
           },
           "attended": {
             "type": "string",
-            "enum": [
-              "Attended",
-              "Absent",
-              "Valid Reason"
-            ]
+            "enum": ["Attended", "Absent", "Valid Reason"]
           },
           "is_ic": {
             "type": "boolean",
@@ -2236,13 +2107,7 @@
             "items": {
               "type": "integer"
             },
-            "example": [
-              0,
-              1,
-              2,
-              3,
-              4
-            ]
+            "example": [0, 1, 2, 3, 4]
           }
         }
       },

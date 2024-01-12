@@ -67,15 +67,16 @@ export class AnnouncementModel {
         const newAttachment = new AnnouncementAttachment();
 
         newAttachment.announcement = newAnnouncement;
-        newAttachment.attachment_id = 'announcement-attachment/' + announcement.title + '-' + idx;
+        newAttachment.attachment_loc = 'announcement-attachment/' + announcement.title + '-' + idx;
         await minioClient.putObject(
           process.env.MINIO_BUCKETNAME as string,
-          newAttachment.attachment_id,
+          newAttachment.attachment_loc,
           attachment.buffer,
           { 'Content-Type': attachment.mimetype },
         );
 
         newAttachment.attachment_name = attachment.originalname;
+        newAttachment.attachment_mime = attachment.mimetype;
         return newAttachment;
       }),
     );
@@ -132,9 +133,9 @@ export class AnnouncementModel {
       );
     announcement.announcement_attachments = await Promise.all(
       announcement.announcement_attachments.map(async (attachment) => {
-        attachment.attachment_id = await minioClient.presignedGetObject(
+        attachment.attachment_loc = await minioClient.presignedGetObject(
           process.env.MINIO_BUCKETNAME as string,
-          attachment.attachment_id,
+          attachment.attachment_loc,
           60 * 60 * 24 * 7,
         );
         return attachment;
@@ -172,9 +173,9 @@ export class AnnouncementModel {
           );
         announcement.announcement_attachments = await Promise.all(
           announcement.announcement_attachments.map(async (attachment) => {
-            attachment.attachment_id = await minioClient.presignedGetObject(
+            attachment.attachment_loc = await minioClient.presignedGetObject(
               process.env.MINIO_BUCKETNAME as string,
-              attachment.attachment_id,
+              attachment.attachment_loc,
               60 * 60 * 24 * 7,
             );
             return attachment;
@@ -239,7 +240,7 @@ export class AnnouncementModel {
         announcement.announcement_attachments.map(async (attachment) => {
           await minioClient.removeObject(
             process.env.MINIO_BUCKETNAME as string,
-            attachment.attachment_id,
+            attachment.attachment_loc,
           );
         }),
       );
@@ -255,17 +256,18 @@ export class AnnouncementModel {
           const newAttachment = new AnnouncementAttachment();
 
           newAttachment.announcement = updatedAnnouncement;
-          newAttachment.attachment_id =
+          newAttachment.attachment_loc =
             'announcement-attachment/' + updatedAnnouncement.title + '-' + idx;
           await minioClient.putObject(
             process.env.MINIO_BUCKETNAME as string,
-            newAttachment.attachment_id,
+            newAttachment.attachment_loc,
             attachment.buffer,
             { 'Content-Type': attachment.mimetype },
           );
 
           newAttachment.attachment_name = attachment.originalname;
           newAttachment.announcement_id = updatedAnnouncement.announcement_id;
+          newAttachment.attachment_mime = attachment.mimetype;
           return newAttachment;
         }),
       );
