@@ -15,5 +15,12 @@ export interface AnnouncementCompletion {
 
 export interface AnnouncementAttachment {
   announcement_id: number;
-  attachment: string;
+  attachment_loc: string;
+  attachment_name: string;
+  attachment_mime: string;
 }
+
+export type AnnouncementWithMeta = Announcement & {
+  announcement_attachments: AnnouncementAttachment[];
+  announcement_completions: AnnouncementCompletion[];
+};
