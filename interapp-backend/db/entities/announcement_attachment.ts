@@ -4,10 +4,13 @@ import { Announcement } from './announcement';
 @Entity()
 export class AnnouncementAttachment {
   @PrimaryColumn()
-  attachment_id: string;
+  attachment_loc: string;
 
   @Column()
   attachment_name: string;
+
+  @Column()
+  attachment_mime: string;
 
   @Column()
   announcement_id: number;
