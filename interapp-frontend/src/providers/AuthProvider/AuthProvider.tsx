@@ -10,7 +10,7 @@ import {
 } from './types';
 import APIClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
-import { RoutePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
+import { routePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
 
 export const AuthContext = createContext<AuthContextType>({
@@ -65,11 +65,33 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const userPermissions = user.permissions;
 
-    for (const permission of userPermissions) {
-      if (RoutePermissions[permission].includes(pathname)) {
-        return;
+    const wildcardMatcher = (str: string, pattern: string) => {
+      // Add a trailing slash to the pattern if it doesn't have one
+      if (!pattern.endsWith('/')) {
+        pattern += '/';
       }
+      // Add a trailing slash to the string if it doesn't have one
+      if (!str.endsWith('/')) {
+        str += '/';
+      }
+      // Replace '*' with '.*' to create a regex pattern
+      const regexPattern = `^${pattern.replace(/\*/g, '.*')}$`;
+      // Create a new RegExp object
+      const regex = new RegExp(regexPattern);
+      // Test the url against the regex pattern
+      return regex.test(str);
+    };
+    const allowedRoutes = Object.entries(routePermissions).reduce((acc, [permission, routes]) => {
+      if (userPermissions.includes(Number(permission))) {
+        acc.push(...routes);
+      }
+      return acc;
+    }, [] as string[]);
+
+    if (allowedRoutes.some((route) => wildcardMatcher(pathname, route))) {
+      return;
     }
+
     notifications.show({
       title: 'Error',
       message: 'You do not have permission to access this page',
