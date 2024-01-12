@@ -2,9 +2,10 @@
 import APIClient from '@api/api_client';
 import AnnouncementBox from './AnnouncementBox/AnnouncementBox';
 import PageController from '@components/PageController/PageController';
-import { Announcement, AnnouncementAttachment, AnnouncementCompletion } from './types';
+import { AnnouncementWithMeta } from './types';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
+import { remapAssetUrl } from '@/api/utils';
 import './styles.css';
 
 const handleFetch = async (page: number) => {
@@ -12,15 +13,22 @@ const handleFetch = async (page: number) => {
   const res = await apiClient.get('/announcement/all', { params: { page: page, page_size: 10 } });
   if (res.status !== 200) throw new Error('Failed to fetch announcements');
 
-  const data: {
-    data: (Announcement & {
-      announcement_attachments: AnnouncementAttachment[];
-      announcement_completions: AnnouncementCompletion[];
-    })[];
+  const resData: {
+    data: AnnouncementWithMeta[];
     total_entries: number;
     length_of_page: number;
   } = res.data;
-  return data;
+  resData.data = resData.data.map((announcement) => {
+    announcement.announcement_attachments = announcement.announcement_attachments.map(
+      (attachment) => {
+        attachment.attachment_loc = remapAssetUrl(attachment.attachment_loc);
+        return attachment;
+      },
+    );
+    return announcement;
+  });
+
+  return resData;
 };
 
 type AllAnnouncements = Awaited<ReturnType<typeof handleFetch>>;
@@ -42,7 +50,7 @@ export default function AnnouncementsPage() {
       }
     const body = {
       creation_date: new Date().toISOString(),
-      title: 'test5',
+      title: 'ff',
       description: 'test',
       username: 'sebas',
     };

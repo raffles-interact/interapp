@@ -18,7 +18,7 @@ const AnnouncementBox = ({
   completed,
 }: AnnouncementBoxProps) => {
   return (
-    <Card shadow='sm' padding='md' radius='md' component='a' href='https://google.com'>
+    <Card shadow='sm' padding='md' radius='md' component='a' href={`/announcements/${id}`}>
       <Card.Section>
         <Image src={imageURL ?? '/placeholder-image.jpg'} height={160} alt='promotional image' />
       </Card.Section>
