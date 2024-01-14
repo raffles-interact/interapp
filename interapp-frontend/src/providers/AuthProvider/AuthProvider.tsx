@@ -12,6 +12,7 @@ import APIClient from '@api/api_client';
 import { useRouter, usePathname } from 'next/navigation';
 import { routePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
+import { wildcardMatcher } from '@api/utils';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -30,6 +31,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const pathname = usePathname();
   const apiClient = useMemo(() => new APIClient().instance, []);
 
+  const memoWildcardMatcher = useCallback(wildcardMatcher, []);
+
+  const allowedRoutes = useMemo(() => {
+    if (!user) return noLoginRequiredRoutes;
+
+    return Object.entries(routePermissions).reduce((acc, [permission, routes]) => {
+      if (user.permissions.includes(Number(permission))) {
+        acc.push(...routes);
+      }
+      return acc;
+    }, [] as string[]);
+  }, [user]);
+
   useEffect(() => {
     if (loading) return; // we dont know if user is logged in or not yet
     if (justLoggedIn) {
@@ -43,62 +57,35 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       throw new Error('Invalid user type in local storage\n' + JSON.stringify(user));
     }
 
-    if (!user) {
-      if (!noLoginRequiredRoutes.includes(pathname)) {
+    if (allowedRoutes.some((route) => memoWildcardMatcher(pathname, route))) {
+      return;
+    } else {
+      if (!user) {
         notifications.show({
           title: 'Error',
           message: 'You must be logged in to access this page',
           color: 'red',
         });
         router.replace('/auth/login');
+        return;
       }
-      return;
-    } else if (pathname === '/auth/login' || pathname === '/auth/signup') {
+      if (user && (pathname === '/auth/login' || pathname === '/auth/signup')) {
+        notifications.show({
+          title: 'Info',
+          message: 'You are already logged in. Redirecting to home page.',
+          color: 'red',
+        });
+        router.replace('/');
+        return;
+      }
       notifications.show({
         title: 'Error',
-        message: 'You are already logged in. Redirecting to home page.',
+        message: 'You do not have permission to access this page',
         color: 'red',
       });
       router.replace('/');
       return;
     }
-
-    const userPermissions = user.permissions;
-
-    const wildcardMatcher = (str: string, pattern: string) => {
-      // Add a trailing slash to the pattern if it doesn't have one
-      if (!pattern.endsWith('/')) {
-        pattern += '/';
-      }
-      // Add a trailing slash to the string if it doesn't have one
-      if (!str.endsWith('/')) {
-        str += '/';
-      }
-      // Replace '*' with '.*' to create a regex pattern
-      const regexPattern = `^${pattern.replace(/\*/g, '.*')}$`;
-      // Create a new RegExp object
-      const regex = new RegExp(regexPattern);
-      // Test the url against the regex pattern
-      return regex.test(str);
-    };
-    const allowedRoutes = Object.entries(routePermissions).reduce((acc, [permission, routes]) => {
-      if (userPermissions.includes(Number(permission))) {
-        acc.push(...routes);
-      }
-      return acc;
-    }, [] as string[]);
-
-    if (allowedRoutes.some((route) => wildcardMatcher(pathname, route))) {
-      return;
-    }
-
-    notifications.show({
-      title: 'Error',
-      message: 'You do not have permission to access this page',
-      color: 'red',
-    });
-    router.replace('/');
-    return;
   }, [user, loading]);
 
   useEffect(() => {
