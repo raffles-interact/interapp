@@ -39,7 +39,7 @@ export default function AnnouncementPage({ params }: { params: { id: string } })
 
   return (
     <div className='announcement-page'>
-      <GoBackButton href='/announcements' />
+      <GoBackButton href='/announcements' className='announcement-go-back-button' />
       {data ? (
         <>
           <Group justify='space-between' mb='md' align='center'>

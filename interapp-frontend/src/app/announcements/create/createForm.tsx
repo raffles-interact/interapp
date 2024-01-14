@@ -37,7 +37,7 @@ const CreateForm = () => {
     console.log(values.attachments);
 
     values.attachments.forEach((file) => {
-      body.append('attachments', new File([file], file.name));
+      body.append('attachments', new File([file], file.name, { type: file.type }));
     });
 
     body.append('username', user.username);
@@ -98,6 +98,15 @@ const CreateForm = () => {
           accept={allowedDocFormats}
           maxFiles={10}
           onDrop={(files) => form.setFieldValue('attachments', files)}
+          onReject={(files) => {
+            for (const file of files) {
+              notifications.show({
+                title: file.errors.map((err) => err.code).join(', '),
+                message: file.errors.map((err) => err.message).join(', '),
+                color: 'red',
+              });
+            }
+          }}
         />
         <div className='create-form-attachments'>
           {form.values.attachments.map((attachment, idx) => (

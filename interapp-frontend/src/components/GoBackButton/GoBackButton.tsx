@@ -5,9 +5,10 @@ import { memo, useRef } from 'react';
 
 interface GoBackButtonProps {
   href: string;
+  className?: string;
 }
 
-const GoBackButton = ({ href }: GoBackButtonProps) => {
+const GoBackButton = ({ href, className }: GoBackButtonProps) => {
   const linkRef = useRef<HTMLAnchorElement>(null);
   return (
     <>
@@ -15,6 +16,7 @@ const GoBackButton = ({ href }: GoBackButtonProps) => {
         onClick={() => linkRef.current?.click()}
         variant='light'
         leftSection={<IconArrowLeft />}
+        className={className}
       >
         Go Back
       </Button>

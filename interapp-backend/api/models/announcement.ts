@@ -150,7 +150,6 @@ export class AnnouncementModel {
       }),
     );
 
-    console.log(announcement, announcement.announcement_attachments);
     return announcement;
   }
   public static async getAnnouncements(page?: number, perPage?: number) {

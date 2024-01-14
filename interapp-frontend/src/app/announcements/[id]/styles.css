@@ -11,6 +11,9 @@
 .announcement-attachments > * {
   width: 100%;
 }
+.announcement-go-back-button {
+  width: 10rem;
+}
 
 .announcement-clock-icon {
   color: var(--mantine-color-teal-6);

@@ -7,11 +7,10 @@ const GoHomeButton = () => {
   return (
     <>
       <Button onClick={() => linkRef.current?.click()} variant='outline' color='green'>
-      Go Home
+        Go Home
       </Button>
       <Link hidden ref={linkRef} href='/' />
     </>
-    
   );
 };
 
