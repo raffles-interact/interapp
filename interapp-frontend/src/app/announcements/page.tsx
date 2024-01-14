@@ -4,9 +4,13 @@ import AnnouncementBox from './AnnouncementBox/AnnouncementBox';
 import PageController from '@components/PageController/PageController';
 import { AnnouncementWithMeta } from './types';
 import { useState, useEffect, useContext } from 'react';
-import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
-import { remapAssetUrl } from '@/api/utils';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
+import { remapAssetUrl } from '@api/utils';
+import { Title, Text, Group, ActionIcon } from '@mantine/core';
+import { useRouter } from 'next/navigation';
 import './styles.css';
+import { IconPlus } from '@tabler/icons-react';
+import { Permissions } from '../route_permissions';
 
 const handleFetch = async (page: number) => {
   const apiClient = new APIClient().instance;
@@ -35,6 +39,7 @@ type AllAnnouncements = Awaited<ReturnType<typeof handleFetch>>;
 
 export default function AnnouncementsPage() {
   const { user } = useContext(AuthContext);
+  const router = useRouter();
   const [data, setData] = useState<AllAnnouncements | null>(null);
 
   const [page, setPage] = useState(1);
@@ -43,8 +48,21 @@ export default function AnnouncementsPage() {
     handleFetch(page).then((res) => setData(res));
   }, [page]);
 
+  if (!user || !user.permissions.includes(Permissions.CLUB_MEMBER)) return null;
   return (
     <div className='announcement-page'>
+      <Group justify='space-between' align='center'>
+        <div>
+          <Title order={1}>Announcements</Title>
+          <Text>Here you can find all the announcements from the club.</Text>
+        </div>
+        {user.permissions.includes(Permissions.EXCO) && (
+          <ActionIcon color='green' size={36} onClick={() => router.push('/announcements/create')}>
+            <IconPlus />
+          </ActionIcon>
+        )}
+      </Group>
+
       <div className='announcement-cards-container'>
         {data?.data.map((announcement) => (
           <AnnouncementBox
