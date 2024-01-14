@@ -11,7 +11,7 @@ const announcementRouter = Router();
 
 announcementRouter.post(
   '/',
-  upload.array('docs', 10),
+  upload.array('attachments', 10),
   validateRequiredFields(['creation_date', 'title', 'description', 'username'], ['image']),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
@@ -53,7 +53,7 @@ announcementRouter.get(
 
 announcementRouter.patch(
   '/',
-  upload.array('docs', 10),
+  upload.array('attachments', 10),
   validateRequiredFields(
     ['announcement_id'],
     ['creation_date', 'title', 'description', 'username', 'image'],

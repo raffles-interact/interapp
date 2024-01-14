@@ -11,7 +11,7 @@ export class AnnouncementModel {
     announcement: Omit<
       Announcement,
       'announcement_id' | 'user' | 'announcement_completions' | 'announcement_attachments'
-    > & { attachments: Express.Multer.File[] },
+    > & { attachments?: Express.Multer.File[] },
   ) {
     const newAnnouncement = new Announcement();
     newAnnouncement.creation_date = announcement.creation_date;
@@ -62,24 +62,31 @@ export class AnnouncementModel {
     });
     newAnnouncement.announcement_completions = completions;
 
-    const attachments = await Promise.all(
-      announcement.attachments.map(async (attachment, idx) => {
-        const newAttachment = new AnnouncementAttachment();
+    let attachments: AnnouncementAttachment[] | null = null;
+    if (!announcement.attachments) {
+      newAnnouncement.announcement_attachments = [];
+    } else {
+      attachments = await Promise.all(
+        announcement.attachments.map(async (attachment, idx) => {
+          const newAttachment = new AnnouncementAttachment();
 
-        newAttachment.announcement = newAnnouncement;
-        newAttachment.attachment_loc = 'announcement-attachment/' + announcement.title + '-' + idx;
-        await minioClient.putObject(
-          process.env.MINIO_BUCKETNAME as string,
-          newAttachment.attachment_loc,
-          attachment.buffer,
-          { 'Content-Type': attachment.mimetype },
-        );
+          newAttachment.announcement = newAnnouncement;
+          newAttachment.attachment_loc =
+            'announcement-attachment/' + announcement.title + '-' + idx;
+          await minioClient.putObject(
+            process.env.MINIO_BUCKETNAME as string,
+            newAttachment.attachment_loc,
+            attachment.buffer,
+            { 'Content-Type': attachment.mimetype },
+          );
 
-        newAttachment.attachment_name = attachment.originalname;
-        newAttachment.attachment_mime = attachment.mimetype;
-        return newAttachment;
-      }),
-    );
+          newAttachment.attachment_name = attachment.originalname;
+          newAttachment.attachment_mime = attachment.mimetype;
+          return newAttachment;
+        }),
+      );
+      newAnnouncement.announcement_attachments = attachments;
+    }
 
     try {
       const announcementIdResult = await appDataSource.manager
@@ -94,10 +101,11 @@ export class AnnouncementModel {
         AnnouncementCompletion,
         completions.map((completion) => ({ ...completion, announcement_id: announcementId })),
       );
-      await appDataSource.manager.insert(
-        AnnouncementAttachment,
-        attachments.map((attachment) => ({ ...attachment, announcement_id: announcementId })),
-      );
+      if (attachments)
+        await appDataSource.manager.insert(
+          AnnouncementAttachment,
+          attachments.map((attachment) => ({ ...attachment, announcement_id: announcementId })),
+        );
     } catch (e) {
       throw new HTTPError(
         'Announcement already exists',
@@ -189,7 +197,7 @@ export class AnnouncementModel {
   public static async updateAnnouncement(
     newAnnouncement: Partial<
       Omit<Announcement, 'user' | 'announcement_completions' | 'announcement_attachments'> & {
-        attachments: Express.Multer.File[];
+        attachments?: Express.Multer.File[];
       }
     >,
   ) {
