@@ -94,7 +94,7 @@ announcementRouter.get(
 
 announcementRouter.patch(
   '/completion',
-  validateRequiredFields(['announcement_id', 'username', 'completed']),
+  validateRequiredFields(['announcement_id', 'completed']),
   verifyJWT,
   async (req, res) => {
     if (typeof req.body.completed !== 'boolean') {
@@ -106,7 +106,7 @@ announcementRouter.patch(
     }
     await AnnouncementModel.updateAnnouncementCompletion(
       req.body.announcement_id,
-      req.body.username,
+      req.headers.username as string,
       req.body.completed,
     );
     res.status(204).send();

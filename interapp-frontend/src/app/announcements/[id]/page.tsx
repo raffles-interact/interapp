@@ -1,7 +1,8 @@
 'use client';
 import APIClient from '@api/api_client';
 import { AnnouncementWithMeta } from './../types';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import GoBackButton from '@components/GoBackButton/GoBackButton';
 import { remapAssetUrl } from '@api/utils';
 import { Skeleton, Title, Text, Group } from '@mantine/core';
@@ -26,7 +27,20 @@ const handleFetch = async (id: number) => {
     throw new Error('Failed to fetch announcements');
   }
 };
+
+const handleRead = async (id: number) => {
+  const apiClient = new APIClient().instance;
+  const res = await apiClient.patch('/announcement/completion', {
+    announcement_id: id,
+    completed: true,
+  });
+
+  if (res.status !== 200) throw new Error('Failed to update announcement completion status');
+};
+
 export default function AnnouncementPage({ params }: { params: { id: string } }) {
+  const { user } = useContext(AuthContext);
+
   const [data, setData] = useState<AnnouncementWithMeta | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
@@ -34,6 +48,16 @@ export default function AnnouncementPage({ params }: { params: { id: string } })
     handleFetch(parseInt(params.id)).then((res) => setData(res));
     setLoading(false);
   }, [params.id]);
+
+  useEffect(() => {
+    if (!data || !user) return;
+    const completion = data.announcement_completions.find(
+      (completion) => completion.username === user.username,
+    );
+    if (!completion) return;
+    if (completion.completed) return;
+    handleRead(data.announcement_id).catch((err) => console.error(err));
+  }, [data, user]);
 
   if (loading) return <Skeleton width='100%' height={30} />;
 
