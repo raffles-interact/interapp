@@ -25,9 +25,9 @@ const handleFetch = async (page: number) => {
         return attachment;
       },
     );
+    if (announcement.image) announcement.image = remapAssetUrl(announcement.image);
     return announcement;
   });
-
   return resData;
 };
 
@@ -35,37 +35,9 @@ type AllAnnouncements = Awaited<ReturnType<typeof handleFetch>>;
 
 export default function AnnouncementsPage() {
   const { user } = useContext(AuthContext);
-  const [A, setA] = useState<FileList | null>(null);
   const [data, setData] = useState<AllAnnouncements | null>(null);
 
   const [page, setPage] = useState(1);
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    const apiClient = new APIClient({ useMultiPart: true }).instance;
-    event.preventDefault();
-    const formData = new FormData();
-    if (A)
-      for (let i = 0; i < A.length; i++) {
-        formData.append('docs', A[i]);
-      }
-    const body = {
-      creation_date: new Date().toISOString(),
-      title: 'ff',
-      description: 'test',
-      username: 'sebas',
-    };
-    for (const [key, value] of Object.entries(body)) {
-      formData.append(key, value);
-    }
-    apiClient
-      .post('/announcement', formData)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  };
 
   useEffect(() => {
     handleFetch(page).then((res) => setData(res));
@@ -73,10 +45,6 @@ export default function AnnouncementsPage() {
 
   return (
     <div className='announcement-page'>
-      <form onSubmit={handleSubmit}>
-        <input type='file' accept='*' multiple onChange={(e) => setA(e.currentTarget.files)} />
-        <button type='submit'>Submit</button>
-      </form>
       <div className='announcement-cards-container'>
         {data?.data.map((announcement) => (
           <AnnouncementBox
