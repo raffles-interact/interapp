@@ -1,16 +1,25 @@
 import { Button } from '@mantine/core';
 import { IconArrowLeft } from '@tabler/icons-react';
-import { memo } from 'react';
+import Link from 'next/link';
+import { memo, useRef } from 'react';
 
 interface GoBackButtonProps {
   href: string;
 }
 
 const GoBackButton = ({ href }: GoBackButtonProps) => {
+  const linkRef = useRef<HTMLAnchorElement>(null);
   return (
-    <Button component='a' href={href} variant='light' leftSection={<IconArrowLeft />}>
-      Go Back
-    </Button>
+    <>
+      <Button
+        onClick={() => linkRef.current?.click()}
+        variant='light'
+        leftSection={<IconArrowLeft />}
+      >
+        Go Back
+      </Button>
+      <Link hidden ref={linkRef} href={href} />
+    </>
   );
 };
 
