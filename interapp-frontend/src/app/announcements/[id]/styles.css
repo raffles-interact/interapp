@@ -1,5 +1,17 @@
+.announcement-page {
+  margin: 2rem;
+}
 
+.announcement-attachments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.announcement-attachments > * {
+  width: 100%;
+}
 
-.announcement-attachment-link {
+.announcement-clock-icon {
   color: var(--mantine-color-teal-6);
 }
