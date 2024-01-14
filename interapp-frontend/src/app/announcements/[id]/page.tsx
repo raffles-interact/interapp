@@ -38,27 +38,29 @@ export default function AnnouncementPage({ params }: { params: { id: string } })
   if (loading) return <Skeleton width='100%' height={30} />;
 
   return (
-    <div className='announcement-page'>
+    <>
       <GoBackButton href='/announcements' className='announcement-go-back-button' />
-      {data ? (
-        <>
-          <Group justify='space-between' mb='md' align='center'>
-            <Title order={1}>{data.title}</Title>
-            <Group align='center' gap={5}>
-              <IconClock className='announcement-clock-icon' />
-              <Text>{new Date(data.creation_date).toLocaleString()}</Text>
+      <div className='announcement-page'>
+        {data ? (
+          <>
+            <Group justify='space-between' mb='md' align='center'>
+              <Title order={1}>{data.title}</Title>
+              <Group align='center' gap={5}>
+                <IconClock className='announcement-clock-icon' />
+                <Text>{new Date(data.creation_date).toLocaleString()}</Text>
+              </Group>
             </Group>
-          </Group>
-          <Text dangerouslySetInnerHTML={{ __html: data.description }} />
-          <div className='announcement-attachments'>
-            {data.announcement_attachments.map((attachment, idx) => (
-              <AnnouncementAttachment key={idx} attachment={attachment} />
-            ))}
-          </div>
-        </>
-      ) : (
-        <div>Announcement not found</div>
-      )}
-    </div>
+            <Text dangerouslySetInnerHTML={{ __html: data.description }} />
+            <div className='announcement-attachments'>
+              {data.announcement_attachments.map((attachment, idx) => (
+                <AnnouncementAttachment key={idx} attachment={attachment} />
+              ))}
+            </div>
+          </>
+        ) : (
+          <div>Announcement not found</div>
+        )}
+      </div>
+    </>
   );
 }
