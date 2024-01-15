@@ -7,4 +7,4 @@ ENV BUN_RUNTIME_TRANSPILER_CACHE_PATH 0
 RUN bun install --frozen-lockfile
 
 EXPOSE 1234
-CMD ["bun", "run", "api/routes/index.ts"]
+CMD ["bun", "run", "--watch", "api/routes/index.ts"]
