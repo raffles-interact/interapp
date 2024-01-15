@@ -35,7 +35,7 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-  
+        
   redis:
     container_name: interapp-redis-test
     image: redis:alpine
@@ -55,7 +55,7 @@ services:
       start_period: 60s
 
   minio:
-    container_name: interapp-minio
+    container_name: interapp-minio-test
     image: minio/minio
     restart: on-failure
     command: minio server /data
@@ -95,6 +95,14 @@ services:
         condition: service_healthy
       minio:
         condition: service_healthy
+    develop:
+      watch:
+        - path: ./interapp-backend/api
+          action: sync
+          target: /app/api
+        - path: ./interapp-backend/db
+          action: sync
+          target: /app/db
 
   
 networks:

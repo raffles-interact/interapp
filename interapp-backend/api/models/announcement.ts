@@ -195,12 +195,15 @@ export class AnnouncementModel {
   }
   public static async updateAnnouncement(
     newAnnouncement: Partial<
-      Omit<Announcement, 'user' | 'announcement_completions' | 'announcement_attachments'> & {
+      Omit<
+        Announcement,
+        'user' | 'announcement_completions' | 'announcement_attachments' | 'announcement_id'
+      > & {
         attachments?: Express.Multer.File[];
       }
-    >,
+    > & { announcement_id: number },
   ) {
-    const announcement = await this.getAnnouncement(newAnnouncement.announcement_id as number);
+    const announcement = await this.getAnnouncement(newAnnouncement.announcement_id);
     if (!announcement) {
       throw new HTTPError(
         'Announcement not found',
@@ -209,13 +212,15 @@ export class AnnouncementModel {
       );
     }
     const updatedAnnouncement = new Announcement();
+    updatedAnnouncement.announcement_id = newAnnouncement.announcement_id;
     updatedAnnouncement.creation_date = newAnnouncement.creation_date ?? announcement.creation_date;
     updatedAnnouncement.description = newAnnouncement.description ?? announcement.description;
     updatedAnnouncement.title = newAnnouncement.title ?? announcement.title;
     updatedAnnouncement.image = newAnnouncement.image ?? announcement.image;
     updatedAnnouncement.username = newAnnouncement.username ?? announcement.username;
-    updatedAnnouncement.user = await UserModel.getUser(updatedAnnouncement.username);
-    updatedAnnouncement.announcement_completions = announcement.announcement_completions;
+    updatedAnnouncement.user = (await UserModel.getUserDetails(
+      updatedAnnouncement.username,
+    )) as User;
 
     if (updatedAnnouncement.image) {
       // delete old image
@@ -252,7 +257,6 @@ export class AnnouncementModel {
         }),
       );
 
-      announcement.announcement_attachments = [];
       await appDataSource.manager.delete(AnnouncementAttachment, {
         announcement_id: announcement.announcement_id,
       });
@@ -278,10 +282,8 @@ export class AnnouncementModel {
           return newAttachment;
         }),
       );
-      updatedAnnouncement.announcement_attachments = attachments;
       await appDataSource.manager.insert(AnnouncementAttachment, attachments);
     }
-
     await appDataSource.manager.update(
       Announcement,
       { announcement_id: announcement.announcement_id },
