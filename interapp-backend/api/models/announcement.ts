@@ -225,7 +225,10 @@ export class AnnouncementModel {
     if (updatedAnnouncement.image) {
       // delete old image
       if (announcement.image) {
-        await minioClient.removeObject(process.env.MINIO_BUCKETNAME as string, announcement.image);
+        await minioClient.removeObject(
+          process.env.MINIO_BUCKETNAME as string,
+          'announcement/' + announcement.title,
+        );
       }
 
       const convertedFile = dataUrlToBuffer(updatedAnnouncement.image);
@@ -248,14 +251,24 @@ export class AnnouncementModel {
 
     if (newAnnouncement.attachments) {
       // delete old attachments
-      await Promise.all(
-        announcement.announcement_attachments.map(async (attachment) => {
-          await minioClient.removeObject(
-            process.env.MINIO_BUCKETNAME as string,
-            attachment.attachment_loc,
-          );
-        }),
-      );
+
+      const deleteObjects = new Promise<void>((resolve, reject) => {
+        const stream = minioClient.listObjectsV2(
+          process.env.MINIO_BUCKETNAME as string,
+          'announcement-attachment/',
+        );
+        const objects: string[] = [];
+        stream.on('data', (obj) => obj.name && objects.push(obj.name));
+        stream.on('error', (err) => {
+          reject(err);
+        });
+        stream.on('end', async () => {
+          await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
+          resolve();
+        });
+      });
+
+      await Promise.resolve(deleteObjects);
 
       await appDataSource.manager.delete(AnnouncementAttachment, {
         announcement_id: announcement.announcement_id,
@@ -269,6 +282,7 @@ export class AnnouncementModel {
           newAttachment.announcement = updatedAnnouncement;
           newAttachment.attachment_loc =
             'announcement-attachment/' + updatedAnnouncement.title + '-' + idx;
+
           await minioClient.putObject(
             process.env.MINIO_BUCKETNAME as string,
             newAttachment.attachment_loc,
@@ -279,6 +293,7 @@ export class AnnouncementModel {
           newAttachment.attachment_name = attachment.originalname;
           newAttachment.announcement_id = updatedAnnouncement.announcement_id;
           newAttachment.attachment_mime = attachment.mimetype;
+
           return newAttachment;
         }),
       );
