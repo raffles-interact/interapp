@@ -9,20 +9,20 @@ import APIClient from '@api/api_client';
 import { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { type AnnouncementWithMeta, type AnnouncementForm } from '../../types';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { remapAssetUrl } from '@api/utils';
 import { notifications } from '@mantine/notifications';
+import { Button, Group, Skeleton, TextInput, Title, Text, Stack } from '@mantine/core';
+import { IconClock, IconUser } from '@tabler/icons-react';
+import { allowedImgFormats, allowedDocFormats } from '../../utils';
+import './styles.css';
 
 const fetchAnnouncement = async (id: number) => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.get('/announcement/', { params: { announcement_id: id } });
 
-  if (res.status !== 200) {
-    throw new Error('Failed to fetch announcement');
-  }
-
   const announcement: AnnouncementWithMeta = res.data;
-  return announcement;
+  return [res.status, announcement] as const;
 };
 
 const updateAnnouncement = async (id: string, values: AnnouncementForm) => {
@@ -42,11 +42,14 @@ const updateAnnouncement = async (id: string, values: AnnouncementForm) => {
 };
 
 function EditForm() {
+  const router = useRouter();
   const params = useParams<{ id: string }>();
   const announcementId = useMemo(() => Number(params.id), []);
 
   const { user } = useContext(AuthContext);
   const [announcement, setAnnouncement] = useState<AnnouncementWithMeta | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [submitLoading, setSubmitLoading] = useState(false);
   const form = useForm<AnnouncementForm>({
     initialValues: {
       image: null,
@@ -59,6 +62,7 @@ function EditForm() {
   const handleSubmit = useCallback(
     async (values: AnnouncementForm) => {
       if (!user) return;
+      setSubmitLoading(true);
       const [status, data] = await updateAnnouncement(params.id, values);
 
       switch (status) {
@@ -69,12 +73,13 @@ function EditForm() {
             color: 'red',
           });
           break;
-        case 204:
+        case 200:
           notifications.show({
             title: 'Success',
             message: `Successfully updated announcement ${values.title} with id ${data.announcement_id}`,
             color: 'green',
           });
+          router.push('/announcements');
           break;
         default:
           notifications.show({
@@ -83,19 +88,32 @@ function EditForm() {
             color: 'red',
           });
       }
+      setSubmitLoading(false);
     },
     [user, params.id],
   );
 
   useEffect(() => {
+    if (!user) return;
+    setLoading(true);
     const handleFetch = async () => {
-      const announcement = await fetchAnnouncement(announcementId);
+      const [status, announcement] = await fetchAnnouncement(announcementId);
+      if (status === 404) {
+        notifications.show({
+          title: 'Error',
+          message: `Announcement with id ${announcementId} does not exist`,
+          color: 'red',
+        });
+        router.replace('/announcements');
+        return;
+      }
       const imageURL = announcement.image ? new URL(remapAssetUrl(announcement.image)) : null;
       const b64 = imageURL && (await convertToBase64(imageURL));
 
       let attachments: File[] = [];
       for (const attachment of announcement.announcement_attachments) {
         const attachmentURL = new URL(remapAssetUrl(attachment.attachment_loc));
+
         const file = await fetch(attachmentURL)
           .then((response) => response.blob())
           .then(
@@ -104,6 +122,7 @@ function EditForm() {
           );
         attachments.push(file);
       }
+
       form.setValues({
         title: announcement.title,
         description: announcement.description,
@@ -119,13 +138,81 @@ function EditForm() {
           attachment_loc: remapAssetUrl(attachment.attachment_loc),
         })),
       });
+
+      setLoading(false);
     };
+
     handleFetch();
   }, []);
 
+  if (!user) return null;
+  if (loading) return <Skeleton width='100%' height={30} />;
+
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
-      {announcement && JSON.stringify(announcement)}
+      <div className='edit-form'>
+        <Group justify='space-between'>
+          <Title order={1}>Edit Announcement</Title>
+          <Stack gap={5}>
+            <Group align='center' gap={5}>
+              <IconClock className='edit-form-icon' />
+              <Text>{announcement && new Date(announcement.creation_date).toLocaleString()}</Text>
+            </Group>
+            <Group align='center' gap={5}>
+              <IconUser className='edit-form-icon' />
+              <Text>{announcement && announcement.username}</Text>
+            </Group>
+          </Stack>
+        </Group>
+
+        <UploadImage
+          accept={allowedImgFormats}
+          defaultImageURL={announcement?.image}
+          onChange={(imageURL, file) => {
+            if (file)
+              convertToBase64(file).then((base64) => {
+                form.setFieldValue('image', base64);
+              });
+            else form.setFieldValue('image', null);
+          }}
+          className='edit-form-image'
+        />
+        <TextInput label='Title' placeholder='Title' required {...form.getInputProps('title')} />
+        <TextEditor
+          content={announcement?.description ?? ''}
+          onChange={(content) => form.setFieldValue('description', content)}
+        />
+        <FileDrop
+          accept={allowedDocFormats}
+          maxFiles={10}
+          onDrop={(files) => form.setFieldValue('attachments', files)}
+          onReject={(files) => {
+            for (const file of files) {
+              notifications.show({
+                title: file.errors.map((err) => err.code).join(', '),
+                message: file.errors.map((err) => err.message).join(', '),
+                color: 'red',
+              });
+            }
+          }}
+        />
+        <div className='edit-form-attachments'>
+          {form.values.attachments.map((attachment, idx) => (
+            <AnnouncementAttachment
+              key={idx}
+              attachment={{
+                attachment_loc: URL.createObjectURL(attachment),
+                attachment_mime: attachment.type,
+                attachment_name: attachment.name,
+              }}
+            />
+          ))}
+        </div>
+
+        <Button type='submit' loading={submitLoading}>
+          Submit
+        </Button>
+      </div>
     </form>
   );
 }

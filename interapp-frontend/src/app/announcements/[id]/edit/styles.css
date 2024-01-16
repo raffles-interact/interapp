@@ -1,3 +1,38 @@
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 2rem;
+}
+.edit-form > * {
+  width: 100%;
+}
+
+.edit-form-image {
+  width: 20rem;
+  aspect-ratio: 5/3;
+  object-fit: contain;
+  border: 1px solid var(--mantine-color-dark-6);
+  border-radius: 7px;
+}
+.edit-form-attachments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.edit-form-attachments > * {
+  width: 100%;
+}
 .edit-page {
   margin: 2rem;
+}
+
+.edit-go-back-button {
+  margin-bottom: 2rem;
+}
+
+.edit-form-icon {
+  color: var(--mantine-color-teal-6);
 }

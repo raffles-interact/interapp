@@ -2,7 +2,7 @@
 
 import { useForm } from '@mantine/form';
 import APIClient from '@api/api_client';
-import { TextInput, Button } from '@mantine/core';
+import { TextInput, Button, Title } from '@mantine/core';
 import TextEditor from '@components/TextEditor/TextEditor';
 import FileDrop from '@components/FileDrop/FileDrop';
 import UploadImage, { convertToBase64 } from '@/components/UploadImage/UploadImage';
@@ -29,13 +29,12 @@ const CreateForm = () => {
   });
 
   const handleSubmit = useCallback(
-    async (values: typeof form.values) => {
+    async (values: AnnouncementForm) => {
       if (!user) return;
       const body = new FormData();
       if (values.image) body.append('image', values.image);
       body.append('title', values.title);
       body.append('description', values.description);
-      console.log(values.attachments);
 
       values.attachments.forEach((file) => {
         body.append('attachments', new File([file], file.name, { type: file.type }));
@@ -84,6 +83,7 @@ const CreateForm = () => {
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
       <div className='create-form'>
+        <Title order={1}>Create Announcement</Title>
         <UploadImage
           accept={allowedImgFormats}
           onChange={(imageURL, file) => {
