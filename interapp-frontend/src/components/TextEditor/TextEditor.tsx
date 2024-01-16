@@ -13,20 +13,23 @@ interface TextEditorProps {
   className?: string;
 }
 export default function TextEditor({ content, onChange, className }: TextEditorProps) {
-  const editor = useEditor({
-    extensions: [
-      StarterKit,
-      Underline,
-      Link,
+  const editor = useEditor(
+    {
+      extensions: [
+        StarterKit,
+        Underline,
+        Link,
 
-      Highlight,
-      TextAlign.configure({ types: ['heading', 'paragraph'] }),
-    ],
-    content,
-    onUpdate({ editor }) {
-      onChange(editor.getHTML());
+        Highlight,
+        TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      ],
+      content,
+      onUpdate({ editor }) {
+        onChange(editor.getHTML());
+      },
     },
-  });
+    [content],
+  );
 
   return (
     <RichTextEditor editor={editor} className={className}>
