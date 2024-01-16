@@ -222,23 +222,22 @@ export class AnnouncementModel {
       updatedAnnouncement.username,
     )) as User;
 
-    if (!newAnnouncement.image) {
-      // delete old image
+    const deleteOldImage = () => {
       if (announcement.image) {
-        await minioClient.removeObject(
+        return minioClient.removeObject(
           process.env.MINIO_BUCKETNAME as string,
           'announcement/' + announcement.title,
         );
       }
+    }
+
+    if (!newAnnouncement.image) {
+      // delete old image
+      deleteOldImage();
       updatedAnnouncement.image = null;
     } else {
       // rm old image
-      if (announcement.image) {
-        await minioClient.removeObject(
-          process.env.MINIO_BUCKETNAME as string,
-          'announcement/' + announcement.title,
-        );
-      }
+      deleteOldImage();
       // update image
       const convertedFile = dataUrlToBuffer(newAnnouncement.image);
       if (!convertedFile) {
@@ -256,8 +255,8 @@ export class AnnouncementModel {
       );
       updatedAnnouncement.image = 'announcement/' + updatedAnnouncement.title;
     }
-    if (!newAnnouncement.attachments) {
-      // delete old attachments
+
+    const deleteOldAttachments = () => {
       const deleteObjects = new Promise<void>((resolve, reject) => {
         const stream = minioClient.listObjectsV2(
           process.env.MINIO_BUCKETNAME as string,
@@ -272,32 +271,20 @@ export class AnnouncementModel {
           await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
           resolve();
         });
-      });
+      }
+      );
+      Promise.resolve(deleteObjects);
+    }
 
-      await Promise.resolve(deleteObjects);
+    if (!newAnnouncement.attachments) {
+      // delete old attachments
+      deleteOldAttachments();
       await appDataSource.manager.delete(AnnouncementAttachment, {
         announcement_id: announcement.announcement_id,
       });
-      updatedAnnouncement.announcement_attachments = [];
     } else {
       // rm old attachments
-      const deleteObjects = new Promise<void>((resolve, reject) => {
-        const stream = minioClient.listObjectsV2(
-          process.env.MINIO_BUCKETNAME as string,
-          'announcement-attachment/' + announcement.title,
-        );
-        const objects: string[] = [];
-        stream.on('data', (obj) => obj.name && objects.push(obj.name));
-        stream.on('error', (err) => {
-          reject(err);
-        });
-        stream.on('end', async () => {
-          await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
-          resolve();
-        });
-      });
-
-      await Promise.resolve(deleteObjects);
+      deleteOldAttachments();
       await appDataSource.manager.delete(AnnouncementAttachment, {
         announcement_id: announcement.announcement_id,
       });
