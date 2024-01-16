@@ -216,13 +216,13 @@ export class AnnouncementModel {
     updatedAnnouncement.creation_date = newAnnouncement.creation_date ?? announcement.creation_date;
     updatedAnnouncement.description = newAnnouncement.description ?? announcement.description;
     updatedAnnouncement.title = newAnnouncement.title ?? announcement.title;
-    updatedAnnouncement.image = newAnnouncement.image ?? announcement.image;
+
     updatedAnnouncement.username = newAnnouncement.username ?? announcement.username;
     updatedAnnouncement.user = (await UserModel.getUserDetails(
       updatedAnnouncement.username,
     )) as User;
 
-    if (updatedAnnouncement.image) {
+    if (!newAnnouncement.image) {
       // delete old image
       if (announcement.image) {
         await minioClient.removeObject(
@@ -230,9 +230,17 @@ export class AnnouncementModel {
           'announcement/' + announcement.title,
         );
       }
-
-      const convertedFile = dataUrlToBuffer(updatedAnnouncement.image);
-
+      updatedAnnouncement.image = null;
+    } else {
+      // rm old image
+      if (announcement.image) {
+        await minioClient.removeObject(
+          process.env.MINIO_BUCKETNAME as string,
+          'announcement/' + announcement.title,
+        );
+      }
+      // update image
+      const convertedFile = dataUrlToBuffer(newAnnouncement.image);
       if (!convertedFile) {
         throw new HTTPError(
           'Invalid promotional image',
@@ -248,14 +256,12 @@ export class AnnouncementModel {
       );
       updatedAnnouncement.image = 'announcement/' + updatedAnnouncement.title;
     }
-
-    if (newAnnouncement.attachments) {
+    if (!newAnnouncement.attachments) {
       // delete old attachments
-
       const deleteObjects = new Promise<void>((resolve, reject) => {
         const stream = minioClient.listObjectsV2(
           process.env.MINIO_BUCKETNAME as string,
-          'announcement-attachment/',
+          'announcement-attachment/' + announcement.title,
         );
         const objects: string[] = [];
         stream.on('data', (obj) => obj.name && objects.push(obj.name));
@@ -269,11 +275,32 @@ export class AnnouncementModel {
       });
 
       await Promise.resolve(deleteObjects);
-
       await appDataSource.manager.delete(AnnouncementAttachment, {
         announcement_id: announcement.announcement_id,
       });
+      updatedAnnouncement.announcement_attachments = [];
+    } else {
+      // rm old attachments
+      const deleteObjects = new Promise<void>((resolve, reject) => {
+        const stream = minioClient.listObjectsV2(
+          process.env.MINIO_BUCKETNAME as string,
+          'announcement-attachment/' + announcement.title,
+        );
+        const objects: string[] = [];
+        stream.on('data', (obj) => obj.name && objects.push(obj.name));
+        stream.on('error', (err) => {
+          reject(err);
+        });
+        stream.on('end', async () => {
+          await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
+          resolve();
+        });
+      });
 
+      await Promise.resolve(deleteObjects);
+      await appDataSource.manager.delete(AnnouncementAttachment, {
+        announcement_id: announcement.announcement_id,
+      });
       // insert new attachments
       const attachments = await Promise.all(
         newAnnouncement.attachments.map(async (attachment, idx) => {
@@ -299,6 +326,7 @@ export class AnnouncementModel {
       );
       await appDataSource.manager.insert(AnnouncementAttachment, attachments);
     }
+
     await appDataSource.manager.update(
       Announcement,
       { announcement_id: announcement.announcement_id },
