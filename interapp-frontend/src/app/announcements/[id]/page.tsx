@@ -35,7 +35,7 @@ const handleRead = async (id: number) => {
     completed: true,
   });
 
-  if (res.status !== 200) throw new Error('Failed to update announcement completion status');
+  if (res.status !== 204) throw new Error('Failed to update announcement completion status');
 };
 
 export default function AnnouncementPage({ params }: { params: { id: string } }) {

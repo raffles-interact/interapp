@@ -1,3 +1,4 @@
+import { type FileWithPath } from '@mantine/dropzone';
 export interface Announcement {
   announcement_id: number;
   creation_date: string;
@@ -24,3 +25,10 @@ export type AnnouncementWithMeta = Announcement & {
   announcement_attachments: AnnouncementAttachment[];
   announcement_completions: AnnouncementCompletion[];
 };
+
+export interface AnnouncementForm {
+  image: string | null;
+  title: string;
+  description: string;
+  attachments: FileWithPath[];
+}
