@@ -1,7 +1,6 @@
 'use client';
 import { RichTextEditor, Link } from '@mantine/tiptap';
 import { useEditor } from '@tiptap/react';
-import { useEffect, useState } from 'react';
 import Highlight from '@tiptap/extension-highlight';
 import StarterKit from '@tiptap/starter-kit';
 import Underline from '@tiptap/extension-underline';
@@ -12,7 +11,7 @@ interface TextEditorProps {
   onChange: (content: string) => void;
   className?: string;
 }
-export default function TextEditor({ content, onChange, className }: TextEditorProps) {
+export default function TextEditor({ content, onChange, className }: Readonly<TextEditorProps>) {
   const editor = useEditor(
     {
       extensions: [

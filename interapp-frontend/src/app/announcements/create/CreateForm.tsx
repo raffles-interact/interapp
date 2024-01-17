@@ -114,7 +114,7 @@ const CreateForm = () => {
         <div className='create-form-attachments'>
           {form.values.attachments.map((attachment, idx) => (
             <AnnouncementAttachment
-              key={idx}
+              key={attachment.name + idx}
               attachment={{
                 attachment_loc: URL.createObjectURL(attachment),
                 attachment_mime: attachment.type,

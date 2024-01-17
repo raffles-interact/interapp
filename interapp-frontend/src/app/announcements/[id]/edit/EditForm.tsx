@@ -160,7 +160,7 @@ function EditForm() {
             </Group>
             <Group align='center' gap={5}>
               <IconUser className='edit-form-icon' />
-              <Text>{announcement && announcement.username}</Text>
+              <Text>{announcement?.username}</Text>
             </Group>
           </Stack>
         </Group>
@@ -199,7 +199,7 @@ function EditForm() {
         <div className='edit-form-attachments'>
           {form.values.attachments.map((attachment, idx) => (
             <AnnouncementAttachment
-              key={idx}
+              key={attachment.name + idx}
               attachment={{
                 attachment_loc: URL.createObjectURL(attachment),
                 attachment_mime: attachment.type,
