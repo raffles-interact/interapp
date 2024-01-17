@@ -11,9 +11,9 @@ const generateIcon = (mime: string) => {
 
 export default function AnnouncementAttachment({
   attachment,
-}: {
-  attachment: Readonly<Omit<AnnouncementAttachment, 'announcement_id'>>;
-}) {
+}: Readonly<{
+  attachment: Omit<AnnouncementAttachment, 'announcement_id'>;
+}>) {
   return (
     <Card
       padding='md'
