@@ -25,7 +25,7 @@ const handleFetch = async (id: number) => {
       attachment.attachment_loc = remapAssetUrl(attachment.attachment_loc);
       return attachment;
     });
-    return data as AnnouncementWithMeta;
+    return data;
   } else if (res.status === 404) {
     return null;
   } else {
@@ -63,7 +63,7 @@ const handleDelete = async (id: number, handleEnd: () => void) => {
   handleEnd();
 };
 
-export default function AnnouncementPage({ params }: { params: { id: string } }) {
+export default function AnnouncementPage({ params }: Readonly<{ params: { id: string } }>) {
   const { user } = useContext(AuthContext);
 
   const [data, setData] = useState<AnnouncementWithMeta | null>(null);
@@ -107,7 +107,7 @@ export default function AnnouncementPage({ params }: { params: { id: string } })
                   <IconUser className='edit-form-icon' />
                   <Text>{data.username}</Text>
                 </Group>
-                {user && user.permissions.includes(Permissions.EXCO) && (
+                {user?.permissions.includes(Permissions.EXCO) && (
                   <div className='announcement-actions'>
                     <CRUDModal
                       title='Delete Announcement'
@@ -150,7 +150,10 @@ export default function AnnouncementPage({ params }: { params: { id: string } })
             <Text dangerouslySetInnerHTML={{ __html: data.description }} />
             <div className='announcement-attachments'>
               {data.announcement_attachments.map((attachment, idx) => (
-                <AnnouncementAttachment key={idx} attachment={attachment} />
+                <AnnouncementAttachment
+                  key={attachment.attachment_name + idx}
+                  attachment={attachment}
+                />
               ))}
             </div>
           </>

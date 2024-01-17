@@ -1,10 +1,4 @@
-import {
-  IconFile,
-  IconFileTypePdf,
-  IconFileTypeDocx,
-  IconPhoto,
-  IconFileTypePpt,
-} from '@tabler/icons-react';
+import { IconFileTypePdf, IconFileTypeDocx, IconPhoto, IconFileTypePpt } from '@tabler/icons-react';
 type MediaType = {
   format: string;
   icon: React.ReactNode;

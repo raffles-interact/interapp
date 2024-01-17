@@ -48,7 +48,7 @@ export default function AnnouncementsPage() {
     handleFetch(page).then((res) => setData(res));
   }, [page]);
 
-  if (!user || !user.permissions.includes(Permissions.CLUB_MEMBER)) return null;
+  if (!user?.permissions.includes(Permissions.CLUB_MEMBER)) return null;
   return (
     <div className='announcement-page'>
       <Group justify='space-between' align='center'>

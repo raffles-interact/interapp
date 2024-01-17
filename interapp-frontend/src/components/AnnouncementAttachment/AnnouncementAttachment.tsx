@@ -12,7 +12,7 @@ const generateIcon = (mime: string) => {
 export default function AnnouncementAttachment({
   attachment,
 }: {
-  attachment: Omit<AnnouncementAttachment, 'announcement_id'>;
+  attachment: Readonly<Omit<AnnouncementAttachment, 'announcement_id'>>;
 }) {
   return (
     <Card
