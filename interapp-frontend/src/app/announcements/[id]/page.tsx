@@ -149,11 +149,8 @@ export default function AnnouncementPage({ params }: Readonly<{ params: { id: st
             </Group>
             <Text dangerouslySetInnerHTML={{ __html: data.description }} />
             <div className='announcement-attachments'>
-              {data.announcement_attachments.map((attachment, idx) => (
-                <AnnouncementAttachment
-                  key={attachment.attachment_name + idx}
-                  attachment={attachment}
-                />
+              {data.announcement_attachments.map((attachment) => (
+                <AnnouncementAttachment key={attachment.attachment_loc} attachment={attachment} />
               ))}
             </div>
           </>

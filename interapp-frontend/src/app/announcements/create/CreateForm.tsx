@@ -13,6 +13,7 @@ import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 import { type AnnouncementForm } from '../types';
 import AnnouncementAttachment from '@components/AnnouncementAttachment/AnnouncementAttachment';
+import { FileWithPath } from '@mantine/dropzone';
 import './styles.css';
 
 const CreateForm = () => {
@@ -79,6 +80,20 @@ const CreateForm = () => {
     [user],
   );
 
+  const generateAttachmentInfo = useCallback((attachment: FileWithPath) => {
+    const loc = URL.createObjectURL(attachment);
+    return (
+      <AnnouncementAttachment
+        key={loc}
+        attachment={{
+          attachment_loc: loc,
+          attachment_mime: attachment.type,
+          attachment_name: attachment.name,
+        }}
+      />
+    );
+  }, []);
+
   if (!user) return null;
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -112,16 +127,7 @@ const CreateForm = () => {
           }}
         />
         <div className='create-form-attachments'>
-          {form.values.attachments.map((attachment, idx) => (
-            <AnnouncementAttachment
-              key={attachment.name + idx}
-              attachment={{
-                attachment_loc: URL.createObjectURL(attachment),
-                attachment_mime: attachment.type,
-                attachment_name: attachment.name,
-              }}
-            />
-          ))}
+          {form.values.attachments.map(generateAttachmentInfo)}
         </div>
 
         <Button type='submit'>Submit</Button>

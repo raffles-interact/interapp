@@ -16,6 +16,7 @@ import { Button, Group, Skeleton, TextInput, Title, Text, Stack } from '@mantine
 import { IconClock, IconUser } from '@tabler/icons-react';
 import { allowedImgFormats, allowedDocFormats } from '../../utils';
 import './styles.css';
+import { FileWithPath } from '@mantine/dropzone';
 
 const fetchAnnouncement = async (id: number) => {
   const apiClient = new APIClient().instance;
@@ -145,6 +146,20 @@ function EditForm() {
     handleFetch();
   }, []);
 
+  const generateAttachmentInfo = useCallback((attachment: FileWithPath) => {
+    const loc = URL.createObjectURL(attachment);
+    return (
+      <AnnouncementAttachment
+        key={loc}
+        attachment={{
+          attachment_loc: loc,
+          attachment_mime: attachment.type,
+          attachment_name: attachment.name,
+        }}
+      />
+    );
+  }, []);
+
   if (!user) return null;
   if (loading) return <Skeleton width='100%' height={30} />;
 
@@ -197,16 +212,7 @@ function EditForm() {
           }}
         />
         <div className='edit-form-attachments'>
-          {form.values.attachments.map((attachment, idx) => (
-            <AnnouncementAttachment
-              key={attachment.name + idx}
-              attachment={{
-                attachment_loc: URL.createObjectURL(attachment),
-                attachment_mime: attachment.type,
-                attachment_name: attachment.name,
-              }}
-            />
-          ))}
+          {form.values.attachments.map(generateAttachmentInfo)}
         </div>
 
         <Button type='submit' loading={submitLoading}>
