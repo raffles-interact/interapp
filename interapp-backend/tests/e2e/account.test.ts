@@ -330,8 +330,8 @@ describe('API (account)', async () => {
     });
     expect(res.status).toBe(200);
     expect(await res.json()).toMatchObject({
-      unreadAnnouncements: [],
-      activeSessions: [],
+      unread_announcements: [],
+      active_sessions: [],
       verified: false,
     });
   });
