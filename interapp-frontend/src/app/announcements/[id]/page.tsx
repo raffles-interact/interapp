@@ -5,10 +5,15 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import GoBackButton from '@components/GoBackButton/GoBackButton';
 import { remapAssetUrl } from '@api/utils';
-import { Skeleton, Title, Text, Group } from '@mantine/core';
-import { IconClock } from '@tabler/icons-react';
+import { Skeleton, Title, Text, Group, Stack, ActionIcon, Button } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { IconClock, IconUser, IconPencil, IconTrash } from '@tabler/icons-react';
+import CRUDModal from '@components/CRUDModal/CRUDModal';
 import AnnouncementAttachment from '@components/AnnouncementAttachment/AnnouncementAttachment';
+import { useRouter } from 'next/navigation';
 import './styles.css';
+import { notifications } from '@mantine/notifications';
+import { Permissions } from '@/app/route_permissions';
 
 const handleFetch = async (id: number) => {
   const apiClient = new APIClient().instance;
@@ -38,11 +43,35 @@ const handleRead = async (id: number) => {
   if (res.status !== 204) throw new Error('Failed to update announcement completion status');
 };
 
+const handleDelete = async (id: number, handleEnd: () => void) => {
+  const apiClient = new APIClient().instance;
+  const res = await apiClient.delete('/announcement', { data: { announcement_id: id } });
+
+  if (res.status !== 204) {
+    notifications.show({
+      title: 'Error',
+      message: 'Announcement could not be deleted',
+      color: 'red',
+    });
+    throw new Error('Failed to delete announcement');
+  } else
+    notifications.show({
+      title: 'Success',
+      message: 'Announcement deleted',
+      color: 'green',
+    });
+  handleEnd();
+};
+
 export default function AnnouncementPage({ params }: { params: { id: string } }) {
   const { user } = useContext(AuthContext);
 
   const [data, setData] = useState<AnnouncementWithMeta | null>(null);
   const [loading, setLoading] = useState(true);
+  const [opened, { open, close }] = useDisclosure();
+
+  const router = useRouter();
+
   useEffect(() => {
     setLoading(true);
     handleFetch(parseInt(params.id)).then((res) => setData(res));
@@ -69,10 +98,54 @@ export default function AnnouncementPage({ params }: { params: { id: string } })
           <>
             <Group justify='space-between' mb='md' align='center'>
               <Title order={1}>{data.title}</Title>
-              <Group align='center' gap={5}>
-                <IconClock className='announcement-clock-icon' />
-                <Text>{new Date(data.creation_date).toLocaleString()}</Text>
-              </Group>
+              <Stack gap={5}>
+                <Group align='center' gap={5}>
+                  <IconClock className='edit-form-icon' />
+                  <Text>{new Date(data.creation_date).toLocaleString()}</Text>
+                </Group>
+                <Group align='center' gap={5}>
+                  <IconUser className='edit-form-icon' />
+                  <Text>{data.username}</Text>
+                </Group>
+                {user && user.permissions.includes(Permissions.EXCO) && (
+                  <div className='announcement-actions'>
+                    <CRUDModal
+                      title='Delete Announcement'
+                      opened={opened}
+                      close={close}
+                      open={open}
+                      Icon={IconTrash}
+                      iconColor='red'
+                    >
+                      <Text>Are you sure you want to delete this announcement?</Text>
+                      <Group justify='center' gap={5} mt='md'>
+                        <Button onClick={close} variant='outline'>
+                          Cancel
+                        </Button>
+                        <Button
+                          onClick={() =>
+                            handleDelete(data.announcement_id, () => {
+                              close();
+                              router.push('/announcements');
+                            })
+                          }
+                          color='red'
+                          variant='outline'
+                        >
+                          Delete
+                        </Button>
+                      </Group>
+                    </CRUDModal>
+                    <ActionIcon
+                      color='blue'
+                      size={36}
+                      onClick={() => router.push(`/announcements/${data.announcement_id}/edit`)}
+                    >
+                      <IconPencil />
+                    </ActionIcon>
+                  </div>
+                )}
+              </Stack>
             </Group>
             <Text dangerouslySetInnerHTML={{ __html: data.description }} />
             <div className='announcement-attachments'>

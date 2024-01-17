@@ -229,7 +229,7 @@ export class AnnouncementModel {
           'announcement/' + announcement.title,
         );
       }
-    }
+    };
 
     if (!newAnnouncement.image) {
       // delete old image
@@ -271,10 +271,9 @@ export class AnnouncementModel {
           await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
           resolve();
         });
-      }
-      );
+      });
       Promise.resolve(deleteObjects);
-    }
+    };
 
     if (!newAnnouncement.attachments) {
       // delete old attachments
@@ -323,6 +322,23 @@ export class AnnouncementModel {
     return updatedAnnouncement;
   }
   public static async deleteAnnouncement(announcement_id: number) {
+    const announcement = await this.getAnnouncement(announcement_id);
+    const deleteObjects = new Promise<void>((resolve, reject) => {
+      const stream = minioClient.listObjectsV2(
+        process.env.MINIO_BUCKETNAME as string,
+        'announcement-attachment/' + announcement.title,
+      );
+      const objects: string[] = [];
+      stream.on('data', (obj) => obj.name && objects.push(obj.name));
+      stream.on('error', (err) => {
+        reject(err);
+      });
+      stream.on('end', async () => {
+        await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
+        resolve();
+      });
+    });
+    Promise.resolve(deleteObjects);
     await appDataSource.manager.delete(Announcement, { announcement_id });
   }
   public static async getAnnouncementCompletions(announcement_id: number) {

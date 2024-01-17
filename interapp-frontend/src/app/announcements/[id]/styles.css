@@ -18,3 +18,8 @@
 .announcement-clock-icon {
   color: var(--mantine-color-teal-6);
 }
+
+.announcement-actions {
+  display: flex;
+  gap: 0.5rem;
+}
