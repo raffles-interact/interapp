@@ -251,4 +251,9 @@ userRouter.delete('/profile_picture', verifyJWT, async (req, res) => {
   await UserModel.deleteProfilePicture(req.headers.username as string);
   res.status(204).send();
 });
+
+userRouter.get('/notifications', verifyJWT, async (req, res) => {
+  const notifications = await UserModel.getNotifications(req.headers.username as string);
+  res.status(200).send(notifications);
+});
 export default userRouter;

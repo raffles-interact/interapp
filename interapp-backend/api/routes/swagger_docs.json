@@ -801,6 +801,90 @@
         ]
       }
     },
+    "/user/notifications": {
+      "get": {
+        "tags": ["user"],
+        "summary": "get notifications for a user",
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unread_announcements": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "announcement_id": {
+                            "type": "number",
+                            "example": 1
+                          },
+                          "announcement": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string",
+                                "example": "adfjf"
+                              },
+                              "description": {
+                                "type": "string",
+                                "example": "<p></p>"
+                              },
+                              "creation_date": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "active_sessions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "service_session_id": {
+                            "type": "number",
+                            "example": 1
+                          },
+                          "service_session": {
+                            "type": "object",
+                            "properties": {
+                              "start_time": {
+                                "type": "string"
+                              },
+                              "end_time": {
+                                "type": "string"
+                              },
+                              "service": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "example": "tsp"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "verified": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/announcement": {
       "post": {
         "tags": ["announcement"],
