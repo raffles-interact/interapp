@@ -381,10 +381,8 @@ describe('Unit (user)', () => {
       username: 'testuser',
     });
 
-    let announcementIds = [];
     for (let i = 0; i < 3; i++) {
-      const id = await AnnouncementModel.createAnnouncement(createAnnouncementBody(i));
-      announcementIds.push(id);
+      await AnnouncementModel.createAnnouncement(createAnnouncementBody(i));
     }
 
     // get notifications

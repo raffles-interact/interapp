@@ -166,7 +166,13 @@ const NavbarNotifications = () => {
   if (!user) return <div></div>;
   return (
     <>
-      <div className='navbar-notifications' onClick={() => setOpened(!opened)}>
+      <div
+        className='navbar-notifications'
+        onClick={() => setOpened(!opened)}
+        onKeyDown={(e) => {
+          if (e.key === 'F1') setOpened(!opened);
+        }}
+      >
         {notificationsCount > 0 ? (
           <Indicator color='blue'>
             <IconInbox className='navbar-notifications-icon' />
