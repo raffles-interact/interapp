@@ -9,7 +9,6 @@ import {
   AnnouncementCompletion,
   AttendanceStatus,
 } from '@db/entities';
-import { ServiceModel } from './service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
