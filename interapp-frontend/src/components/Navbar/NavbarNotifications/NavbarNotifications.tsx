@@ -6,8 +6,8 @@ import {
   IconHeart,
   IconMail,
 } from '@tabler/icons-react';
-import { Drawer, Text, Group, Stack } from '@mantine/core';
-import { memo, useContext, useState, useCallback, useEffect } from 'react';
+import { Drawer, Text, Group, Stack, Indicator } from '@mantine/core';
+import { memo, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import NavbarNotificationsBox from './NavbarNotificationsBox/NavbarNotificationsBox';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import APIClient from '@api/api_client';
@@ -84,7 +84,6 @@ const NavbarNotifications = () => {
   }, [user]);
 
   useEffect(() => {
-    if (!opened) return;
     getNotifications()
       .then((res) => {
         if (!res) return;
@@ -97,11 +96,84 @@ const NavbarNotifications = () => {
       });
   }, [getNotifications, opened]);
 
+  const notificationsDisplay = useMemo(() => {
+    if (!userNotifications) return;
+    return (
+      <>
+        {userNotifications?.unread_announcements.map((notification) => {
+          return (
+            <NavbarNotificationsBox
+              key={notification.announcement_id}
+              title={notification.announcement.title}
+              description={notification.announcement.description}
+              date={new Date(notification.announcement.creation_date).toLocaleString()}
+              icon={
+                <Group gap={5}>
+                  <IconSpeakerphone />
+                  <Text fw={700}>Announcement</Text>
+                </Group>
+              }
+              color='red'
+              onClick={async () => {
+                router.push(`/announcements/${notification.announcement_id}`);
+                setOpened(false);
+              }}
+            />
+          );
+        })}
+        {userNotifications?.active_sessions.map((notification) => {
+          return (
+            <NavbarNotificationsBox
+              key={notification.service_session_id}
+              title={notification.service_session.service.name}
+              date={new Date(notification.service_session.start_time).toLocaleString()}
+              icon={
+                <Group gap={5}>
+                  <IconHeart />
+                  <Text fw={700}>Active Service Session</Text>
+                </Group>
+              }
+              color='green'
+            />
+          );
+        })}
+        {userNotifications?.verified ? null : (
+          <NavbarNotificationsBox
+            title='Verify your account'
+            description='Verify your account to gain access to all features.'
+            icon={
+              <Group gap={5}>
+                <IconMail />
+                <Text fw={700}>Verification</Text>
+              </Group>
+            }
+            color='blue'
+            onClick={sendVerificationEmail}
+          />
+        )}
+      </>
+    );
+  }, [userNotifications, router, sendVerificationEmail]);
+
+  const notificationsCount = useMemo(() => {
+    if (!userNotifications) return 0;
+    const unreadAnnouncements = userNotifications.unread_announcements.length;
+    const activeSessions = userNotifications.active_sessions.length;
+    const verified = userNotifications.verified ? 0 : 1;
+    return unreadAnnouncements + activeSessions + verified;
+  }, [userNotifications]);
+
   if (!user) return <div></div>;
   return (
     <>
       <div className='navbar-notifications' onClick={() => setOpened(!opened)}>
-        <IconInbox className='navbar-notifications-icon' />
+        {notificationsCount > 0 ? (
+          <Indicator color='blue'>
+            <IconInbox className='navbar-notifications-icon' />
+          </Indicator>
+        ) : (
+          <IconInbox className='navbar-notifications-icon' />
+        )}
       </div>
       <Drawer position='right' shadow='md' opened={opened} onClose={() => setOpened(false)}>
         <Text>Notifications</Text>
@@ -114,56 +186,12 @@ const NavbarNotifications = () => {
           </Group>
         ) : null}
         <Stack>
-          {userNotifications?.unread_announcements.map((notification) => {
-            return (
-              <NavbarNotificationsBox
-                key={notification.announcement_id}
-                title={notification.announcement.title}
-                description={notification.announcement.description}
-                date={new Date(notification.announcement.creation_date).toLocaleString()}
-                icon={
-                  <Group gap={5}>
-                    <IconSpeakerphone />
-                    <Text fw={700}>Announcement</Text>
-                  </Group>
-                }
-                color='red'
-                onClick={async () => {
-                  router.push(`/announcements/${notification.announcement_id}`);
-                  setOpened(false);
-                }}
-              />
-            );
-          })}
-          {userNotifications?.active_sessions.map((notification) => {
-            return (
-              <NavbarNotificationsBox
-                key={notification.service_session_id}
-                title={notification.service_session.service.name}
-                date={new Date(notification.service_session.start_time).toLocaleString()}
-                icon={
-                  <Group gap={5}>
-                    <IconHeart />
-                    <Text fw={700}>Active Service Session</Text>
-                  </Group>
-                }
-                color='green'
-              />
-            );
-          })}
-          {userNotifications?.verified ? null : (
-            <NavbarNotificationsBox
-              title='Verify your account'
-              description='Verify your account to gain access to all features.'
-              icon={
-                <Group gap={5}>
-                  <IconMail />
-                  <Text fw={700}>Verification</Text>
-                </Group>
-              }
-              color='blue'
-              onClick={sendVerificationEmail}
-            />
+          {notificationsCount > 0 && notificationsDisplay ? (
+            notificationsDisplay
+          ) : (
+            <Text c='dimmed' size='sm'>
+              No notifications.
+            </Text>
           )}
         </Stack>
       </Drawer>
