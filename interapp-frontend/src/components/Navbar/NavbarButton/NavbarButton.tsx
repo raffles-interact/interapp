@@ -38,12 +38,11 @@ export type NavbarTab = {
 export type NavbarActions = {
   goTo: (href: string) => void;
   logout: () => Promise<number>;
-  resendVerificationEmail: () => Promise<number>;
 };
 
 const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarTab[] = (
   user,
-  { goTo, logout, resendVerificationEmail },
+  { goTo, logout },
 ) => [
   {
     name: 'Home',
@@ -97,38 +96,6 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
 
     icon: IconLogin2,
     show: !!user,
-    category: 'Authentication',
-  },
-  {
-    name: 'Resend Verification Email',
-    callback: async () => {
-      const res = await resendVerificationEmail();
-      switch (res) {
-        case 204:
-          notifications.show({
-            title: 'Success!',
-            message: 'Verification email sent.',
-            color: 'green',
-          });
-          break;
-        case 400:
-          notifications.show({
-            title: 'Error!',
-            message: 'You are already verified.',
-            color: 'red',
-          });
-          break;
-        default:
-          notifications.show({
-            title: 'Error!',
-            message: 'Something went wrong.',
-            color: 'red',
-          });
-          break;
-      }
-    },
-    icon: IconMail,
-    show: !!user && !user.verified,
     category: 'Authentication',
   },
   {
@@ -213,15 +180,8 @@ const NavbarButton = () => {
 
   const { user, logout } = useContext(AuthContext);
   const apiClient = new APIClient().instance;
-  const resendVerificationEmail = useCallback(
-    async () => (await apiClient.post('/user/verify_email')).status,
-    [user],
-  );
 
-  const tabs = useMemo(
-    () => generateNavbarTabs(user, { goTo, logout, resendVerificationEmail }),
-    [user, goTo, logout],
-  );
+  const tabs = useMemo(() => generateNavbarTabs(user, { goTo, logout }), [user, goTo, logout]);
   const catagorisedTabs = useMemo(() => catagoriseTabs(tabs), [tabs]);
 
   const [opened, setOpened] = useState(false);
