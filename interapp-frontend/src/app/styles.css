@@ -1,17 +1,21 @@
-.body {
-    display: flex;
-    flex-direction:column;
-    justify-content:space-between;
-    padding: 0 10%;
+.homepage {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem;
 }
 /* some problem with the formatting of the Image component from mantine, it takes up the entire screen right now lol*/
 
+.homepage-divider {
+  margin: 1rem 0;
+  border-bottom: 1px solid var(--mantine-color-grey-2);
+}
 .image-container {
-    display: block;
-    width: 100%;
-    height: auto;
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .body > div {
-    margin-top: 1%;
+  margin-top: 1%;
 }

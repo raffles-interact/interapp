@@ -1,24 +1,25 @@
 'use client';
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { useRouter } from 'next/navigation';
+import { Permissions } from '@/app/route_permissions';
 
-import AnnouncementList from '@components/AnnouncementList/AnnouncementList'
-import ServiceList from '@components/ServiceList/ServiceList'
-import AttendanceList from '@components/AttendanceList/AttendanceList'
+import LatestAnnouncement from '@/app/_homepage/LatestAnnouncement/LatestAnnouncement';
+import ServiceList from '@/app/_homepage/ServiceList/ServiceList';
+import AttendanceList from '@/app/_homepage/AttendanceList/AttendanceList';
 
-import { Text, Box } from '@mantine/core';
+import { Group, Stack, Title, Text, SimpleGrid } from '@mantine/core';
 import Image from 'next/image';
 import './styles.css';
 
 export default function Home() {
-  const router = useRouter();
   const { user, logout } = useContext(AuthContext);
 
   // checks whether user is an interact member or a visitor; true if interact member, false if visitor
-  const has_permission = user?.permissions.some(element => {
-    return [1,2,3,4,5].includes(element)
-  })
+  const has_permission = useMemo(() => {
+    if (!user) return false;
+    return user.permissions.includes(Permissions.CLUB_MEMBER);
+  }, [user]);
   // website will return DIFFERENT pages for interact members and visitors
   // for the Announcement, Service and Attendance lists, I created components that are supposed to return summarised versions of these 3 things respectively
   // but I haven't added API calls to the backend yet
@@ -26,19 +27,26 @@ export default function Home() {
   // page shown to visitors just supposed to be an overview of Interact + a call to join
   if (has_permission) {
     return (
-      <div className='body'>
-        <AnnouncementList number_of_announcements={1}/>
-        <ServiceList/>
-        <AttendanceList/>
+      <div className='homepage'>
+        <Stack gap={5}>
+          <Title order={1} fw={700}>
+            Hello {user?.username}, welcome back to Interapp.
+          </Title>
+          <Text>Here are your updates for what's happening in Interact today.</Text>
+          <hr className='homepage-divider' />
+        </Stack>
+        <SimpleGrid cols={{ base: 1, sm: 2 }}>
+          <LatestAnnouncement />
+          <AttendanceList />
+        </SimpleGrid>
+        <ServiceList />
       </div>
     );
   } else {
-    return ( 
+    return (
       <div className='body'>
         <h1>Welcome to Raffles Interact's official website!</h1>
-        <div className='image-container'>
-          <Image src='/filler_picture.jpg' alt="Group picture of Raffles Interact members" fill={true}/>
-        </div>
+        <div className='image-container'></div>
         <p>You can...</p>
         <ul>
           <li>View recent announcements</li>
@@ -47,7 +55,6 @@ export default function Home() {
           <li>Mark your attendance (or not, with a valid reason)</li>
         </ul>
       </div>
-    )
+    );
   }
-  
 }
