@@ -6,7 +6,7 @@ import {
   IconHeart,
   IconMail,
 } from '@tabler/icons-react';
-import { Drawer, Text, Group, Stack, Indicator } from '@mantine/core';
+import { Drawer, Text, Group, Stack, Indicator, Title } from '@mantine/core';
 import { memo, useContext, useState, useCallback, useEffect, useMemo } from 'react';
 import NavbarNotificationsBox from './NavbarNotificationsBox/NavbarNotificationsBox';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
@@ -100,6 +100,11 @@ const NavbarNotifications = () => {
     if (!userNotifications) return;
     return (
       <>
+        {userNotifications?.unread_announcements.length > 0 && (
+          <Text size='sm' c='dimmed'>
+            New Announcements
+          </Text>
+        )}
         {userNotifications?.unread_announcements.map((notification) => {
           return (
             <NavbarNotificationsBox
@@ -107,13 +112,7 @@ const NavbarNotifications = () => {
               title={notification.announcement.title}
               description={notification.announcement.description}
               date={new Date(notification.announcement.creation_date).toLocaleString()}
-              icon={
-                <Group gap={5}>
-                  <IconSpeakerphone />
-                  <Text fw={700}>Announcement</Text>
-                </Group>
-              }
-              color='red'
+              icon={<IconSpeakerphone color='teal' />}
               onClick={async () => {
                 router.push(`/announcements/${notification.announcement_id}`);
                 setOpened(false);
@@ -121,33 +120,31 @@ const NavbarNotifications = () => {
             />
           );
         })}
+        {userNotifications?.active_sessions.length > 0 && (
+          <Text size='sm' c='dimmed'>
+            Active Service Sessions
+          </Text>
+        )}
         {userNotifications?.active_sessions.map((notification) => {
           return (
             <NavbarNotificationsBox
               key={notification.service_session_id}
               title={notification.service_session.service.name}
               date={new Date(notification.service_session.start_time).toLocaleString()}
-              icon={
-                <Group gap={5}>
-                  <IconHeart />
-                  <Text fw={700}>Active Service Session</Text>
-                </Group>
-              }
-              color='green'
+              icon={<IconHeart color='red' />}
             />
           );
         })}
+        {!userNotifications?.verified && (
+          <Text size='sm' c='dimmed'>
+            Verify Email
+          </Text>
+        )}
         {userNotifications?.verified ? null : (
           <NavbarNotificationsBox
             title='Verify your account'
             description='Verify your account to gain access to all features.'
-            icon={
-              <Group gap={5}>
-                <IconMail />
-                <Text fw={700}>Verification</Text>
-              </Group>
-            }
-            color='blue'
+            icon={<IconMail color='blue' />}
             onClick={sendVerificationEmail}
           />
         )}
@@ -183,7 +180,9 @@ const NavbarNotifications = () => {
         )}
       </div>
       <Drawer position='right' shadow='md' opened={opened} onClose={() => setOpened(false)}>
-        <Text>Notifications</Text>
+        <Title order={3} mb='md'>
+          Notifications
+        </Title>
         {error ? (
           <Group gap={5}>
             <IconExclamationCircle color='red' size={12} />

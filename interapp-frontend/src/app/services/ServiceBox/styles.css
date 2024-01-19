@@ -30,13 +30,11 @@
   width: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
 }
 
 .service-box-info-headers {
   display: flex;
   flex-direction: column;
-  align-items: center;
   margin-bottom: 0.5rem;
   overflow: hidden;
 }
