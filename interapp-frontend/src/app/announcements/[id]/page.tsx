@@ -100,11 +100,11 @@ export default function AnnouncementPage({ params }: Readonly<{ params: { id: st
               <Title order={1}>{data.title}</Title>
               <Stack gap={5}>
                 <Group align='center' gap={5}>
-                  <IconClock className='edit-form-icon' />
+                  <IconClock className='announcement-meta-icon' />
                   <Text>{new Date(data.creation_date).toLocaleString()}</Text>
                 </Group>
                 <Group align='center' gap={5}>
-                  <IconUser className='edit-form-icon' />
+                  <IconUser className='announcement-meta-icon' />
                   <Text>{data.username}</Text>
                 </Group>
                 {user?.permissions.includes(Permissions.EXCO) && (
