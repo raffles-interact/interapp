@@ -1,5 +1,5 @@
 'use client';
-import { memo, useContext, useState, useMemo, useCallback } from 'react';
+import { memo, useContext, useState, useMemo } from 'react';
 import {
   IconHome,
   IconLogin,
@@ -10,7 +10,6 @@ import {
   IconSpeakerphone,
   IconPlaylistAdd,
   IconMenu2,
-  IconMail,
   IconHeart,
   type TablerIconsProps,
   IconCheck,
@@ -21,7 +20,6 @@ import { Permissions } from '@/app/route_permissions';
 import { Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
-import APIClient from '@api/api_client';
 import './styles.css';
 
 export type NavbarCategories = 'Authentication' | 'Settings' | 'Administration' | 'General';
@@ -179,7 +177,6 @@ const NavbarButton = () => {
   const goTo = (href: string) => router.push(href);
 
   const { user, logout } = useContext(AuthContext);
-  const apiClient = new APIClient().instance;
 
   const tabs = useMemo(() => generateNavbarTabs(user, { goTo, logout }), [user, goTo, logout]);
   const catagorisedTabs = useMemo(() => catagoriseTabs(tabs), [tabs]);

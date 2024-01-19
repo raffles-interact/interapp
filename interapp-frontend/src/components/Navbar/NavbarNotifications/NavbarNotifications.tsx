@@ -172,6 +172,7 @@ const NavbarNotifications = () => {
         onKeyDown={(e) => {
           if (e.key === 'F1') setOpened(!opened);
         }}
+        role='button'
       >
         {notificationsCount > 0 ? (
           <Indicator color='blue'>

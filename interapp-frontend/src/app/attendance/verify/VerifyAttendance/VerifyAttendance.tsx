@@ -125,7 +125,9 @@ const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
     <div className='verify-attendance'>
       <Title>Verify Attendance</Title>
       <Text>{message}</Text>
-      {status === 'Success' && <Text>Checked in successfully. Added {gainedHours} service hours to your account.</Text>}
+      {status === 'Success' && (
+        <Text>Checked in successfully. Added {gainedHours} service hours to your account.</Text>
+      )}
       {status === 'Success' ? (
         <GoHomeButton />
       ) : (
