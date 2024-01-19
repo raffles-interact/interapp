@@ -8,6 +8,7 @@ import APIClient from '@api/api_client';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { Permissions } from '@/app/route_permissions';
+import { notifications } from '@mantine/notifications';
 import './styles.css';
 
 function DeleteService({
@@ -29,6 +30,11 @@ function DeleteService({
     });
     router.refresh();
     close();
+    notifications.show({
+      title: 'Success',
+      message: 'Service deleted',
+      color: 'green',
+    });
     setLoading(false);
   };
   if (!user) return null;
