@@ -23,7 +23,7 @@ export class APIClient {
       proxy: false,
       baseURL: this.config.useClient
         ? process.env.NEXT_PUBLIC_AXIOS_BASE_URL
-        : `http://${process.env.BACKEND_HOST}:${process.env.BACKEND_PORT}/api`,
+        : `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`,
     });
     this.instance.interceptors.request.use((req) => {
       if (this.config.useMultiPart) req.headers['Content-Type'] = 'multipart/form-data';

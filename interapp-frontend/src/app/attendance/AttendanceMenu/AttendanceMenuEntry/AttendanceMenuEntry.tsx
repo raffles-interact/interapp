@@ -14,7 +14,7 @@ interface AttendanceMenuEntryProps {
 }
 
 export const fetchAttendanceDetails = async (service_session_id: number) => {
-  const apiClient = new APIClient({ useClient: false }).instance;
+  const apiClient = new APIClient().instance;
   const res = await apiClient.get('/service/session', {
     params: { service_session_id: service_session_id },
   });

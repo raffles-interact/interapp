@@ -57,8 +57,8 @@ export default async function ServiceSessionPage() {
       <div>
         <Title order={1}>Service Sessions</Title>
         <Text>
-          Here you can view all the service sessions! These are created automatically every Sunday
-          with the regular users provided in the Services page.
+          Here you can view all the service sessions! These are created every Sunday, with the
+          regular volunteers viewable in the Services page.
         </Text>
       </div>
 

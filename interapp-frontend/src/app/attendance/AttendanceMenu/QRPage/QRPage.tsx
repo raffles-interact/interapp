@@ -17,7 +17,7 @@ interface QRPageProps {
   hash: string;
 }
 const refreshAttendance = async (id: number) => {
-  const apiClient = new APIClient({ useClient: false }).instance;
+  const apiClient = new APIClient().instance;
   const res = await apiClient.get('/service/session_user_bulk', {
     params: { service_session_id: id },
   });
