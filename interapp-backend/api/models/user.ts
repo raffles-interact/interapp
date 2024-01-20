@@ -404,7 +404,7 @@ export class UserModel {
       .getMany();
   }
   public static async getAllServiceSessionsByUser(username: string) {
-    type getAllServiceSessionsByUserResult = Omit<
+    type GetAllServiceSessionsByUserResult = Omit<
       ServiceSessionUser,
       'service_session' | 'user'
     > & {
@@ -413,7 +413,7 @@ export class UserModel {
       };
     };
 
-    const serviceSessions = (await appDataSource.manager
+    const serviceSessions: GetAllServiceSessionsByUserResult[] = await appDataSource.manager
       .createQueryBuilder()
       .select(['service_session_user'])
       .from(ServiceSessionUser, 'service_session_user')
@@ -427,7 +427,7 @@ export class UserModel {
       .leftJoin('service_session.service', 'service')
       .addSelect(['service.name', 'service.promotional_image'])
       .orderBy('service_session.start_time', 'DESC')
-      .getMany()) as unknown as getAllServiceSessionsByUserResult[];
+      .getMany()
 
     if (!serviceSessions) {
       throw new HTTPError(

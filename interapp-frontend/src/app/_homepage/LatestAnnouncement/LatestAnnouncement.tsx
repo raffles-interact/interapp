@@ -61,49 +61,46 @@ export default function LatestAnnouncement() {
     );
   }
   return (
-    <div>
-      <Title order={2}>Latest Announcement</Title>
-      <Card shadow='sm' padding='md' radius='md' className='announcement'>
-        <Card.Section>
-          <Image
-            src={announcement.image ?? '/placeholder-image.jpg'}
-            height={160}
-            alt='promotional image'
-          />
-        </Card.Section>
-        <Card.Section>
-          <Stack gap={5} m='md'>
-            <Title order={2} fw={500}>
-              {announcement.title}
-            </Title>
-            <div className='announcement-meta'>
-              <IconClock size={20} />
-              <Text size='xs' c='dimmed'>
-                {new Date(announcement.creation_date).toLocaleString()}
-              </Text>
-              <IconUser size={20} />
-              <Text size='xs' c='dimmed'>
-                {announcement.username}
-              </Text>
-            </div>
+    <Card shadow='sm' padding='md' radius='md' className='announcement'>
+      <Card.Section>
+        <Image
+          src={announcement.image ?? '/placeholder-image.jpg'}
+          height={160}
+          alt='promotional image'
+        />
+      </Card.Section>
+      <Card.Section>
+        <Stack gap={5} m='md'>
+          <Title order={2} fw={500}>
+            {announcement.title}
+          </Title>
+          <div className='announcement-meta'>
+            <IconClock size={20} />
+            <Text size='xs' c='dimmed'>
+              {new Date(announcement.creation_date).toLocaleString()}
+            </Text>
+            <IconUser size={20} />
+            <Text size='xs' c='dimmed'>
+              {announcement.username}
+            </Text>
+          </div>
 
-            <Text
-              size='sm'
-              lineClamp={4}
-              dangerouslySetInnerHTML={{ __html: announcement.description }}
-            />
-          </Stack>
-        </Card.Section>
-        <ActionIcon
-          color='blue'
-          size={36}
-          variant='outline'
-          onClick={() => router.push(`/announcements/${announcement.announcement_id}`)}
-          className='announcement-link'
-        >
-          <IconExternalLink />
-        </ActionIcon>
-      </Card>
-    </div>
+          <Text
+            size='sm'
+            lineClamp={4}
+            dangerouslySetInnerHTML={{ __html: announcement.description }}
+          />
+        </Stack>
+      </Card.Section>
+      <ActionIcon
+        color='blue'
+        size={36}
+        variant='outline'
+        onClick={() => router.push(`/announcements/${announcement.announcement_id}`)}
+        className='announcement-link'
+      >
+        <IconExternalLink />
+      </ActionIcon>
+    </Card>
   );
 }

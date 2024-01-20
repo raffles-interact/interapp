@@ -36,8 +36,14 @@ export default function Home() {
           <hr className='homepage-divider' />
         </Stack>
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          <LatestAnnouncement />
-          <AttendanceList />
+          <div>
+            <Title order={2}>Latest Announcement</Title>
+            <LatestAnnouncement />
+          </div>
+          <div>
+            <Title order={2}>Recent Attendance</Title>
+            <AttendanceList username={user?.username} sessionCount={4} />
+          </div>
         </SimpleGrid>
         <ServiceList />
       </div>
