@@ -24,12 +24,25 @@ const fetchAttendance = async (username: string, sessionCount: number) => {
   const response = await apiClient.get('/service/session_user_bulk?username=' + username);
   if (response.status !== 200) throw new Error('Failed to fetch service sessions');
 
-  const data: FetchAttendanceResponse = response.data.slice(0, sessionCount); // get the first 3 service sessions (most recent)
+  const now = new Date();
 
-  data.forEach((serviceSession) => {
-    if (serviceSession.promotional_image)
-      serviceSession.promotional_image = remapAssetUrl(serviceSession.promotional_image);
-  });
+  const data = (response.data as FetchAttendanceResponse)
+    .filter((session) => {
+      const sessionDate = new Date(session.start_time);
+      return sessionDate < now;
+    })
+    .slice(0, sessionCount)
+    .sort((a, b) => {
+      const aDate = new Date(a.start_time);
+      const bDate = new Date(b.start_time);
+      return bDate.getTime() - aDate.getTime();
+    })
+    .map((session) => {
+      if (session.promotional_image) {
+        session.promotional_image = remapAssetUrl(session.promotional_image);
+      }
+      return session;
+    });
 
   return data;
 };
