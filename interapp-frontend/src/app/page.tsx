@@ -1,30 +1,83 @@
 'use client';
-import { useContext, useMemo } from 'react';
+import { useContext, useMemo, useState, useEffect } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { useRouter } from 'next/navigation';
 import { Permissions } from '@/app/route_permissions';
 
 import LatestAnnouncement from '@/app/_homepage/LatestAnnouncement/LatestAnnouncement';
-import ServiceList from '@/app/_homepage/ServiceList/ServiceList';
-import AttendanceList from '@/app/_homepage/AttendanceList/AttendanceList';
+import ServiceList from '@/app/_homepage/NextAttendance/ServiceList';
+import AttendanceList, {
+  type FetchAttendanceResponse,
+} from '@/app/_homepage/AttendanceList/AttendanceList';
+import APIClient from '@api/api_client';
+import { remapAssetUrl } from '@api/utils';
 
 import { Group, Stack, Title, Text, SimpleGrid } from '@mantine/core';
 import Image from 'next/image';
 import './styles.css';
 
+const fetchAttendance = async (username: string, sessionCount: number) => {
+  const apiClient = new APIClient().instance;
+  const response = await apiClient.get('/service/session_user_bulk?username=' + username);
+  if (response.status !== 200) throw new Error('Failed to fetch service sessions');
+
+  const now = new Date();
+
+  const prevSessions = (response.data as FetchAttendanceResponse)
+    .filter((session) => {
+      const sessionDate = new Date(session.start_time);
+      return sessionDate < now;
+    })
+    .slice(0, sessionCount)
+    .sort((a, b) => {
+      const aDate = new Date(a.start_time);
+      const bDate = new Date(b.start_time);
+      return bDate.getTime() - aDate.getTime();
+    })
+    .map((session) => {
+      if (session.promotional_image) {
+        session.promotional_image = remapAssetUrl(session.promotional_image);
+      }
+      return session;
+    });
+
+  // get the next session: sort based on start time, filter out all sessions that have already ended, then get the last element
+  const nextSession = (response.data as FetchAttendanceResponse)
+    .sort((a, b) => {
+      const aDate = new Date(a.start_time);
+      const bDate = new Date(b.start_time);
+      return aDate.getTime() - bDate.getTime();
+    })
+    .filter((session) => {
+      const sessionDate = new Date(session.end_time);
+      return sessionDate > now;
+    })[-1];
+
+  return [prevSessions, nextSession] as const;
+};
+
+const sessionCount = 4;
+
 export default function Home() {
-  const { user, logout } = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
+
+  const [attendancelist, setAttendanceList] = useState<FetchAttendanceResponse | null>(null);
+  const [nextSession, setNextSession] = useState<FetchAttendanceResponse[0] | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    // fetch the latest 4 attendance sessions
+    fetchAttendance(user.username, sessionCount).then(([prev, next]) => {
+      setAttendanceList(prev);
+      setNextSession(next);
+    });
+  }, [user]);
 
   // checks whether user is an interact member or a visitor; true if interact member, false if visitor
   const has_permission = useMemo(() => {
     if (!user) return false;
     return user.permissions.includes(Permissions.CLUB_MEMBER);
   }, [user]);
-  // website will return DIFFERENT pages for interact members and visitors
-  // for the Announcement, Service and Attendance lists, I created components that are supposed to return summarised versions of these 3 things respectively
-  // but I haven't added API calls to the backend yet
-  //
-  // page shown to visitors just supposed to be an overview of Interact + a call to join
+
   if (has_permission) {
     return (
       <div className='homepage'>
@@ -42,7 +95,7 @@ export default function Home() {
           </div>
           <div>
             <Title order={2}>Recent Attendance</Title>
-            <AttendanceList username={user?.username} sessionCount={4} />
+            <AttendanceList attendance={attendancelist} sessionCount={sessionCount} />
           </div>
         </SimpleGrid>
         <ServiceList />
