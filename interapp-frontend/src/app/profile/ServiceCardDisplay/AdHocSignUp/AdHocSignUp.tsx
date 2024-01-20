@@ -15,7 +15,7 @@ type AdHocSignUpProps =
 const generateTimeInfo = (start_time: string, end_time: string) => {
   const startTime = new Date(start_time);
   const endTime = new Date(end_time);
-  return `${startTime.toLocaleString()} - ${endTime.toLocaleString()}`;
+  return `${startTime.toLocaleString('en-GB')} - ${endTime.toLocaleString('en-GB')}`;
 };
 
 const AdHocSignUp = (props: AdHocSignUpProps) => {

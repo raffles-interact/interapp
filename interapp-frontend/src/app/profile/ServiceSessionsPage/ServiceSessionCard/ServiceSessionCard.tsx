@@ -28,7 +28,7 @@ const generateAttendedBadge = (attended: 'Absent' | 'Attended' | 'Valid Reason')
 const generateTimeInterval = (start_time: string, end_time: string) => {
   const start = new Date(start_time);
   const end = new Date(end_time);
-  return `${start.toLocaleString()} - ${end.toLocaleString()}`;
+  return `${start.toLocaleString('en-GB')} - ${end.toLocaleString('en-GB')}`;
 };
 
 const generateBoolean = (value: boolean) => {

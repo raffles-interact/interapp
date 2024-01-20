@@ -43,7 +43,7 @@ const AnnouncementBox = ({
           Posted on:
         </Text>
         <Text size='xs' mt='sm'>
-          {date.toLocaleString()}
+          {date.toLocaleString('en-GB')}
         </Text>
       </Group>
       <Link href={`/announcements/${id}`} hidden ref={linkRef} />

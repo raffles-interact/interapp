@@ -111,7 +111,7 @@ const NavbarNotifications = () => {
               key={notification.announcement_id}
               title={notification.announcement.title}
               description={notification.announcement.description}
-              date={new Date(notification.announcement.creation_date).toLocaleString()}
+              date={new Date(notification.announcement.creation_date).toLocaleString('en-GB')}
               icon={<IconSpeakerphone color='teal' />}
               onClick={async () => {
                 router.push(`/announcements/${notification.announcement_id}`);
@@ -130,7 +130,7 @@ const NavbarNotifications = () => {
             <NavbarNotificationsBox
               key={notification.service_session_id}
               title={notification.service_session.service.name}
-              date={new Date(notification.service_session.start_time).toLocaleString()}
+              date={new Date(notification.service_session.start_time).toLocaleString('en-GB')}
               icon={<IconHeart color='red' />}
             />
           );
