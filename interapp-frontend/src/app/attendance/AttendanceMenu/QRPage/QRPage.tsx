@@ -113,7 +113,8 @@ const QRPage = ({ id, hash }: QRPageProps) => {
             {detail.service_title} (id: {detail.service_session_id})
           </Title>
           <Text>
-            {detail.start_time?.toLocaleString('en-GB')} - {detail.end_time?.toLocaleString('en-GB')}
+            {detail.start_time?.toLocaleString('en-GB')} -{' '}
+            {detail.end_time?.toLocaleString('en-GB')}
           </Text>
 
           <Text>

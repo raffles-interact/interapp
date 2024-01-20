@@ -45,7 +45,8 @@ export default function AttendanceList({ attendance, sessionCount }: AttendanceL
             <AttendanceBadge attended={el.attended} />
           </Group>
           <Text c='dimmed'>
-            {new Date(el.start_time).toLocaleString('en-GB')} - {new Date(el.end_time).toLocaleString('en-GB')}
+            {new Date(el.start_time).toLocaleString('en-GB')} -{' '}
+            {new Date(el.end_time).toLocaleString('en-GB')}
           </Text>
         </Paper>
       ))}

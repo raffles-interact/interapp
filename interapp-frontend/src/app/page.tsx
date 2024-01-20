@@ -4,14 +4,15 @@ import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { Permissions } from '@/app/route_permissions';
 
 import LatestAnnouncement from '@/app/_homepage/LatestAnnouncement/LatestAnnouncement';
-import ServiceList from '@/app/_homepage/NextAttendance/ServiceList';
 import AttendanceList, {
   type FetchAttendanceResponse,
 } from '@/app/_homepage/AttendanceList/AttendanceList';
+import NextAttendance from '@/app/_homepage/NextAttendance/NextAttendance';
+
 import APIClient from '@api/api_client';
 import { remapAssetUrl } from '@api/utils';
 
-import { Group, Stack, Title, Text, SimpleGrid } from '@mantine/core';
+import { Stack, Title, Text, SimpleGrid } from '@mantine/core';
 import Image from 'next/image';
 import './styles.css';
 
@@ -50,9 +51,13 @@ const fetchAttendance = async (username: string, sessionCount: number) => {
     .filter((session) => {
       const sessionDate = new Date(session.end_time);
       return sessionDate > now;
-    })[-1];
+    });
 
-  return [prevSessions, nextSession] as const;
+  if (nextSession.length === 0) {
+    return [prevSessions, null] as const;
+  } else {
+    return [prevSessions, nextSession[nextSession.length - 1]] as const;
+  }
 };
 
 const sessionCount = 4;
@@ -89,16 +94,19 @@ export default function Home() {
           <hr className='homepage-divider' />
         </Stack>
         <SimpleGrid cols={{ base: 1, sm: 2 }}>
-          <div>
+          <Stack gap={5}>
             <Title order={2}>Latest Announcement</Title>
             <LatestAnnouncement />
-          </div>
-          <div>
+          </Stack>
+          <Stack gap={5}>
             <Title order={2}>Recent Attendance</Title>
             <AttendanceList attendance={attendancelist} sessionCount={sessionCount} />
-          </div>
+          </Stack>
         </SimpleGrid>
-        <ServiceList />
+        <Stack gap={5}>
+          <Title order={2}>Next Session to Attend</Title>
+          <NextAttendance nextSession={nextSession} />
+        </Stack>
       </div>
     );
   } else {
