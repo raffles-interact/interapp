@@ -77,7 +77,7 @@ export default function LatestAnnouncement() {
           <div className='announcement-meta'>
             <IconClock size={20} />
             <Text size='xs' c='dimmed'>
-              {new Date(announcement.creation_date).toLocaleString()}
+              {new Date(announcement.creation_date).toLocaleString('en-GB')}
             </Text>
             <IconUser size={20} />
             <Text size='xs' c='dimmed'>

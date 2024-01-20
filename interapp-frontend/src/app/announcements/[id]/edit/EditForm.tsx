@@ -171,7 +171,7 @@ function EditForm() {
           <Stack gap={5}>
             <Group align='center' gap={5}>
               <IconClock className='edit-form-icon' />
-              <Text>{announcement && new Date(announcement.creation_date).toLocaleString()}</Text>
+              <Text>{announcement && new Date(announcement.creation_date).toLocaleString('en-GB')}</Text>
             </Group>
             <Group align='center' gap={5}>
               <IconUser className='edit-form-icon' />

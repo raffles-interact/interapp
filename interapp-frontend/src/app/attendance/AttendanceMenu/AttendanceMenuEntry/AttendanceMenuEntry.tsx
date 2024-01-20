@@ -98,7 +98,7 @@ const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) =
             {detail.service_title} (id: {detail.service_session_id})
           </Title>
           <Text>
-            {detail.start_time.toLocaleString()} - {detail.end_time.toLocaleString()}
+            {detail.start_time.toLocaleString('en-GB')} - {detail.end_time.toLocaleString('en-GB')}
           </Text>
           <Text>
             {detail.user_details.filter((user) => user.attended === 'Attended').length} /{' '}

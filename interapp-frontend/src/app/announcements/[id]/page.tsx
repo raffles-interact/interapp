@@ -101,7 +101,7 @@ export default function AnnouncementPage({ params }: Readonly<{ params: { id: st
               <Stack gap={5}>
                 <Group align='center' gap={5}>
                   <IconClock className='announcement-meta-icon' />
-                  <Text>{new Date(data.creation_date).toLocaleString()}</Text>
+                  <Text>{new Date(data.creation_date).toLocaleString('en-GB')}</Text>
                 </Group>
                 <Group align='center' gap={5}>
                   <IconUser className='announcement-meta-icon' />
