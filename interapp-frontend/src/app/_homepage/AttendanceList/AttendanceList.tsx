@@ -1,12 +1,6 @@
-'use client';
 import { Text, Title, Skeleton, Stack, Paper, Group, Badge } from '@mantine/core';
-import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@api/utils';
-import { useState, useEffect } from 'react';
 
-import './styles.css';
-
-type FetchAttendanceResponse = {
+export type FetchAttendanceResponse = {
   service_id: number;
   start_time: string;
   end_time: string;
@@ -19,34 +13,6 @@ type FetchAttendanceResponse = {
   is_ic: boolean;
 }[];
 
-const fetchAttendance = async (username: string, sessionCount: number) => {
-  const apiClient = new APIClient().instance;
-  const response = await apiClient.get('/service/session_user_bulk?username=' + username);
-  if (response.status !== 200) throw new Error('Failed to fetch service sessions');
-
-  const now = new Date();
-
-  const data = (response.data as FetchAttendanceResponse)
-    .filter((session) => {
-      const sessionDate = new Date(session.start_time);
-      return sessionDate < now;
-    })
-    .slice(0, sessionCount)
-    .sort((a, b) => {
-      const aDate = new Date(a.start_time);
-      const bDate = new Date(b.start_time);
-      return bDate.getTime() - aDate.getTime();
-    })
-    .map((session) => {
-      if (session.promotional_image) {
-        session.promotional_image = remapAssetUrl(session.promotional_image);
-      }
-      return session;
-    });
-
-  return data;
-};
-
 const AttendanceBadge = ({ attended }: Pick<FetchAttendanceResponse[0], 'attended'>) => {
   let color = 'gray';
   if (attended === 'Attended') color = 'green';
@@ -56,23 +22,12 @@ const AttendanceBadge = ({ attended }: Pick<FetchAttendanceResponse[0], 'attende
 };
 
 interface AttendanceListProps {
-  username?: string;
+  attendance: FetchAttendanceResponse | null;
   sessionCount: number;
 }
 
-export default function AttendanceList({ username, sessionCount }: AttendanceListProps) {
-  const [loading, setLoading] = useState(true);
-  const [attendancelist, setAttendanceList] = useState<FetchAttendanceResponse>([]);
-
-  useEffect(() => {
-    if (!username) return;
-    fetchAttendance(username, sessionCount).then((data) => {
-      setAttendanceList(data);
-      setLoading(false);
-    });
-  }, []);
-
-  if (!username || loading) {
+export default function AttendanceList({ attendance, sessionCount }: AttendanceListProps) {
+  if (attendance === null) {
     return (
       <Stack gap={5}>
         {[...Array(sessionCount)].map((_, i) => (
@@ -83,15 +38,14 @@ export default function AttendanceList({ username, sessionCount }: AttendanceLis
   }
   return (
     <Stack gap={5}>
-      {attendancelist.map((attendance) => (
-        <Paper shadow='sm' p='md' radius='md' key={attendance.service_session_id}>
+      {attendance.map((el) => (
+        <Paper shadow='sm' p='md' radius='md' key={el.service_session_id}>
           <Group justify='space-between'>
-            <Title order={4}>{attendance.name}</Title>
-            <AttendanceBadge attended={attendance.attended} />
+            <Title order={4}>{el.name}</Title>
+            <AttendanceBadge attended={el.attended} />
           </Group>
           <Text c='dimmed'>
-            {new Date(attendance.start_time).toLocaleString()} -{' '}
-            {new Date(attendance.end_time).toLocaleString()}
+            {new Date(el.start_time).toLocaleString()} - {new Date(el.end_time).toLocaleString()}
           </Text>
         </Paper>
       ))}
