@@ -12,8 +12,7 @@ import NextAttendance from '@/app/_homepage/NextAttendance/NextAttendance';
 import APIClient from '@api/api_client';
 import { remapAssetUrl } from '@api/utils';
 
-import { Stack, Title, Text, SimpleGrid } from '@mantine/core';
-import Image from 'next/image';
+import { Stack, Title, Text, SimpleGrid, Skeleton } from '@mantine/core';
 import './styles.css';
 
 const fetchAttendance = async (username: string, sessionCount: number) => {
@@ -63,7 +62,7 @@ const fetchAttendance = async (username: string, sessionCount: number) => {
 const sessionCount = 4;
 
 export default function Home() {
-  const { user } = useContext(AuthContext);
+  const { user, loading } = useContext(AuthContext);
 
   const [attendancelist, setAttendanceList] = useState<FetchAttendanceResponse | null>(null);
   const [nextSession, setNextSession] = useState<FetchAttendanceResponse[0] | null>(null);
@@ -82,6 +81,14 @@ export default function Home() {
     if (!user) return false;
     return user.permissions.includes(Permissions.CLUB_MEMBER);
   }, [user]);
+
+  if (loading) {
+    return (
+      <div className='homepage'>
+        <Skeleton height={200} />
+      </div>
+    )
+  }
 
   if (has_permission) {
     return (
