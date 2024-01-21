@@ -35,7 +35,7 @@ const NavbarNotificationsBox = ({
       pos='relative'
     >
       <Card.Section m='sm'>
-        <Group gap={5}>
+        <Group gap={5} wrap='nowrap'>
           <div style={{ width: 40 }}>{icon}</div>
 
           <div>

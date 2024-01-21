@@ -14,6 +14,7 @@ import APIClient from '@api/api_client';
 import { useRouter } from 'next/navigation';
 import { notifications } from '@mantine/notifications';
 import './styles.css';
+import { Permissions } from '@/app/route_permissions';
 
 const NavbarNotifications = () => {
   const apiClient = new APIClient().instance;
@@ -160,7 +161,7 @@ const NavbarNotifications = () => {
     return unreadAnnouncements + activeSessions + verified;
   }, [userNotifications]);
 
-  if (!user) return <div></div>;
+  if (!user || !user.permissions.includes(Permissions.CLUB_MEMBER)) return <div></div>;
   return (
     <>
       <div
