@@ -19,7 +19,7 @@ export default function NextAttendance({ nextSession }: NextAttendanceProps) {
       <Title order={4}>{nextSession.name}</Title>
       <Text c='dimmed'>
         {new Date(nextSession.start_time).toLocaleString('en-GB')} -{' '}
-        {new Date(nextSession.end_time).toLocaleString('en-GB')}{' '}(
+        {new Date(nextSession.end_time).toLocaleString('en-GB')} (
         {new Date(nextSession.start_time).toLocaleString('en-GB', { weekday: 'long' })})
       </Text>
     </Paper>

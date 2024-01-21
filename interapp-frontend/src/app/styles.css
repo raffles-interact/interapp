@@ -6,7 +6,36 @@
   gap: 1rem;
 }
 
+.homepage-bold {
+  font-weight: bold;
+}
+
 .homepage-divider {
   margin: 1rem 0;
   border-bottom: 1px solid var(--mantine-color-grey-2);
+}
+.homepage-logo {
+  width: 30%;
+}
+
+.homepage-image {
+  width: 100%;
+  border-radius: 10px;
+}
+
+@media (max-width: 768px) {
+  .homepage {
+    padding: 1rem;
+  }
+
+  .homepage-image {
+    width: 80%;
+  }
+  .homepage-section {
+    flex-wrap: wrap-reverse;
+    justify-content: center;
+  }
+  .homepage-logo {
+    width: 70%;
+  }
 }
