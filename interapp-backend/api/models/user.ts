@@ -6,6 +6,8 @@ import {
   Service,
   ServiceSessionUser,
   ServiceSession,
+  AnnouncementCompletion,
+  AttendanceStatus,
 } from '@db/entities';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { randomBytes } from 'crypto';
@@ -402,10 +404,16 @@ export class UserModel {
       .getMany();
   }
   public static async getAllServiceSessionsByUser(username: string) {
-    type getAllServiceSessionsByUserResult = Omit<ServiceSessionUser, 'service_session' | 'user'> &
-      {service_session: Pick<ServiceSession, 'start_time' | 'end_time' | 'service_id'> & {service: Pick<Service, 'name' | 'promotional_image'>}};
-      
-    const serviceSessions = (await appDataSource.manager
+    type GetAllServiceSessionsByUserResult = Omit<
+      ServiceSessionUser,
+      'service_session' | 'user'
+    > & {
+      service_session: Pick<ServiceSession, 'start_time' | 'end_time' | 'service_id'> & {
+        service: Pick<Service, 'name' | 'promotional_image'>;
+      };
+    };
+
+    const serviceSessions: GetAllServiceSessionsByUserResult[] = await appDataSource.manager
       .createQueryBuilder()
       .select(['service_session_user'])
       .from(ServiceSessionUser, 'service_session_user')
@@ -419,7 +427,7 @@ export class UserModel {
       .leftJoin('service_session.service', 'service')
       .addSelect(['service.name', 'service.promotional_image'])
       .orderBy('service_session.start_time', 'DESC')
-      .getMany()) as unknown as getAllServiceSessionsByUserResult[];
+      .getMany()
 
     if (!serviceSessions) {
       throw new HTTPError(
@@ -450,7 +458,6 @@ export class UserModel {
       attended: string;
       is_ic: boolean;
       service_session?: any;
-    
     }[] = serviceSessions.map((session) => ({
       ...session,
       service_id: session.service_session.service_id,
@@ -458,14 +465,11 @@ export class UserModel {
       end_time: session.service_session.end_time,
       name: session.service_session.service.name,
       promotional_image: session.service_session.service.promotional_image,
-      
     }));
 
     for (const sess of parsed) {
       delete sess.service_session;
     }
-
-    
 
     return parsed;
   }
@@ -663,5 +667,77 @@ export class UserModel {
     user.profile_picture = null;
 
     await appDataSource.manager.update(User, { username }, user);
+  }
+  public static async getNotifications(username: string) {
+    const isVerified = (
+      await appDataSource.manager
+        .createQueryBuilder()
+        .select(['user.verified'])
+        .from(User, 'user')
+        .where('user.username = :username', { username })
+        .getOne()
+    )?.verified;
+
+    if (isVerified === undefined) {
+      throw new HTTPError(
+        'User not found',
+        `The user with username ${username} was not found in the database`,
+        HTTPErrorCode.NOT_FOUND_ERROR,
+      );
+    }
+
+    const unreadAnnouncements: {
+      announcement_id: number;
+      announcement: {
+        title: string;
+        description: string;
+        creation_date: string;
+      };
+    }[] = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['announcement_completion.announcement_id'])
+      .from(AnnouncementCompletion, 'announcement_completion')
+      .where('announcement_completion.username = :username', { username })
+      .andWhere('announcement_completion.completed = false')
+      .leftJoin('announcement_completion.announcement', 'announcement')
+      .addSelect(['announcement.title', 'announcement.description', 'announcement.creation_date'])
+      .getMany();
+
+    let activeSessions: {
+      service_session_id: number;
+      service_session: {
+        start_time: string;
+        end_time: string;
+        service: {
+          name: string;
+        };
+      };
+    }[] = await appDataSource.manager
+      .createQueryBuilder()
+      .select(['service_session_user'])
+      .from(ServiceSessionUser, 'service_session_user')
+      .where('service_session_user.username = :username', { username })
+      .andWhere('service_session_user.attended IN (:...attended)', {
+        attended: [AttendanceStatus.Absent, AttendanceStatus.ValidReason],
+      })
+      .leftJoin('service_session_user.service_session', 'service_session')
+      .addSelect(['service_session.start_time', 'service_session.end_time'])
+      .leftJoin('service_session.service', 'service')
+      .addSelect(['service.name'])
+      .getMany();
+
+    activeSessions = activeSessions.filter((session) => {
+      const sessionStartTime = new Date(session.service_session.start_time);
+      const sessionEndTime = new Date(session.service_session.end_time);
+      const now = new Date();
+      return sessionStartTime <= now && now <= sessionEndTime;
+    });
+
+    const returnData = {
+      unread_announcements: unreadAnnouncements,
+      active_sessions: activeSessions,
+      verified: isVerified,
+    };
+    return returnData;
   }
 }

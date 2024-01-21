@@ -7,3 +7,4 @@ export * from './user';
 export * from './service_session_user';
 export * from './service_session';
 export * from './service';
+export * from './announcement_attachment';

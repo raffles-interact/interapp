@@ -1,0 +1,22 @@
+.announcement-meta {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  row-gap: 0.5rem;
+  column-gap: 0.3rem;
+  align-items: center;
+}
+
+.announcement-meta > svg {
+  color: var(--mantine-color-teal-6);
+}
+
+.announcement {
+  position: relative;
+}
+
+.announcement-link {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0.5rem;
+}

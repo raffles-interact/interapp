@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Interapp API",
-    "description": "This is the specification for all routes defined in the `api/routes/endpoints/*` directory. All routes should be prefixed with `/api/*`. This spec is not yet fully compliant with openapi >=3.0.0 (DELETE should not have a response body in the newest version). Currently undocumented: DELETE /user, PATCH /user/service_hours, GET /service/get_users_by_service",
+    "description": "This is the specification for all routes defined in the `api/routes/endpoints/*` directory. All routes should be prefixed with `/api/*`. This spec is not yet fully compliant with openapi >=3.0.0 (DELETE should not have a response body in the newest version). ",
     "contact": {
       "email": "sebastian.ong@hotmail.com"
     },
@@ -115,20 +115,17 @@
                   "type": "object",
                   "properties": {
                     "access_token": {
-                      "type": "string"
+                      "type": "string",
+                      "example": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoic2ViZmFzdyIsInZlcmlmaWVkIjpmYWxzZSwicGVybWlzc2lvbnMiOlswXSwiaWF0IjoxNzAwMzEzNjQ1LCJpc3MiOiJpbnRlcmFwcCIsImF1ZCI6ImludGVyYWN0X2NsdWIiLCJleHAiOjE3MDA0MDAwNDV9.vJg4hmBY_slUmGjHK4H_8UITIX9417_BRXznt_6p4rk"
                     },
                     "user": {
-                      "type": "object"
+                      "$ref": "#/components/schemas/UserDetailsWithPerms"
                     },
                     "expire": {
-                      "type": "number"
+                      "type": "number",
+                      "example": 12443204
                     }
                   }
-                },
-                "example": {
-                  "access_token": "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjEsInVzZXJuYW1lIjoic2ViZmFzdyIsInZlcmlmaWVkIjpmYWxzZSwicGVybWlzc2lvbnMiOlswXSwiaWF0IjoxNzAwMzEzNjQ1LCJpc3MiOiJpbnRlcmFwcCIsImF1ZCI6ImludGVyYWN0X2NsdWIiLCJleHAiOjE3MDA0MDAwNDV9.vJg4hmBY_slUmGjHK4H_8UITIX9417_BRXznt_6p4rk",
-                  "user": "<user details as an object>",
-                  "expire": 1701411555
                 }
               }
             }
@@ -176,12 +173,15 @@
           },
           "400": {
             "description": "Missing body"
+          },
+          "401": {
+            "description": "unauthorized"
           }
         }
       }
     },
     "/auth/signout": {
-      "post": {
+      "delete": {
         "tags": ["auth"],
         "summary": "Sign the user out by invalidating tokens",
         "security": [
@@ -192,9 +192,6 @@
         "responses": {
           "204": {
             "description": "Successful operation"
-          },
-          "400": {
-            "description": "Missing body"
           }
         }
       }
@@ -202,42 +199,70 @@
     "/user": {
       "get": {
         "tags": ["user"],
-        "summary": "get all user's info",
+        "summary": "get all user's info, or a specific user's info",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "description": "username to look for",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "description": "successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "username": {
-                        "type": "string",
-                        "example": "joe"
-                      },
-                      "user_id": {
-                        "type": "integer",
-                        "example": 123
-                      },
-                      "email": {
-                        "type": "string",
-                        "example": "dfjsldkj2@gmail.com"
-                      },
-                      "verified": {
-                        "type": "boolean",
-                        "example": true
-                      },
-                      "service_hours": {
-                        "type": "integer",
-                        "example": 31
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/UserDetailsWithProfilePic"
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/UserDetailsWithProfilePic"
                       }
                     }
-                  }
+                  ]
                 }
               }
             }
+          },
+          "404": {
+            "description": "user not found or users not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": ["user"],
+        "summary": "Delete user",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "username": "testuser"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
           }
         }
       }
@@ -245,7 +270,7 @@
     "/user/change_email": {
       "patch": {
         "tags": ["user"],
-        "summary": "change email of a user",
+        "summary": "change email of requested user (need admin), or user who sent the request",
         "requestBody": {
           "content": {
             "application/json": {
@@ -255,8 +280,13 @@
                   "new_email": {
                     "type": "string",
                     "example": "fsalfkj@gmail.com"
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "a"
                   }
-                }
+                },
+                "required": ["new_email"]
               }
             }
           }
@@ -418,9 +448,6 @@
           "204": {
             "description": "Successful operation"
           },
-          "400": {
-            "description": "Missing body"
-          },
           "401": {
             "description": "Invalid token"
           }
@@ -443,9 +470,6 @@
         "responses": {
           "204": {
             "description": "Successful operation"
-          },
-          "400": {
-            "description": "Missing body"
           },
           "401": {
             "description": "Invalid token"
@@ -500,7 +524,7 @@
       },
       "get": {
         "tags": ["user"],
-        "summary": "Get user permissions",
+        "summary": "Get user permissions, or everyone's permissions",
         "parameters": [
           {
             "name": "username",
@@ -520,15 +544,10 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "username": {
-                      "type": "string",
-                      "example": "joe"
-                    },
-                    "permissions": {
+                    "(username)": {
                       "type": "array",
                       "items": {
-                        "type": "integer",
-                        "example": 0
+                        "type": "number"
                       }
                     }
                   }
@@ -611,6 +630,56 @@
           "401": {
             "description": "Invalid token"
           }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": ["user"],
+        "summary": "mass edit user service",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_id": {
+                    "type": "number"
+                  },
+                  "data": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "action": {
+                          "type": "string",
+                          "enum": ["add", "remove"]
+                        },
+                        "username": {
+                          "type": "string",
+                          "example": "joe"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body/ invalid body"
+          },
+          "401": {
+            "description": "Invalid token"
+          }
         }
       },
       "delete": {
@@ -647,15 +716,184 @@
         }
       }
     },
+    "/user/service_hours": {
+      "patch": {
+        "tags": ["user"],
+        "summary": "Update self service hours or others' service hours",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hours": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "a"
+                  }
+                },
+                "required": ["hours"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Successful operation"
+          },
+          "400": {
+            "description": "Missing body"
+          }
+        }
+      }
+    },
+    "/user/profile_picture": {
+      "patch": {
+        "tags": ["user"],
+        "summary": "Update self's pfp",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profile_picture": {
+                    "type": "string",
+                    "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAIsAAACLCAYAAABRGWr/AAAAAXNSR0IA.."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Sucessful operation"
+          },
+          "400": {
+            "description": "missing body"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["user"],
+        "summary": "delete self's profile picture",
+        "responses": {
+          "204": {
+            "description": "Sucessful operation"
+          },
+          "400": {
+            "description": "missing body"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/user/notifications": {
+      "get": {
+        "tags": ["user"],
+        "summary": "get notifications for a user",
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "unread_announcements": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "announcement_id": {
+                            "type": "number",
+                            "example": 1
+                          },
+                          "announcement": {
+                            "type": "object",
+                            "properties": {
+                              "title": {
+                                "type": "string",
+                                "example": "adfjf"
+                              },
+                              "description": {
+                                "type": "string",
+                                "example": "<p></p>"
+                              },
+                              "creation_date": {
+                                "type": "string"
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "active_sessions": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "service_session_id": {
+                            "type": "number",
+                            "example": 1
+                          },
+                          "service_session": {
+                            "type": "object",
+                            "properties": {
+                              "start_time": {
+                                "type": "string"
+                              },
+                              "end_time": {
+                                "type": "string"
+                              },
+                              "service": {
+                                "type": "object",
+                                "properties": {
+                                  "name": {
+                                    "type": "string",
+                                    "example": "tsp"
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "verified": {
+                      "type": "boolean",
+                      "example": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/announcement": {
       "post": {
         "tags": ["announcement"],
         "summary": "Create a new announcement",
         "requestBody": {
           "content": {
-            "application/json": {
+            "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/CreateAnnouncement"
+                "$ref": "#/components/schemas/CreateAnnouncementWithDocs"
               }
             }
           },
@@ -694,7 +932,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Announcement"
+                  "$ref": "#/components/schemas/AnnouncementWithDocs"
                 }
               }
             }
@@ -719,7 +957,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/Announcement"
+                "$ref": "#/components/schemas/AnnouncementWithDocs"
               }
             }
           },
@@ -785,15 +1023,46 @@
       "get": {
         "tags": ["announcement"],
         "summary": "Get all announcements",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
         "responses": {
           "200": {
             "description": "Successful operation",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Announcement"
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/AnnouncementWithDocs"
+                      }
+                    },
+                    "total_entries": {
+                      "type": "integer",
+                      "example": 123
+                    },
+                    "page_size": {
+                      "type": "integer",
+                      "example": 4
+                    }
                   }
                 }
               }
@@ -802,7 +1071,7 @@
         }
       }
     },
-    "/announcement/completions": {
+    "/announcement/completion": {
       "get": {
         "tags": ["announcement"],
         "summary": "Get all completions for a specific announcement",
@@ -840,49 +1109,7 @@
           }
         }
       },
-      "post": {
-        "tags": ["announcement"],
-        "summary": "Add users that need to view the announcement",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "announcement_id": {
-                    "type": "integer"
-                  },
-                  "usernames": {
-                    "type": "array",
-                    "items": {
-                      "type": "string"
-                    }
-                  }
-                }
-              },
-              "example": {
-                "announcement_id": 1,
-                "usernames": ["user1", "user2"]
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "201": {
-            "description": "Successful operation"
-          },
-          "400": {
-            "description": "Invalid input"
-          },
-          "404": {
-            "description": "Announcement or users not found"
-          }
-        }
-      }
-    },
-    "/announcement/completion": {
-      "post": {
+      "patch": {
         "tags": ["announcement"],
         "summary": "Modify the viewed status of an announcement for a user",
         "requestBody": {
@@ -1014,7 +1241,14 @@
         },
         "responses": {
           "200": {
-            "description": "Service updated"
+            "description": "Service updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Service"
+                }
+              }
+            }
           },
           "400": {
             "description": "Invalid input"
@@ -1061,6 +1295,60 @@
             "bearerAuth": []
           }
         ]
+      }
+    },
+    "/service/all": {
+      "get": {
+        "tags": ["service"],
+        "summary": "get all services available",
+        "responses": {
+          "200": {
+            "description": "success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Service"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/service/get_users_by_service": {
+      "get": {
+        "tags": ["service"],
+        "summary": "get users by service",
+        "parameters": [
+          {
+            "name": "service_id",
+            "in": "query",
+            "description": "ID of the service to get users for",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserDetails"
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/service/session": {
@@ -1193,6 +1481,65 @@
             "bearerAuth": []
           }
         ]
+      }
+    },
+    "/service/session/all": {
+      "get": {
+        "tags": ["service"],
+        "summary": "Get some or all service sessions by service id (optional)",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "page": {
+                    "type": "integer"
+                  },
+                  "page_size": {
+                    "type": "integer"
+                  },
+                  "service_id": {
+                    "type": "integer",
+                    "format": "int64"
+                  }
+                },
+                "required": ["page", "page_size"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ServiceSession"
+                      }
+                    },
+                    "total_entries": {
+                      "type": "integer",
+                      "example": 12344
+                    },
+                    "length_of_page": {
+                      "type": "integer",
+                      "example": 3
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "not found"
+          }
+        }
       }
     },
     "/service/session_user": {
@@ -1343,7 +1690,7 @@
         ]
       }
     },
-    "/session_user_bulk": {
+    "/service/session_user_bulk": {
       "get": {
         "tags": ["service"],
         "summary": "Get all session users",
@@ -1440,6 +1787,141 @@
             "bearerAuth": []
           }
         ]
+      },
+      "delete": {
+        "tags": ["service"],
+        "description": "remove users from service session",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_session_id": {
+                    "type": "integer",
+                    "example": 1
+                  },
+                  "usernames": {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    },
+                    "example": ["joe", "joe2"]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "deleted"
+          },
+          "400": {
+            "description": "Invalid input"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/service/active_sessions": {
+      "get": {
+        "tags": ["service"],
+        "description": "get active service sessions hash and info",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "(hash)": {
+                        "type": "object",
+                        "properties": {
+                          "service_session_id": {
+                            "type": "integer"
+                          },
+                          "ICs": {
+                            "type": "array",
+                            "items": {
+                              "type": "string",
+                              "example": ["joe", "jpe2"]
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/service/ad_hoc_sessions": {
+      "get": {
+        "tags": ["service"],
+        "description": "get active service sessions hash and info",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ServiceSession"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/service/verify_attendance": {
+      "post": {
+        "tags": ["service"],
+        "description": "verify hash to mark current user as attended",
+        "responses": {
+          "204": {
+            "description": "verified hash"
+          },
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Session user not found"
+          }
+        },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "hash": {
+                    "type": "string",
+                    "example": "61ccbddcf94bbfc4b45fd6caa0bb36a7be96a93ec19ce7714616818dca4e129e82d6e36c2772a5a04165efa01bbbc64d5e7244cc138d6fb7884d730e27956c704810e099da33cb02287f7f27bd53fcb03dcf2fbe41f31faf40a9ac1c812418415be39e121f39b85b9ddcd5969e95d050fc9673c61ef66c9bd370953b02d7eb3d"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
       }
     }
   },
@@ -1482,7 +1964,7 @@
             "type": "string",
             "example": "description desctiotiofuierohfewrjfhejkfh"
           },
-          "attatchment": {
+          "image": {
             "type": "string",
             "nullable": true,
             "example": "data:image;base64,ewkjfowejfoiwjfioerjfioerjfioejfoiewrjfoierjf...."
@@ -1506,6 +1988,44 @@
           "announcement_id": {
             "type": "integer",
             "example": 1
+          }
+        }
+      },
+      "CreateAnnouncementWithDocs": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CreateAnnouncement"
+          },
+          {
+            "type": "object"
+          }
+        ],
+        "properties": {
+          "docs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
+          }
+        }
+      },
+      "AnnouncementWithDocs": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Announcement"
+          },
+          {
+            "type": "object"
+          }
+        ],
+        "properties": {
+          "docs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "binary"
+            }
           }
         }
       },
@@ -1628,6 +2148,66 @@
           "is_ic": {
             "type": "boolean",
             "example": false
+          }
+        }
+      },
+      "UserDetails": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "integer",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "example": "joe"
+          },
+          "email": {
+            "type": "string",
+            "example": "ffdd@ddd.com"
+          },
+          "verified": {
+            "type": "boolean",
+            "example": true
+          },
+          "service_hours": {
+            "type": "integer",
+            "example": 9
+          }
+        }
+      },
+      "UserDetailsWithPerms": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserDetails"
+          },
+          {
+            "type": "object"
+          }
+        ],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "example": [0, 1, 2, 3, 4]
+          }
+        }
+      },
+      "UserDetailsWithProfilePic": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserDetails"
+          },
+          {
+            "type": "object"
+          }
+        ],
+        "properties": {
+          "profile_picture": {
+            "type": "string",
+            "example": "http://interapp-minio/abc/def?X-amzn-......."
           }
         }
       }

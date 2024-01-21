@@ -14,7 +14,7 @@ interface VerifyAttendanceProps {
 }
 
 const fetchDuration = async (id: number) => {
-  const apiClient = new APIClient({ useClient: false }).instance;
+  const apiClient = new APIClient().instance;
   const res = await apiClient.get('/service/session', {
     params: { service_session_id: id },
   });
@@ -108,16 +108,26 @@ const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
 
   useEffect(() => {
     if (loading) return;
-    if (!user) throw new Error('User not logged in');
-
-    handleVerify(user);
+    if (user) handleVerify(user);
   }, [loading]);
+
+  if (!loading && !user) {
+    return (
+      <div className='verify-attendance'>
+        <Title>Verify Attendance</Title>
+        <Text>You must be logged in to verify attendance.</Text>
+        <GoHomeButton />
+      </div>
+    );
+  }
 
   return (
     <div className='verify-attendance'>
       <Title>Verify Attendance</Title>
       <Text>{message}</Text>
-      {status === 'Success' && <Text>You have gained {gainedHours} service hours!</Text>}
+      {status === 'Success' && (
+        <Text>Checked in successfully. Added {gainedHours} service hours to your account.</Text>
+      )}
       {status === 'Success' ? (
         <GoHomeButton />
       ) : (

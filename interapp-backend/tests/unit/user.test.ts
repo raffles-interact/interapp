@@ -6,6 +6,10 @@ import { User } from '@db/entities/user';
 import { Service } from '@db/entities/service';
 import { describe, expect, test, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
+import { recreateRedis } from '../utils/recreate_redis';
+import { randomBytes } from 'crypto';
+import redisClient from '@utils/init_redis';
+import { AnnouncementModel } from '@models/announcement';
 
 describe('Unit (user)', () => {
   beforeAll(async () => {
@@ -318,8 +322,74 @@ describe('Unit (user)', () => {
       start_time: expect.any(Object),
       end_time: expect.any(Object),
       name: 'testservice',
-      promotional_image: null
+      promotional_image: null,
     });
+  });
+
+  test('get user notifications', async () => {
+    // create active sessions
+    const now = new Date();
+    const inOneHour = new Date();
+    inOneHour.setHours(now.getHours() + 1);
+    const createServiceSessionBody = {
+      service_id: 1,
+      start_time: now.toISOString(),
+      end_time: inOneHour.toISOString(),
+      ad_hoc_enabled: false,
+    };
+    let serviceSessionIds = [];
+    for (let i = 0; i < 3; i++) {
+      const id = await ServiceModel.createServiceSession(createServiceSessionBody);
+      serviceSessionIds.push(id);
+    }
+    expect((await ServiceModel.getAllServiceSessions(1, 5)).data).toBeArrayOfSize(5);
+
+    const service_sessions = (await ServiceModel.getAllServiceSessions()).data;
+    let hashes = await redisClient.hGetAll('service_session');
+    for (const session of service_sessions) {
+      // check if service session id is in redis
+
+      if (!Object.values(hashes).find((v) => v === String(session.service_session_id))) {
+        // if service session id is not in redis, generate a hash as key and service session id as value
+
+        const newHash = randomBytes(128).toString('hex');
+
+        await redisClient.hSet('service_session', newHash, session.service_session_id);
+      }
+    }
+    hashes = await redisClient.hGetAll('service_session');
+    expect(Object.entries(hashes)).toBeArrayOfSize(6);
+
+    // add user to service sessions x3
+    for (const id of serviceSessionIds) {
+      await ServiceModel.createServiceSessionUser({
+        service_session_id: id,
+        username: 'testuser',
+        is_ic: true,
+        attended: AttendanceStatus.Absent,
+        ad_hoc: false,
+      });
+    }
+    expect((await UserModel.getAllServiceSessionsByUser('testuser')).length).toBe(6);
+
+    // create announcements
+    const createAnnouncementBody = (idx: number) => ({
+      title: 'test announcement' + idx, // title must be unique
+      description: 'test announcement',
+      image: null,
+      creation_date: new Date().toISOString(),
+      username: 'testuser',
+    });
+
+    for (let i = 0; i < 3; i++) {
+      await AnnouncementModel.createAnnouncement(createAnnouncementBody(i));
+    }
+
+    // get notifications
+    const res = await UserModel.getNotifications('testuser');
+    expect(res.unread_announcements).toBeArrayOfSize(3);
+    expect(res.active_sessions).toBeArrayOfSize(3);
+    expect(res.verified).toBe(true);
   });
 
   test('delete user', async () => {
@@ -331,5 +401,6 @@ describe('Unit (user)', () => {
 
   afterAll(async () => {
     await recreateDB();
+    await recreateRedis();
   });
 });

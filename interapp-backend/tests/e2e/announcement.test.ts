@@ -110,22 +110,9 @@ describe('API (announcements)', () => {
     expect(res.status).toBe(404);
   });
 
-  // Test for adding users to announcement
-  test('add users to announcement', async () => {
-    const res = await fetch(`${API_URL}/announcement/completions`, {
-      method: 'POST',
-      body: JSON.stringify({
-        announcement_id: 1,
-        usernames: ['testuser', 'testuser2'],
-      }),
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
-    });
-    expect(res.status).toBe(201);
-  });
-
   // Test for getting users announcement completion status
   test('get users announcement completion status', async () => {
-    const res = await fetch(`${API_URL}/announcement/completions?announcement_id=1`, {
+    const res = await fetch(`${API_URL}/announcement/completion?announcement_id=1`, {
       method: 'GET',
 
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
@@ -153,7 +140,7 @@ describe('API (announcements)', () => {
 
   // check if user has completed announcement
   test('check if user has completed announcement', async () => {
-    const res = await fetch(`${API_URL}/announcement/completions?announcement_id=1`, {
+    const res = await fetch(`${API_URL}/announcement/completion?announcement_id=1`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -165,7 +152,7 @@ describe('API (announcements)', () => {
   });
 
   // Test for invalid POST endpoint
-  test('create announcement with invalid date', async () => {
+  test('create announcement with duplicate title', async () => {
     const res = await fetch(`${API_URL}/announcement/`, {
       method: 'POST',
       body: JSON.stringify({
@@ -176,7 +163,7 @@ describe('API (announcements)', () => {
       }),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    expect(res.status).toBe(400);
+    expect(res.status).toBe(409);
   });
 
   // Test for GET endpoint
@@ -190,7 +177,7 @@ describe('API (announcements)', () => {
 
   // Test for GET /all endpoint
   test('get all announcements', async () => {
-    const res = await fetch(`${API_URL}/announcement/all`, {
+    const res = await fetch(`${API_URL}/announcement/all?page=1&page_size=10`, {
       method: 'GET',
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });

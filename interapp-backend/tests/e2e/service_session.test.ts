@@ -530,7 +530,7 @@ describe('API (service session)', async () => {
   });
 
   test('get all service sessions', async () => {
-    const res = await fetch(`${API_URL}/service/session/get_all?page=1&page_size=5`, {
+    const res = await fetch(`${API_URL}/service/session/all?page=1&page_size=5`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -539,7 +539,7 @@ describe('API (service session)', async () => {
     expect(res_json).toHaveProperty('data');
     expect((res_json as Record<string, unknown>).data).toBeArrayOfSize(5);
 
-    const res2 = await fetch(`${API_URL}/service/session/get_all?page=2&page_size=5`, {
+    const res2 = await fetch(`${API_URL}/service/session/all?page=2&page_size=5`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
     });
@@ -556,7 +556,7 @@ describe('API (service session)', async () => {
   });
 
   test('get all service sessions for service', async () => {
-    const res = await fetch(`${API_URL}/service/session/get_all?service_id=1&page=1&page_size=5`, {
+    const res = await fetch(`${API_URL}/service/session/all?service_id=1&page=1&page_size=5`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${accessToken}` },
     });

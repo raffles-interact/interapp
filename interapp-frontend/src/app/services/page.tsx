@@ -12,16 +12,9 @@ import './styles.css';
 const fetchAllServices = async () => {
   const apiClient = new APIClient({ useClient: false }).instance;
   try {
-    const res = await apiClient.get('/service/get_all');
+    const res = await apiClient.get('/service/all');
 
-    switch (res.status) {
-      case 200:
-        break;
-      case 400:
-        throw new Error('Bad Request');
-      default:
-        throw new Error('Unknown error');
-    }
+    if (res.status !== 200) throw new Error(res.data);
 
     const allServices: Service[] = res.data;
     // promotional image url will look like this:

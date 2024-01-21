@@ -1,4 +1,5 @@
 import { Card, Text, Badge, Button, Group, Image, Grid } from '@mantine/core';
+import Link from 'next/link';
 import { memo } from 'react';
 
 interface ServiceSessionCardProps {
@@ -27,7 +28,7 @@ const generateAttendedBadge = (attended: 'Absent' | 'Attended' | 'Valid Reason')
 const generateTimeInterval = (start_time: string, end_time: string) => {
   const start = new Date(start_time);
   const end = new Date(end_time);
-  return `${start.toLocaleString()} - ${end.toLocaleString()}`;
+  return `${start.toLocaleString('en-GB')} - ${end.toLocaleString('en-GB')}`;
 };
 
 const generateBoolean = (value: boolean) => {
@@ -70,18 +71,17 @@ const ServiceSessionCard = ({
         <Grid.Col span={6}>Ad hoc?</Grid.Col>
         <Grid.Col span={6}>{generateBoolean(ad_hoc)}</Grid.Col>
       </Grid>
-
-      <Button
-        color='blue'
-        fullWidth
-        mt='md'
-        radius='md'
-        variant='outline'
-        component='a'
-        href={'/attendance/absence?id=' + service_session_id}
+      <Link
+        href={{
+          pathname: '/attendance/absence',
+          query: { id: service_session_id },
+        }}
+        style={{ textDecoration: 'none' }}
       >
-        Request for absence
-      </Button>
+        <Button color='blue' fullWidth mt='md' radius='md' variant='outline'>
+          Request for absence
+        </Button>
+      </Link>
     </Card>
   );
 };

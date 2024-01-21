@@ -1,5 +1,5 @@
 'use client';
-import { Group, NumberInput, TextInput, Textarea, Button } from '@mantine/core';
+import { Group, NumberInput, TextInput, Textarea, Button, TagsInput } from '@mantine/core';
 import { TimeInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
@@ -15,15 +15,16 @@ import UploadImage, { convertToBase64, allowedFormats } from '@components/Upload
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
 import { getAllUsernames } from '@api/utils';
-import PillsInputWithSearch from '@components/PillsInputWithSearch/PillsInputWithSearch';
 import { useRouter } from 'next/navigation';
 import { CreateServiceWithUsers } from '../types';
 
 const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: string[] }) => {
   const { user } = useContext(AuthContext);
   const [opened, setOpened] = useState(false);
+
   const [allUsernames, setAllUsernames] = useState<string[]>([]);
   const [allValidServiceICUsernames, setAllValidServiceICUsernames] = useState<string[]>([]);
+
   const [loading, setLoading] = useState(false);
   const apiClient = new APIClient().instance;
   const router = useRouter();
@@ -58,14 +59,18 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
         if (!value) return false;
         return value.toString().length !== 8 && 'Invalid phone number';
       },
-      website: (value) => {
-        if (!value) return false;
-        return !value.includes('http') && 'Invalid website';
-      },
+
       end_time: (value, values) =>
         value <= values.start_time && 'End time must be after start time',
     },
   });
+
+  useEffect(() => {
+    if (!form.values.service_ic_username) return;
+    if (!form.values.usernames.includes(form.values.service_ic_username)) {
+      form.setFieldValue('usernames', [...form.values.usernames, form.values.service_ic_username]);
+    }
+  }, [form.values.service_ic_username]);
 
   const handleSubmit = async (data: CreateServiceWithUsers) => {
     setLoading(true);
@@ -185,18 +190,21 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
           </div>
 
           <SearchableSelect
-            defaultValue={''}
+            defaultValue={form.values.service_ic_username}
             allValues={allValidServiceICUsernames}
             onChange={(newServiceIc) => form.setFieldValue('service_ic_username', newServiceIc)}
             label='Service IC'
             required
           />
-          <PillsInputWithSearch
+
+          <TagsInput
             label='Service Users'
-            allValues={allUsernames}
-            onChange={(newServiceUsers) => form.setFieldValue('usernames', newServiceUsers)}
+            placeholder='Users that participate in this service regularly'
             required
+            data={allUsernames}
+            {...form.getInputProps('usernames')}
           />
+
           <Group gap={3} justify='center'>
             <Button onClick={() => setOpened(false)} variant='outline' color='red'>
               Cancel

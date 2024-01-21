@@ -351,7 +351,7 @@ describe('Unit (service)', () => {
   test('get all ad hoc service sessions', async () => {
     const adHocServiceSessions = await ServiceModel.getAdHocServiceSessions();
     expect(adHocServiceSessions).toBeArrayOfSize(1);
-  })
+  });
 
   afterAll(async () => {
     await recreateDB();

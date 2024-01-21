@@ -1,14 +1,17 @@
 'use client';
-import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Button } from '@mantine/core';
-import { memo } from 'react';
+import { memo, useRef } from 'react';
 
 const GoHomeButton = () => {
-  const router = useRouter();
+  const linkRef = useRef<HTMLAnchorElement>(null);
   return (
-    <Button onClick={() => router.push('/')} variant='outline' color='green'>
-      Go Home
-    </Button>
+    <>
+      <Button onClick={() => linkRef.current?.click()} variant='outline' color='green'>
+        Go Home
+      </Button>
+      <Link hidden ref={linkRef} href='/' />
+    </>
   );
 };
 

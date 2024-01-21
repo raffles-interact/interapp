@@ -1,0 +1,34 @@
+.create-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  gap: 2rem;
+}
+.create-form > * {
+  width: 100%;
+}
+
+.create-form-image {
+  width: 20rem;
+  aspect-ratio: 5/3;
+  object-fit: contain;
+  border: 1px solid var(--mantine-color-dark-6);
+  border-radius: 7px;
+}
+.create-form-attachments {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.create-form-attachments > * {
+  width: 100%;
+}
+.create-page {
+  margin: 2rem;
+}
+
+.create-go-back-button {
+  margin-bottom: 2rem;
+}

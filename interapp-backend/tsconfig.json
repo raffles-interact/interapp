@@ -20,9 +20,6 @@
     "strictPropertyInitialization": false,
     "resolveJsonModule": true,
     "esModuleInterop": true,
-    "types": [
-      "bun-types" // add Bun global
-    ],
     "paths": {
       "@db/*": ["./db/*"],
       "@routes/*": ["./api/routes/*"],

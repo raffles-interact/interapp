@@ -323,6 +323,19 @@ describe('API (account)', async () => {
     expect(res.status).toBe(204);
   });
 
+  test('get notifications', async () => {
+    const res = await fetch(`${API_URL}/user/notifications`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      unread_announcements: [],
+      active_sessions: [],
+      verified: false,
+    });
+  });
+
   //test logout
   test('logout', async () => {
     const res = await fetch(`${API_URL}/auth/signout`, {

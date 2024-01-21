@@ -17,7 +17,7 @@ interface QRPageProps {
   hash: string;
 }
 const refreshAttendance = async (id: number) => {
-  const apiClient = new APIClient({ useClient: false }).instance;
+  const apiClient = new APIClient().instance;
   const res = await apiClient.get('/service/session_user_bulk', {
     params: { service_session_id: id },
   });
@@ -113,7 +113,8 @@ const QRPage = ({ id, hash }: QRPageProps) => {
             {detail.service_title} (id: {detail.service_session_id})
           </Title>
           <Text>
-            {detail.start_time?.toLocaleString()} - {detail.end_time?.toLocaleString()}
+            {detail.start_time?.toLocaleString('en-GB')} -{' '}
+            {detail.end_time?.toLocaleString('en-GB')}
           </Text>
 
           <Text>
