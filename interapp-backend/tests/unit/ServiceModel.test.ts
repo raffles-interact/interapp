@@ -1,7 +1,7 @@
 import { testSuites } from '../constants.test';
 import { AuthModel, ServiceModel } from '../../api/models';
-import { describe, test, expect } from 'bun:test';
-import { recreateDB, recreateRedis } from '../utils';
+import { describe, test, beforeEach, expect } from 'bun:test';
+import { recreateDB, recreateMinio, recreateRedis } from '../utils';
 import redisClient from '@utils/init_redis';
 import { AttendanceStatus } from '@db/entities/service_session_user';
 import { readFileSync } from 'fs';
@@ -218,7 +218,7 @@ suite.updateService = [
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
 
-      let service = await ServiceModel.getService(1);
+      const service = await ServiceModel.getService(1);
       // update service
       const mut = {
         name: 'updated service',
@@ -227,7 +227,9 @@ suite.updateService = [
         day_of_week: 2,
         start_time: '12:00:00',
       };
-      service = { ...service, ...mut };
+      Object.entries(mut).forEach(([key, value]) => {
+        (service as any)[key] = value;
+      });
 
       const updatedService = await ServiceModel.updateService(service);
       for (const key in mut) {
@@ -1460,13 +1462,13 @@ suite.verifyAttendance = [
       expect(createdSessionUsers).toBeArrayOfSize(10);
 
       const usernames = sessionUsers.map((sessionUser) => sessionUser.username);
-      let att = [];
+      let att = []
       for (const username of usernames) {
         const res = await ServiceModel.verifyAttendance(hash, username);
         expect(res).toBeDefined();
         att.push(res);
       }
-
+      
       expect(att).toBeArrayOfSize(10);
     },
     cleanup: async () => {
@@ -1478,9 +1480,10 @@ suite.verifyAttendance = [
     name: 'should not verify attendance with invalid hash',
     cb: async () => {
       expect(ServiceModel.verifyAttendance('invalid', 'test')).rejects.toThrow();
-    },
-  },
+    }
+  }
 ];
+
 
 describe('ServiceModel', () => {
   for (const [method, tests] of Object.entries(suite)) {
