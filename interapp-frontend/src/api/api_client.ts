@@ -42,7 +42,7 @@ export class APIClient {
       if (this.config.useMultiPart) req.headers['Content-Type'] = 'multipart/form-data';
       else req.headers['Content-Type'] = 'application/json';
 
-      if (!this.isReactServerComponent) {
+      if (this.config.useClient) {
         const token = localStorage.getItem('access_token');
         if (token) {
           req.headers['Authorization'] = `Bearer ${token}`;
@@ -53,14 +53,10 @@ export class APIClient {
     this.instance.interceptors.response.use(
       (res) => res,
       (err) => {
-        const statusCode: number = err?.response?.status;
-        const headers = err?.response?.headers;
-
-        if (statusCode === 429 && headers && this.abortController) {
-          this.abortController.abort('Too many requests');
-          window.location.href = `/error/429?reset=${headers['ratelimit-reset']}&policy=${headers['ratelimit-policy']}`;
+        const statusCode: number = err.response.status;
+        if (statusCode === 429) {
+          window.location.href = '/error/429';
         }
-
         throw err;
       },
     );
