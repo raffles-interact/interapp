@@ -14,7 +14,8 @@ export const noLoginRequiredRoutes = [
   '/auth/signup',
   '/auth/forgot_password',
   '/auth/forgot_password_verify',
-  '/error/*',
+  '/404',
+  '/500'
 ];
 
 export const routePermissions = {

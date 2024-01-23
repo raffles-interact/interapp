@@ -2,15 +2,19 @@
 import GoHomeButton from '@components/GoHomeButton/GoHomeButton';
 import { Title, Text, Stack, Button, Code } from '@mantine/core';
 
-export default function ErrorPage({
+export default function Error({
   error,
   reset,
 }: {
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  
   return (
-    <Stack align='center' gap={10} p='lg'>
+    <Stack
+      align='center'
+      gap={10}
+    >
       <Title>Uh Oh!</Title>
       <Text>The application has experienced an error!! 😭😭</Text>
       <Text>Here is the error message:</Text>
@@ -26,9 +30,7 @@ export default function ErrorPage({
           have a GitHub account, reach out to the relevant people. Please include a description of
           how you produced this error, as well as the error message shown above.
         </Text>
-        <Button onClick={reset} variant='outline'>
-          Attempt to recover
-        </Button>
+        <Button onClick={reset} variant='outline'>Attempt to recover</Button>
         <GoHomeButton />
       </Stack>
     </Stack>
