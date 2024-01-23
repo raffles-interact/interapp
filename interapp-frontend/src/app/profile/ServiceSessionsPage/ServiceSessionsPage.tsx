@@ -3,8 +3,9 @@ import APIClient from '@api/api_client';
 import { remapAssetUrl } from '@/api/utils';
 import { useEffect, useState } from 'react';
 import ServiceSessionCard from './ServiceSessionCard/ServiceSessionCard';
-import { Skeleton, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
 import './styles.css';
+import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
 
 const fetchUserServiceSessions = async (username: string) => {
   const apiClient = new APIClient().instance;
@@ -49,7 +50,7 @@ const ServiceSessionsPage = ({ username }: ServiceSessionsPageProps) => {
     });
   }, []);
 
-  if (loading) return <Skeleton width='100%' height={30} />;
+  if (loading) return <PageSkeleton />;
   if (serviceSessions.length === 0)
     return (
       <div className='service-session-content'>
