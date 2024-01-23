@@ -28,17 +28,25 @@ export class APIClient {
     this.instance.interceptors.request.use((req) => {
       if (this.config.useMultiPart) req.headers['Content-Type'] = 'multipart/form-data';
       else req.headers['Content-Type'] = 'application/json';
-      return req;
-    });
-    if (this.config.useClient) {
-      this.instance.interceptors.request.use((req) => {
+
+      if (this.config.useClient) {
         const token = localStorage.getItem('access_token');
         if (token) {
           req.headers['Authorization'] = `Bearer ${token}`;
         }
-        return req;
-      });
-    }
+      }
+      return req;
+    });
+    this.instance.interceptors.response.use(
+      (res) => res,
+      (err) => {
+        const statusCode: number = err.response.status;
+        if (statusCode === 429) {
+          window.location.href = '/error/429';
+        }
+        throw err;
+      },
+    );
   }
 }
 
