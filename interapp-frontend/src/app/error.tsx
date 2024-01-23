@@ -2,7 +2,7 @@
 import GoHomeButton from '@components/GoHomeButton/GoHomeButton';
 import { Title, Text, Stack, Button, Code } from '@mantine/core';
 
-export default function Error({
+export default function ErrorPage({
   error,
   reset,
 }: {

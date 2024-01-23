@@ -3,15 +3,15 @@
 export default function GlobalError({
   error,
   reset,
-}: {
+}: Readonly<{
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+}>) {
   const handleGoHome = () => {
     window.location.href = '/';
   };
   return (
-    <html>
+    <html lang='en-GB'>
       <body>
         <div
           style={{
