@@ -10,7 +10,7 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   return (
-    <Stack align='center' gap={10}>
+    <Stack align='center' gap={10} p='lg'>
       <Title>Uh Oh!</Title>
       <Text>The application has experienced an error!! 😭😭</Text>
       <Text>Here is the error message:</Text>
