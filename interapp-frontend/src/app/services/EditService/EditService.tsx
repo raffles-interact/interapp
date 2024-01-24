@@ -117,7 +117,7 @@ const EditService = ({
       opened={opened}
       open={open}
       close={close}
-      title='Add Service'
+      title='Edit Service'
       Icon={IconPencil}
       show={() => !!user && user.permissions.includes(Permissions.EXCO)}
     >
