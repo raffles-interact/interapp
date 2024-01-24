@@ -8,9 +8,7 @@ export class APIClient {
   private readonly isReactServerComponent: boolean = typeof window === 'undefined';
   public readonly instance: AxiosInstance;
   private readonly config: APIClientConfig;
-  private abortController: AbortController | null = this.isReactServerComponent
-    ? null
-    : new AbortController();
+  private abortController: AbortController = new AbortController();
   public constructor(config?: APIClientConfig) {
     const defaults: APIClientConfig = {
       useMultiPart: false,
@@ -20,7 +18,7 @@ export class APIClient {
     this.instance = axios.create({
       timeout: 60000,
       withCredentials: true,
-      signal: this.abortController?.signal,
+      signal: this.abortController.signal,
       validateStatus: (status) => {
         return status !== 429 && status < 500;
       },
@@ -32,11 +30,7 @@ export class APIClient {
         : process.env.NEXT_PUBLIC_AXIOS_BASE_URL,
     });
     this.instance.interceptors.request.use((req) => {
-      if (
-        !this.isReactServerComponent &&
-        window.location.pathname === '/error/429' &&
-        this.abortController
-      ) {
+      if (window.location.pathname === '/error/429') {
         this.abortController.abort('Too many requests');
       }
       if (this.config.useMultiPart) req.headers['Content-Type'] = 'multipart/form-data';
@@ -53,10 +47,14 @@ export class APIClient {
     this.instance.interceptors.response.use(
       (res) => res,
       (err) => {
-        const statusCode: number = err.response.status;
+        const statusCode: number = err?.response?.status;
+        const headers = err?.response?.headers;
+
         if (statusCode === 429) {
-          window.location.href = '/error/429';
+          this.abortController.abort('Too many requests');
+          window.location.href = `/error/429?reset=${headers['ratelimit-reset']}&policy=${headers['ratelimit-policy']}`;
         }
+
         throw err;
       },
     );

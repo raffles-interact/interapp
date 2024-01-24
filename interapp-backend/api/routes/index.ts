@@ -25,7 +25,7 @@ if (['development', 'test'].includes(process.env.NODE_ENV ?? '')) {
 }
 
 if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
+  app.set('trust proxy', true);
   app.use(generateRateLimit(1000 * 60, 500)); // 500 requests per 1 minute
 }
 
