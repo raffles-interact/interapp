@@ -63,8 +63,8 @@ describe('API (auth)', () => {
       method: 'POST',
       body: JSON.stringify({
         user_id: 1,
-        username: 'fejkdlsjlksjlskdjf;lasjf',
-        email: 'fffkoefk@ifgeji',
+        username: 'fejkdlsjlksjlskdjflasjf',
+        email: 'fffkoefk@ifgeji.com',
         password: 'testpassword',
       }),
       headers: { 'Content-Type': 'application/json' },
