@@ -32,8 +32,6 @@ type JSONValue =
   | boolean
   | null;
 
-z;
-
 export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const content: unknown = req.method === 'GET' ? req.query : req.body;

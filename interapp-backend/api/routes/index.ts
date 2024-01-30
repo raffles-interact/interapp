@@ -1,9 +1,11 @@
 import express from 'express';
-import helloRouter from './endpoints/hello';
-import authRouter from './endpoints/auth';
-import userRouter from './endpoints/user';
-import serviceRouter from './endpoints/service';
-import announcementRouter from './endpoints/announcement';
+import {
+  helloRouter,
+  authRouter,
+  userRouter,
+  serviceRouter,
+  announcementRouter,
+} from './endpoints';
 
 import 'express-async-errors';
 import cors from 'cors';

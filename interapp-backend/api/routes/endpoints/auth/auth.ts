@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
-import { validateRequiredFields, verifyJWT } from '../middleware';
+import { validateRequiredFields, verifyJWT } from '../../middleware';
 import { AuthModel } from '@models/auth';
 
 const authRouter = Router();

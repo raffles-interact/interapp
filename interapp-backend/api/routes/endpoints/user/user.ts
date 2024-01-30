@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../../middleware';
 import { UserModel } from '@models/user';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';

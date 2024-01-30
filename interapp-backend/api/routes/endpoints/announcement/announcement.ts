@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
-import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../../middleware';
 import { AnnouncementModel } from '@models/announcement';
 import { Permissions } from '@utils/permissions';
 import multer from 'multer';
