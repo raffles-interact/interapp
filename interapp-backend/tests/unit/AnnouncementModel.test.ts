@@ -54,6 +54,7 @@ suite.createAnnouncement = [
       });
       expect(announcement_id).toBe(1);
     },
+    cleanup: async () => await recreateDB(),
   },
 ];
 
