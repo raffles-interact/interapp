@@ -82,7 +82,7 @@ const AbsenceForm = ({ id }: AbsenceFormProps) => {
         .
       </Text>
       <Button onClick={handleSubmit} variant='outline' color='blue'>
-        Mark as Valid Reason
+        Excuse form submitted
       </Button>
     </>
   );
