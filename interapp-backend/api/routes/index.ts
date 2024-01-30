@@ -1,3 +1,38 @@
+// check that all attributes in process env is set
+const requiredEnv = [
+  'POSTGRES_USER',
+  'POSTGRES_PASSWORD',
+  'POSTGRES_DB',
+  'POSTGRES_HOST',
+  'POSTGRES_PORT',
+  'API_PORT',
+  'REDIS_URL',
+  'FRONTEND_URL',
+  'SCHOOL_EMAIL_REGEX',
+  'MINIO_ROOT_USER',
+  'MINIO_ROOT_PASSWORD',
+  'MINIO_ADDRESS',
+  'MINIO_CONSOLE_ADDRESS',
+  'MINIO_ACCESSKEY',
+  'MINIO_SECRETKEY',
+  'MINIO_BUCKETNAME',
+  'MINIO_ENDPOINT',
+  'JWT_ACCESS_SECRET',
+  'JWT_REFRESH_SECRET',
+  'JWT_ACCESS_EXPIRATION',
+  'JWT_REFRESH_EXPIRATION',
+  'JWT_ISSUER',
+  'JWT_AUDIENCE',
+  'EMAIL_USER',
+  'EMAIL_PASSWORD',
+];
+
+for (const env of requiredEnv) {
+  if (!process.env[env]) {
+    throw new Error(`Missing environment variable ${env}`);
+  }
+}
+
 import express from 'express';
 import {
   helloRouter,

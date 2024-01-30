@@ -1,42 +1,21 @@
 import { Router } from 'express';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
-import { validateRequiredFields, verifyJWT } from '../../middleware';
+import { validateRequiredFieldsV2, verifyJWT } from '../../middleware';
+import { SignupFields, SigninFields } from './validation';
 import { AuthModel } from '@models/auth';
 
 const authRouter = Router();
 
-authRouter.post(
-  '/signup',
-  validateRequiredFields(['user_id', 'username', 'email', 'password']),
-  async (req, res) => {
-    if (typeof req.body.user_id !== 'number') {
-      throw new HTTPError(
-        'Invalid field type',
-        'user_id must be a number',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
+authRouter.post('/signup', validateRequiredFieldsV2(SignupFields), async (req, res) => {
+  const body: SignupFields = req.body;
 
-    // test if school email
-    const emailRegex = new RegExp(process.env.SCHOOL_EMAIL_REGEX as string);
-    if (emailRegex.test(req.body.email)) {
-      throw new HTTPError(
-        'Invalid email',
-        'Email cannot be a valid school email',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
+  await AuthModel.signUp(body.user_id, body.username, body.email, body.password);
+  res.status(201).send();
+});
 
-    await AuthModel.signUp(req.body.user_id, req.body.username, req.body.email, req.body.password);
-    res.status(201).send();
-  },
-);
-
-authRouter.post('/signin', validateRequiredFields(['username', 'password']), async (req, res) => {
-  const { token, refresh, user, expire } = await AuthModel.signIn(
-    req.body.username,
-    req.body.password,
-  );
+authRouter.post('/signin', validateRequiredFieldsV2(SigninFields), async (req, res) => {
+  const body: SigninFields = req.body;
+  const { token, refresh, user, expire } = await AuthModel.signIn(body.username, body.password);
   res.cookie('refresh', refresh, {
     httpOnly: true,
     path: '/api/auth/refresh',
