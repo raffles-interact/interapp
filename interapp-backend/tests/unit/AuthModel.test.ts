@@ -180,7 +180,7 @@ suite.verify = [
   },
 ];
 
-describe('ServiceModel', () => {
+describe('AuthModel', () => {
   for (const [method, tests] of Object.entries(suite)) {
     describe(method, async () => {
       for (const { name, cb, cleanup } of tests) {
