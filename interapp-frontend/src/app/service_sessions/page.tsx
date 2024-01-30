@@ -13,7 +13,7 @@ const handleFetchServiceSessionsData = async (
   perPage: number,
   service_id?: number,
 ) => {
-  const apiClient = new APIClient().instance;
+  const apiClient = new APIClient({ useClient: false }).instance;
 
   // we first get the service sessions
   const params = service_id

@@ -427,7 +427,7 @@ export class UserModel {
       .leftJoin('service_session.service', 'service')
       .addSelect(['service.name', 'service.promotional_image'])
       .orderBy('service_session.start_time', 'DESC')
-      .getMany();
+      .getMany()
 
     if (!serviceSessions) {
       throw new HTTPError(

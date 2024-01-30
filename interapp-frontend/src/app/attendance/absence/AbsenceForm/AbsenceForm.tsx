@@ -2,10 +2,9 @@
 import APIClient from '@api/api_client';
 import { useContext, useRef } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { Text, Button } from '@mantine/core';
+import { Skeleton, Text, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import Link from 'next/link';
-import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
 
 const handleSetValidReason = async (id: number, username: string) => {
   const apiClient = new APIClient().instance;
@@ -45,7 +44,8 @@ const AbsenceForm = ({ id }: AbsenceFormProps) => {
       });
   };
 
-  if (loading) return <PageSkeleton />;
+  if (loading) return <Skeleton width='100%' height={30} />;
+
   return (
     <>
       <iframe
@@ -82,7 +82,7 @@ const AbsenceForm = ({ id }: AbsenceFormProps) => {
         .
       </Text>
       <Button onClick={handleSubmit} variant='outline' color='blue'>
-        Excuse form submitted
+        Mark as Valid Reason
       </Button>
     </>
   );

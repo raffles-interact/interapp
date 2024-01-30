@@ -136,14 +136,6 @@ export class ServiceModel {
   ) {
     const session = new ServiceSession();
     session.service_id = service_session.service_id;
-    const validTime = new Date(service_session.start_time) > new Date(service_session.end_time);
-    if (validTime) {
-      throw new HTTPError(
-        'Invalid time',
-        'Start time must be before end time',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
     session.start_time = service_session.start_time;
     session.end_time = service_session.end_time;
     session.ad_hoc_enabled = service_session.ad_hoc_enabled;
@@ -171,19 +163,8 @@ export class ServiceModel {
     }
     return res;
   }
-  public static async updateServiceSession(
-    service_session: Omit<ServiceSession, 'service_session_users' | 'service'>,
-  ) {
+  public static async updateServiceSession(service_session: ServiceSession) {
     const service = await this.getService(service_session.service_id); // check if service exists
-
-    const validTime = new Date(service_session.start_time) > new Date(service_session.end_time);
-    if (validTime) {
-      throw new HTTPError(
-        'Invalid time',
-        'Start time must be before end time',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
     try {
       await appDataSource.manager.update(
         ServiceSession,

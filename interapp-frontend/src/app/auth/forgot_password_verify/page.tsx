@@ -8,7 +8,7 @@ export default async function ForgotPasswordVerifyPage({
 }: {
   searchParams: { [key: string]: string | string[] | undefined };
 }) {
-  const apiClient = new APIClient().instance;
+  const apiClient = new APIClient({ useClient: false }).instance;
   const token = searchParams.token as string | undefined;
   if (!token) {
     return (

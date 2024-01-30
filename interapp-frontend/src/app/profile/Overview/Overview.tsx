@@ -4,13 +4,22 @@ import { useState, useEffect } from 'react';
 import { User, UserWithProfilePicture, validateUserType } from '@providers/AuthProvider/types';
 import { Permissions } from '../../route_permissions';
 import { remapAssetUrl } from '@api/utils';
-import { Text, Title, Group, Stack, Badge, ActionIcon, Paper, Button } from '@mantine/core';
+import {
+  Skeleton,
+  Text,
+  Title,
+  Group,
+  Stack,
+  Badge,
+  ActionIcon,
+  Paper,
+  Button,
+} from '@mantine/core';
 import './styles.css';
 import { permissionsMap } from '@/app/admin/AdminTable/PermissionsInput/PermissionsInput';
 import { IconEdit } from '@tabler/icons-react';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
-import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
 
 const fetchUserDetails = async (username: string) => {
   const apiClient = new APIClient().instance;
@@ -60,7 +69,7 @@ const Overview = ({ username, updateUser }: OverviewProps) => {
     });
   };
 
-  if (!user) return <PageSkeleton />;
+  if (!user) return <Skeleton width='100%' height={30} />;
 
   return (
     <Paper shadow='xs' withBorder p='xl' className='profile-container-outer'>

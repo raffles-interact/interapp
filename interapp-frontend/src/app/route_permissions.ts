@@ -14,11 +14,10 @@ export const noLoginRequiredRoutes = [
   '/auth/signup',
   '/auth/forgot_password',
   '/auth/forgot_password_verify',
-  '/error/*',
 ];
 
 export const routePermissions = {
-  [Permissions.VISTOR]: ['/', '/auth/verify_email', '/settings', '/profile', '/error/*'],
+  [Permissions.VISTOR]: ['/', '/auth/verify_email', '/settings', '/profile'],
   [Permissions.CLUB_MEMBER]: [
     '/announcements',
     '/services',

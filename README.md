@@ -4,7 +4,6 @@
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=raffles-interact_interapp&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=raffles-interact_interapp)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=raffles-interact_interapp&metric=bugs)](https://sonarcloud.io/summary/new_code?id=raffles-interact_interapp)
 [![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=raffles-interact_interapp&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=raffles-interact_interapp)
-[![CI](https://github.com/raffles-interact/interapp/actions/workflows/pipeline.yml/badge.svg)](https://github.com/raffles-interact/interapp/actions/workflows/pipeline.yml)
 
 A monorepo for Raffles Interact's administrative application. Built with Next.js and Express along with the Bun runtime.
 

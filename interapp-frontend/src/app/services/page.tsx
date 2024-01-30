@@ -10,7 +10,7 @@ import { Service } from './types';
 import './styles.css';
 
 const fetchAllServices = async () => {
-  const apiClient = new APIClient().instance;
+  const apiClient = new APIClient({ useClient: false }).instance;
   try {
     const res = await apiClient.get('/service/all');
 
