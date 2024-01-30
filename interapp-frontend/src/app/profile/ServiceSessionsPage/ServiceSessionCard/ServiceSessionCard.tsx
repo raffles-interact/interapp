@@ -79,7 +79,7 @@ const ServiceSessionCard = ({
         style={{ textDecoration: 'none' }}
       >
         <Button color='blue' fullWidth mt='md' radius='md' variant='outline'>
-          Request for absence
+          Request for excusal 
         </Button>
       </Link>
     </Card>

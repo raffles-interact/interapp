@@ -5,12 +5,13 @@ import {
 } from '../AttendanceMenuEntry/AttendanceMenuEntry';
 import APIClient from '@/api/api_client';
 import { useState, useEffect, memo, useRef, Suspense } from 'react';
-import { Title, Text, Badge, Skeleton } from '@mantine/core';
+import { Title, Text, Badge } from '@mantine/core';
 import { useInterval } from '@mantine/hooks';
 import QRCode from 'qrcode';
 import { IconFlag, IconExternalLink } from '@tabler/icons-react';
 import './styles.css';
 import Link from 'next/link';
+import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
 
 interface QRPageProps {
   id: number;
@@ -39,6 +40,7 @@ const QRPage = ({ id, hash }: QRPageProps) => {
     {} as fetchAttendanceDetailsType,
   );
 
+  console.log(process.env.NEXT_PUBLIC_WEBSITE_URL)
   const redirectLink = useRef<string>(
     process.env.NEXT_PUBLIC_WEBSITE_URL + '/attendance/verify?hash=' + hash + '&id=' + id,
   );
@@ -107,7 +109,7 @@ const QRPage = ({ id, hash }: QRPageProps) => {
           </Link>
         </div>
       </div>
-      <Suspense fallback={<Skeleton width='100%' height={30} />}>
+      <Suspense fallback={<PageSkeleton />}>
         <div className='QRCode-details'>
           <Title order={2}>
             {detail.service_title} (id: {detail.service_session_id})

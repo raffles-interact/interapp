@@ -24,6 +24,11 @@ if (['development', 'test'].includes(process.env.NODE_ENV ?? '')) {
   app.use('/api/docs', serve, setup(swagger_docs, { swaggerOptions: { validatorUrl: null } }));
 }
 
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+  app.use(generateRateLimit(1000 * 60, 500)); // 500 requests per 1 minute
+}
+
 app.use('/api/hello', helloRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
@@ -31,7 +36,6 @@ app.use('/api/service', serviceRouter);
 app.use('/api/announcement', announcementRouter);
 
 app.use(handleError);
-if (process.env.NODE_ENV === 'production') app.use(generateRateLimit(1000 * 60, 50)); // 50 requests per minute
 
 try {
   app.listen(PORT, () => console.log('Server running on port 8000!'));
