@@ -27,11 +27,16 @@ const requiredEnv = [
   'EMAIL_PASSWORD',
 ];
 
-for (const env of requiredEnv) {
-  if (!process.env[env]) {
-    throw new Error(`Missing environment variable ${env}`);
-  }
+const missing = requiredEnv.reduce((acc, curr) => {
+  if (process.env[curr] === undefined) acc.push(curr);
+  return acc;
+}, [] as string[])
+
+if (missing.length > 0) {
+  console.error(`Missing environment variables: ${missing.join(', ')}\nBackend will crash now :(`);
+  process.exit(1);
 }
+
 
 import express from 'express';
 import {
