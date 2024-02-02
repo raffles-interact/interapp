@@ -439,7 +439,7 @@ describe('API (service session)', async () => {
       method: 'POST',
       body: JSON.stringify({
         name: 'test sedsfdsfdsrvice3',
-        contact_email: 'fksalfjasklf@fkjkdsjglk',
+        contact_email: 'fksalfjasklf@fkjkdsjglk.com',
         day_of_week: 2,
         start_time: '09:00',
         end_time: '10:00',

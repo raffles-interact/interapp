@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { validateRequiredFieldsV2, verifyJWT, verifyRequiredPermission } from '../../middleware';
 import {
   AnnouncementIdFields,

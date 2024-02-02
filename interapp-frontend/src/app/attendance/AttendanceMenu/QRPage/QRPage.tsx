@@ -39,8 +39,6 @@ const QRPage = ({ id, hash }: QRPageProps) => {
   const [detail, setDetail] = useState<fetchAttendanceDetailsType>(
     {} as fetchAttendanceDetailsType,
   );
-
-  console.log(process.env.NEXT_PUBLIC_WEBSITE_URL)
   const redirectLink = useRef<string>(
     process.env.NEXT_PUBLIC_WEBSITE_URL + '/attendance/verify?hash=' + hash + '&id=' + id,
   );
