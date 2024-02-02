@@ -220,12 +220,8 @@ serviceRouter.get(
         Number(query.hasOwnProperty('service_session_id')),
       );
       res.status(200).send(session_users);
-    } 
-    throw new HTTPError(
-      '?????',
-      'unreachable code path',
-      HTTPErrorCode.INTERNAL_SERVER_ERROR,
-    );
+    }
+    throw new HTTPError('?????', 'unreachable code path', HTTPErrorCode.INTERNAL_SERVER_ERROR);
   },
 );
 
@@ -236,7 +232,7 @@ serviceRouter.patch(
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
     const body: z.infer<typeof UpdateServiceSessionUserFields> = req.body;
-    
+
     const session_user = await ServiceModel.getServiceSessionUser(
       Number(req.body.service_session_id),
       String(req.body.username),
