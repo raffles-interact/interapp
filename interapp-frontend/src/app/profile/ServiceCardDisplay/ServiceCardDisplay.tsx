@@ -5,7 +5,7 @@ import { ServiceSession } from '@/app/service_sessions/types';
 import { remapAssetUrl } from '@api/utils';
 import ServiceCard from './ServiceCard/ServiceCard';
 import { useState, useEffect } from 'react';
-import { Skeleton, Title } from '@mantine/core';
+import { Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import AdHocSignUp from './AdHocSignUp/AdHocSignUp';
 import './styles.css';

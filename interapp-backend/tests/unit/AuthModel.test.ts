@@ -1,12 +1,8 @@
 import { testSuites } from '../constants.test';
-import { AuthModel, ServiceModel, UserModel } from '../../api/models';
+import { AuthModel, UserModel } from '../../api/models';
 import { User } from '@db/entities';
 import { describe, test, expect } from 'bun:test';
 import { recreateDB, recreateRedis } from '../utils';
-import redisClient from '@utils/init_redis';
-import { AttendanceStatus } from '@db/entities/service_session_user';
-import { readFileSync } from 'fs';
-import { randomBytes } from 'crypto';
 
 const suite = testSuites.AuthModel;
 

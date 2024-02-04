@@ -220,8 +220,8 @@ serviceRouter.get(
         Number(req.query.service_session_id),
       );
       res.status(200).send(session_users);
-    }
-    else throw new HTTPError('?????', 'unreachable code path', HTTPErrorCode.INTERNAL_SERVER_ERROR);
+    } else
+      throw new HTTPError('?????', 'unreachable code path', HTTPErrorCode.INTERNAL_SERVER_ERROR);
   },
 );
 

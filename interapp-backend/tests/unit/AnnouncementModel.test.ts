@@ -325,7 +325,7 @@ suite.getAnnouncementCompletions = [
       const completions = await AnnouncementModel.getAnnouncementCompletions(1);
 
       expect(Object.entries(completions)).toBeArrayOfSize(10);
-      for (const [username, completion] of Object.entries(completions)) {
+      for (const [, completion] of Object.entries(completions)) {
         expect(completion).toBeFalse();
       }
     },

@@ -1,5 +1,5 @@
 'use client';
-import { Title, Text, Stack, Button } from '@mantine/core';
+import { Title, Text, Stack } from '@mantine/core';
 import { useMemo, useEffect, useState } from 'react';
 import { useInterval } from '@mantine/hooks';
 
@@ -10,7 +10,7 @@ export default function Page429({
 }>) {
   const reset = useMemo(() => {
     if (searchParams['reset'] && typeof searchParams['reset'] === 'string') {
-      return parseInt(searchParams['reset'] as string);
+      return parseInt(searchParams['reset']);
     }
     return null;
   }, [searchParams]);
@@ -19,7 +19,7 @@ export default function Page429({
     // looks like this: policy=2;w=60
     // means 2 per 60 seconds
     if (searchParams['policy'] && typeof searchParams['policy'] === 'string') {
-      const [per, totalReset] = (searchParams['policy'] as string).split(';w=');
+      const [per, totalReset] = searchParams['policy'].split(';w=');
       // ensure that per and totalReset are numbers
       if (isNaN(parseInt(per)) || isNaN(parseInt(totalReset))) {
         return [null, null];
