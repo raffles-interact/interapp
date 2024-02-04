@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Interapp API",
+    "title": "OneInteract API",
     "description": "This is the specification for all routes defined in the `api/routes/endpoints/*` directory. All routes should be prefixed with `/api/*`. This spec is not yet fully compliant with openapi >=3.0.0 (DELETE should not have a response body in the newest version). ",
     "contact": {
       "email": "sebastian.ong@hotmail.com"

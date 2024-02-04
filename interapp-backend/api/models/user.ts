@@ -214,11 +214,11 @@ export class UserModel {
 
     const email: EmailOptions = {
       from: {
-        name: 'Interapp',
+        name: 'OneInteract',
         address: process.env.EMAIL_USER as string,
       },
       to: [user.email],
-      subject: 'Reset Password from Interapp',
+      subject: 'Reset Password from OneInteract',
       template: 'reset_password',
       context: {
         username: username,
@@ -293,11 +293,11 @@ export class UserModel {
 
     const email: EmailOptions = {
       from: {
-        name: 'Interapp',
+        name: 'OneInteract',
         address: process.env.EMAIL_USER as string,
       },
       to: [user.email],
-      subject: 'Verify Email from Interapp',
+      subject: 'Verify Email from OneInteract',
       template: 'verify_email',
       context: {
         username: username,

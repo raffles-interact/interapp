@@ -9,12 +9,12 @@ export default function Login() {
     <div className='login-page'>
       <div className='login-headers'>
         <Box visibleFrom='sm' className='login-logo'>
-          <Image src='/interact-logo.png' alt='Interapp Logo' fill={true} />
+          <Image src='/oneinteract.png' alt='OneInteract Logo' fill={true} />
         </Box>
         <div className='login-headers-text'>
           <Title className='login-title'>Log In</Title>
           <Text className='login-text'>
-            Enter your credentials to access all of Interapp's features.
+            Enter your credentials to access all of OneInteract's features.
           </Text>
         </div>
       </div>

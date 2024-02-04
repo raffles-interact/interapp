@@ -8,12 +8,12 @@ export default function SignUp() {
     <div className='signup-page'>
       <div className='signup-headers'>
         <Box visibleFrom='sm' className='signup-logo'>
-          <Image src='/interact-logo.png' alt='Interapp Logo' fill={true} />
+          <Image src='/oneinteract.png' alt='OneInteract Logo' fill={true} />
         </Box>
         <div className='signup-headers-text'>
           <Title className='signup-title'>Sign Up</Title>
           <Text className='signup-text'>
-            Create an account to start using Interapp! Please use the ID number provided by the
+            Create an account to start using OneInteract! Please use the ID number provided by the
             school.
           </Text>
         </div>

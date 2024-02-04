@@ -9,7 +9,7 @@ export default function ForgotPassword() {
     <div className='forgot-password-page'>
       <div className='forgot-password-headers'>
         <Box visibleFrom='sm' className='forgot-password-logo'>
-          <Image src='/interact-logo.png' alt='Interapp Logo' fill={true} />
+          <Image src='/oneinteract.png' alt='OneInteract Logo' fill={true} />
         </Box>
         <div className='forgot-password-headers-text'>
           <Title className='forgot-password-title'>Reset Password</Title>

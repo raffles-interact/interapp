@@ -10,8 +10,8 @@ const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Interapp',
-    default: 'Interapp',
+    template: '%s | OneInteract',
+    default: 'OneInteract',
   },
   description: 'Raffles Interact web application',
   referrer: 'origin-when-cross-origin',

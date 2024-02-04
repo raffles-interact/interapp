@@ -90,7 +90,7 @@ export default function Home() {
       <div className='homepage'>
         <Stack gap={5}>
           <Title order={1} fw={700}>
-            Hello {user?.username}, welcome back to Interapp.
+            Hello {user?.username}, welcome back to OneInteract.
           </Title>
           <Text>Here are your updates for what's happening in Interact today.</Text>
           <hr className='homepage-divider' />
@@ -137,7 +137,7 @@ export default function Home() {
               .
             </Text>
           </Stack>
-          <Image src='/interact-logo.png' className='homepage-logo' />
+          <Image src='/oneinteract.png' className='homepage-logo' />
         </Group>
         <hr className='homepage-divider' />
         <Group gap={20} wrap='nowrap' className='homepage-section'>
