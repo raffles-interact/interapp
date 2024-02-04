@@ -69,7 +69,7 @@ const AdminTable = () => {
                   <Table.Th>Email</Table.Th>
                   <Table.Th>Verified</Table.Th>
                   <Table.Th>Permissions</Table.Th>
-                  <Table.Th>Service Hours</Table.Th>
+                  <Table.Th>CCA Hours</Table.Th>
                   <Table.Th>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>

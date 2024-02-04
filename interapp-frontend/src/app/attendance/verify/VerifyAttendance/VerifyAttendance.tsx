@@ -50,7 +50,7 @@ const verifyAttendanceUser = async (
     case 204:
       return {
         status: 'Success',
-        message: 'Attendance verified successfully!',
+        message: '',
       };
     case 400:
       return {
@@ -126,7 +126,7 @@ const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
       <Title>Verify Attendance</Title>
       <Text>{message}</Text>
       {status === 'Success' && (
-        <Text>Checked in successfully. Added {gainedHours} service hours to your account.</Text>
+        <Text>Checked in successfully. Added {gainedHours} CCA hours to your account.</Text>
       )}
       {status === 'Success' ? (
         <GoHomeButton />

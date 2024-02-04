@@ -104,7 +104,7 @@ const Overview = ({ username, updateUser }: OverviewProps) => {
                 </Badge>
               ))}
             </div>
-            <Text>Service hours: </Text>
+            <Text>CCA hours: </Text>
             <Text className='profile-bold'>{user.service_hours}</Text>
           </div>
         </Stack>

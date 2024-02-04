@@ -181,7 +181,7 @@ export default function Home() {
               <Title order={3}>What features does the site have?</Title>
               <Text>
                 The site has a variety of features that are useful to the club. These include
-                attendance taking, announcement sharing, and tracking of service hours.
+                attendance taking, announcement sharing, and tracking of CCA hours.
               </Text>
               <Text>
                 If you've got experience with web development and want to contribute to the site,
