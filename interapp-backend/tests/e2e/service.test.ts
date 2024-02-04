@@ -109,7 +109,7 @@ describe('API (service)', async () => {
       body: JSON.stringify({
         name: 'test service 2',
         description: 'test description2',
-        contact_email: 'fksalfjasklf@fkjkdsjglk',
+        contact_email: 'fksalfjasklf@fkjkdsjglk.com',
         day_of_week: 2,
         start_time: '09:00',
         end_time: '10:00',
@@ -126,7 +126,7 @@ describe('API (service)', async () => {
       method: 'POST',
       body: JSON.stringify({
         name: 'test service3',
-        contact_email: 'fksalfjasklf@fkjkdsjglk',
+        contact_email: 'fksalfjasklf@fkjkdsjglk.com',
         day_of_week: 2,
         start_time: '09:00',
         end_time: '10:00',
@@ -151,10 +151,11 @@ describe('API (service)', async () => {
         day_of_week: 1,
         start_time: '09:00',
         end_time: '10:00',
-        service_ic_username: 1234,
+        service_ic_username: '1234',
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
+
     expect(invalidres.status).toBe(404);
   });
 
@@ -239,7 +240,7 @@ describe('API (service)', async () => {
       service_id: 2,
       name: 'test service 2',
       description: 'test description2',
-      contact_email: 'fksalfjasklf@fkjkdsjglk',
+      contact_email: 'fksalfjasklf@fkjkdsjglk.com',
       day_of_week: 2,
       start_time: '09:00:00',
       end_time: '10:00:00',

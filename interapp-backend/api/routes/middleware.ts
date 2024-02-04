@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { AuthModel } from '@models/auth';
 import { UserModel } from '@models/user';
+import { z } from 'zod';
 
 import rateLimit from 'express-rate-limit';
 
@@ -16,6 +17,32 @@ export function validateRequiredFields(requiredFields: string[], optionalFields:
         `You are missing these field(s): ${missing.join(', ')}. ` +
           (optionalFields.length > 0 ? 'Optional field(s): ' + optionalFields.join(', ') : ''),
         HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
+
+    next();
+  };
+}
+
+type JSONValue =
+  | Partial<{ [key: string]: JSONValue }>
+  | JSONValue[]
+  | string
+  | number
+  | boolean
+  | null;
+
+export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema: T) {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const content: unknown = req.method === 'GET' ? req.query : req.body;
+    const validationResult = schema.safeParse(content);
+
+    if (!validationResult.success) {
+      throw new HTTPError(
+        'Invalid fields',
+        validationResult.error.message,
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+        validationResult.error.issues,
       );
     }
 

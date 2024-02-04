@@ -1,13 +1,27 @@
 import { Router } from 'express';
-import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../middleware';
+import { validateRequiredFieldsV2, verifyJWT, verifyRequiredPermission } from '../../middleware';
+import {
+  OptionalUsername,
+  RequiredUsername,
+  ChangePasswordFields,
+  ChangeEmailFields,
+  TokenFields,
+  PermissionsFields,
+  ServiceIdFields,
+  ServiceHoursFields,
+  UpdateUserServicesFields,
+  ProfilePictureFields,
+} from './validation';
+import { z } from 'zod';
 import { UserModel } from '@models/user';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
-userRouter.get('/', validateRequiredFields([], ['username']), verifyJWT, async (req, res) => {
-  const username = req.query.username as string | undefined;
+userRouter.get('/', validateRequiredFieldsV2(OptionalUsername), verifyJWT, async (req, res) => {
+  const query: z.infer<typeof OptionalUsername> = req.query;
+  const username = query.username;
 
   if (username !== undefined) {
     const user = await UserModel.getUserDetails(username);
@@ -29,7 +43,7 @@ userRouter.get('/', validateRequiredFields([], ['username']), verifyJWT, async (
   if (!requesterPerms.some((perm) => neededPerms.includes(perm))) {
     throw new HTTPError(
       'Insufficient permissions',
-      'Only admins can get all users',
+      'Only admins, exco, service ic or mentorship ic can get all users',
       HTTPErrorCode.UNAUTHORIZED_ERROR,
     );
   }
@@ -40,36 +54,44 @@ userRouter.get('/', validateRequiredFields([], ['username']), verifyJWT, async (
 
 userRouter.delete(
   '/',
-  validateRequiredFields(['username']),
+  validateRequiredFieldsV2(RequiredUsername),
   verifyJWT,
   verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
-    await UserModel.deleteUser(req.body.username as string);
+    const body: z.infer<typeof RequiredUsername> = req.body;
+    await UserModel.deleteUser(body.username as string);
     res.status(204).send();
   },
 );
 
 userRouter.patch(
   '/password/change',
-  validateRequiredFields(['old_password', 'new_password']),
+  validateRequiredFieldsV2(ChangePasswordFields),
   verifyJWT,
   async (req, res) => {
+    const body: z.infer<typeof ChangePasswordFields> = req.body;
     await UserModel.changePassword(
       req.headers.username as string,
-      req.body.old_password,
-      req.body.new_password,
+      body.old_password,
+      body.new_password,
     );
     res.status(204).send();
   },
 );
 
-userRouter.post('/password/reset_email', validateRequiredFields(['username']), async (req, res) => {
-  await UserModel.sendResetPasswordEmail(req.body.username);
-  res.status(204).send();
-});
+userRouter.post(
+  '/password/reset_email',
+  validateRequiredFieldsV2(RequiredUsername),
+  async (req, res) => {
+    const body: z.infer<typeof RequiredUsername> = req.body;
+    await UserModel.sendResetPasswordEmail(body.username);
+    res.status(204).send();
+  },
+);
 
-userRouter.patch('/password/reset', validateRequiredFields(['token']), async (req, res) => {
-  const newPw = await UserModel.resetPassword(req.body.token);
+userRouter.patch('/password/reset', validateRequiredFieldsV2(TokenFields), async (req, res) => {
+  const body: z.infer<typeof TokenFields> = req.body;
+  const newPw = await UserModel.resetPassword(body.token);
   res.clearCookie('refresh', { path: '/api/auth/refresh' });
   res.status(200).send({
     temp_password: newPw,
@@ -78,10 +100,12 @@ userRouter.patch('/password/reset', validateRequiredFields(['token']), async (re
 
 userRouter.patch(
   '/change_email',
-  validateRequiredFields(['new_email'], ['username']),
+  validateRequiredFieldsV2(ChangeEmailFields),
   verifyJWT,
   async (req, res) => {
-    if (req.body.username) {
+    const body: z.infer<typeof ChangeEmailFields> = req.body;
+
+    if (body.username) {
       // we are changing someone else's email
       const perms = await UserModel.checkPermissions(req.headers.username as string);
       if (!perms.includes(Permissions.ADMIN)) {
@@ -92,15 +116,8 @@ userRouter.patch(
         );
       }
     }
-    const username = req.body.username ?? req.headers.username;
-    const emailRegex = new RegExp(process.env.SCHOOL_EMAIL_REGEX as string);
-    if (emailRegex.test(req.body.new_email)) {
-      throw new HTTPError(
-        'Invalid email',
-        'Email cannot be a valid school email',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
+    const username = body.username ?? (req.headers.username as string);
+
     await UserModel.changeEmail(username, req.body.new_email);
     res.status(204).send();
   },
@@ -111,46 +128,32 @@ userRouter.post('/verify_email', verifyJWT, async (req, res) => {
   res.status(204).send();
 });
 
-userRouter.patch('/verify', validateRequiredFields(['token']), verifyJWT, async (req, res) => {
-  await UserModel.verifyEmail(req.body.token);
+userRouter.patch('/verify', validateRequiredFieldsV2(TokenFields), verifyJWT, async (req, res) => {
+  const body: z.infer<typeof TokenFields> = req.body;
+  await UserModel.verifyEmail(body.token);
   res.status(204).send();
 });
 
 userRouter.patch(
   '/permissions',
-  validateRequiredFields(['username', 'permissions']),
+  validateRequiredFieldsV2(PermissionsFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
-    if (
-      !Array.isArray(req.body.permissions) ||
-      !req.body.permissions.every((x: any) => x in Permissions) ||
-      req.body.permissions.length === 0
-    ) {
-      throw new HTTPError(
-        'Invalid field type',
-        'Permissions must be an array of permission IDs',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
-    if (!req.body.permissions.includes(Permissions.VISTOR)) {
-      throw new HTTPError(
-        'Invalid field type',
-        'Permissions must include the visitor permission',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
-    await UserModel.updatePermissions(req.body.username, req.body.permissions);
+    const body: z.infer<typeof PermissionsFields> = req.body;
+
+    await UserModel.updatePermissions(body.username, body.permissions);
     res.status(204).send();
   },
 );
 
 userRouter.get(
   '/permissions',
-  validateRequiredFields([], ['username']),
+  validateRequiredFieldsV2(OptionalUsername),
   verifyJWT,
   async (req, res) => {
-    const username = req.query.username as string | undefined;
+    const query: z.infer<typeof OptionalUsername> = req.query;
+    const username = query.username;
     const permissions = await UserModel.getPermissions(username);
     res.status(200).send(permissions);
   },
@@ -159,9 +162,10 @@ userRouter.get(
 userRouter.get(
   '/userservices',
   verifyJWT,
-  validateRequiredFields(['username']),
+  validateRequiredFieldsV2(RequiredUsername),
   async (req, res) => {
-    const services = await UserModel.getAllServicesByUser(req.query.username as string);
+    const query = req.query as unknown as z.infer<typeof RequiredUsername>;
+    const services = await UserModel.getAllServicesByUser(query.username as string);
     res.status(200).send(services);
   },
 );
@@ -170,9 +174,10 @@ userRouter.post(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFields(['username', 'service_id']),
+  validateRequiredFieldsV2(ServiceIdFields),
   async (req, res) => {
-    await UserModel.addServiceUser(req.body.service_id, req.body.username);
+    const body: z.infer<typeof ServiceIdFields> = req.body;
+    await UserModel.addServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
 );
@@ -181,9 +186,10 @@ userRouter.delete(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFields(['username', 'service_id']),
+  validateRequiredFieldsV2(ServiceIdFields),
   async (req, res) => {
-    await UserModel.removeServiceUser(req.body.service_id, req.body.username);
+    const body: z.infer<typeof ServiceIdFields> = req.body;
+    await UserModel.removeServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
 );
@@ -192,22 +198,11 @@ userRouter.patch(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFields(['service_id', 'data']),
+  validateRequiredFieldsV2(UpdateUserServicesFields),
   async (req, res) => {
-    //validate data to be of shape {action: 'add' | 'remove', username: string}[]
-    if (
-      !Array.isArray(req.body.data) ||
-      !req.body.data.every((x: any) => x.action === 'add' || x.action === 'remove') ||
-      req.body.data.length === 0
-    ) {
-      throw new HTTPError(
-        'Invalid field type',
-        "Data must be an array of objects with action: 'add' | 'remove' and username",
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
+    const body: z.infer<typeof UpdateUserServicesFields> = req.body;
 
-    await UserModel.updateServiceUserBulk(req.body.service_id, req.body.data);
+    await UserModel.updateServiceUserBulk(body.service_id, body.data);
     res.status(204).send();
   },
 );
@@ -215,9 +210,10 @@ userRouter.patch(
 userRouter.patch(
   '/service_hours',
   verifyJWT,
-  validateRequiredFields(['hours'], ['username']),
+  validateRequiredFieldsV2(ServiceHoursFields),
   async (req, res) => {
-    if (req.body.username) {
+    const body: z.infer<typeof ServiceHoursFields> = req.body;
+    if (body.username) {
       // we are changing someone else's service hours
       const perms = await UserModel.checkPermissions(req.headers.username as string);
       if (!perms.includes(Permissions.ADMIN)) {
@@ -227,11 +223,11 @@ userRouter.patch(
           HTTPErrorCode.UNAUTHORIZED_ERROR,
         );
       }
-      await UserModel.updateServiceHours(req.body.username, req.body.hours);
+      await UserModel.updateServiceHours(body.username, body.hours);
       res.status(204).send();
     } else {
       // we are changing our own service hours
-      await UserModel.updateServiceHours(req.headers.username as string, req.body.hours);
+      await UserModel.updateServiceHours(req.headers.username as string, body.hours);
       res.status(204).send();
     }
   },
@@ -240,9 +236,10 @@ userRouter.patch(
 userRouter.patch(
   '/profile_picture',
   verifyJWT,
-  validateRequiredFields(['profile_picture']),
+  validateRequiredFieldsV2(ProfilePictureFields),
   async (req, res) => {
-    await UserModel.updateProfilePicture(req.headers.username as string, req.body.profile_picture);
+    const body: z.infer<typeof ProfilePictureFields> = req.body;
+    await UserModel.updateProfilePicture(req.headers.username as string, body.profile_picture);
     res.status(204).send();
   },
 );

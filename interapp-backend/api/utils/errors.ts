@@ -1,13 +1,13 @@
 export interface AppError extends Error {
   name: string;
   message: string;
-  data?: Record<string, any>;
+  data?: Record<string, any> | Array<unknown>;
 }
 
 export class HTTPError extends Error implements Partial<AppError> {
   public readonly name: string;
   public readonly message: string;
-  public readonly data?: Record<string, any>;
+  public readonly data?: Record<string, any> | Array<unknown>;
   public readonly status: HTTPErrorCode;
   public readonly headers?: Record<string, string>;
 
@@ -15,7 +15,7 @@ export class HTTPError extends Error implements Partial<AppError> {
     name: string,
     message: string,
     status: HTTPErrorCode,
-    data?: Record<string, any>,
+    data?: Record<string, any> | Array<unknown>,
     headers?: Record<string, string>,
   ) {
     super(message);
