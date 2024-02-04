@@ -215,13 +215,13 @@ serviceRouter.get(
     if (query.hasOwnProperty('username')) {
       const session_users = await UserModel.getAllServiceSessionsByUser(String(req.query.username));
       res.status(200).send(session_users);
-    } else if (req.query.service_session_id) {
+    } else if (query.hasOwnProperty('service_session_id')) {
       const session_users = await ServiceModel.getServiceSessionUsers(
-        Number(query.hasOwnProperty('service_session_id')),
+        Number(req.query.service_session_id),
       );
       res.status(200).send(session_users);
     }
-    throw new HTTPError('?????', 'unreachable code path', HTTPErrorCode.INTERNAL_SERVER_ERROR);
+    else throw new HTTPError('?????', 'unreachable code path', HTTPErrorCode.INTERNAL_SERVER_ERROR);
   },
 );
 
