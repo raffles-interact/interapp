@@ -34,7 +34,7 @@ const AnnouncementBox = ({
       </Card.Section>
       <Group justify='space-between' mt='md' mb='xs'>
         <Text fw={500}>{title}</Text>
-        {completed ? <Badge color='green'>Completed</Badge> : <Badge color='red'>Unread</Badge>}
+        {completed ? <Badge color='green'>Read</Badge> : <Badge color='red'>Unread</Badge>}
       </Group>
       <Text size='sm' c='dimmed' lineClamp={3} dangerouslySetInnerHTML={{ __html: description }} />
 
