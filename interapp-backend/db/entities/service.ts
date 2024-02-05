@@ -33,6 +33,12 @@ export class Service {
   description?: string | null;
 
   @Column()
+  enable_scheduled: boolean;
+
+  @Column()
+  service_hours: number;
+
+  @Column()
   contact_email: string;
 
   @Column({ type: 'int', width: 8, nullable: true }) // 8 digit phone number (country code assumed to be +65)
