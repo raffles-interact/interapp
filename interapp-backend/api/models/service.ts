@@ -16,6 +16,8 @@ export class ServiceModel {
     newService.contact_email = service.contact_email;
     newService.contact_number = service.contact_number;
     newService.website = service.website;
+    newService.enable_scheduled = service.enable_scheduled;
+    newService.service_hours = service.service_hours;
 
     if (!service.promotional_image) newService.promotional_image = null;
     else {
@@ -147,6 +149,7 @@ export class ServiceModel {
     session.start_time = service_session.start_time;
     session.end_time = service_session.end_time;
     session.ad_hoc_enabled = service_session.ad_hoc_enabled;
+    session.service_hours = service_session.service_hours;
     session.service = await this.getService(service_session.service_id);
     try {
       await appDataSource.manager.insert(ServiceSession, session);

@@ -34,6 +34,8 @@ const _CreateServiceFields = z.object({
     .optional(),
   website: z.string().optional(),
   promotional_image: z.string().optional(),
+  enable_scheduled: z.boolean(),
+  service_hours: z.number().int().nonnegative(),
 });
 
 export const UpdateServiceFields = z
@@ -70,6 +72,7 @@ const _CreateServiceSessionFields = z.object({
   start_time: z.string(),
   end_time: z.string(),
   ad_hoc_enabled: z.boolean(),
+  service_hours: z.number().int().nonnegative(),
 });
 
 export const CreateServiceSessionFields = _CreateServiceSessionFields.refine(

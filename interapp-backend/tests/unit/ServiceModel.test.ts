@@ -6,6 +6,7 @@ import redisClient from '@utils/init_redis';
 import { AttendanceStatus } from '@db/entities/service_session_user';
 import { readFileSync } from 'fs';
 import { randomBytes } from 'crypto';
+import { Service } from '@db/entities';
 
 const suite = testSuites.ServiceModel;
 
@@ -25,6 +26,8 @@ suite.createService = [
         start_time: '10:00',
         end_time: '11:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       });
       expect(id).toBe(1);
     },
@@ -48,6 +51,8 @@ suite.createService = [
         end_time: '11:00',
         service_ic_username: 'test',
         promotional_image: imgB64,
+        service_hours: 1,
+        enable_scheduled: true,
       });
       expect(id).toBe(1);
     },
@@ -62,7 +67,10 @@ suite.createService = [
       const img = readFileSync('tests/utils/assets/interact-logo.png', 'base64');
       const imgB64 = `data:image/png;base64,${img}`;
 
-      const args = [
+      const args: Omit<
+        Service,
+        'service_id' | 'service_ic' | 'user_service' | 'service_sessions'
+      >[] = [
         {
           name: 'test service',
           description: 'test description',
@@ -72,6 +80,8 @@ suite.createService = [
           end_time: '11:00',
           service_ic_username: 'test',
           promotional_image: imgB64,
+          service_hours: 1,
+          enable_scheduled: true,
         },
         {
           name: 'test service2',
@@ -83,6 +93,8 @@ suite.createService = [
           end_time: '14:00',
           service_ic_username: 'test2',
           promotional_image: imgB64,
+          service_hours: 1,
+          enable_scheduled: true,
         },
         {
           name: 'test service3',
@@ -93,6 +105,8 @@ suite.createService = [
           end_time: '16:00',
           service_ic_username: 'test3',
           website: 'http://test.com',
+          service_hours: 1,
+          enable_scheduled: false,
         },
       ];
       const ids = await Promise.all(args.map((arg) => ServiceModel.createService(arg)));
@@ -127,6 +141,8 @@ suite.createService = [
           start_time: '10:00',
           end_time: '11:00',
           service_ic_username: 'test',
+          service_hours: 1,
+          enable_scheduled: true,
         });
 
       await create();
@@ -153,6 +169,9 @@ suite.createService = [
           start_time: '10:00',
           end_time: '11:00',
           service_ic_username: 'test',
+
+          service_hours: 1,
+          enable_scheduled: true,
         });
       // create 1 service first
       await create(0);
@@ -180,6 +199,9 @@ suite.getService = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       await ServiceModel.createService(serviceData);
@@ -213,6 +235,8 @@ suite.updateService = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const id = await ServiceModel.createService(serviceData);
@@ -249,6 +273,8 @@ suite.updateService = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const service = await ServiceModel.createService(serviceData);
@@ -276,6 +302,8 @@ suite.updateService = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const id = await ServiceModel.createService(serviceData);
@@ -309,6 +337,8 @@ suite.deleteService = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const id = await ServiceModel.createService(serviceData);
@@ -345,6 +375,8 @@ suite.getAllServices = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       await ServiceModel.createService(serviceData);
@@ -371,6 +403,8 @@ suite.getAllServices = [
         end_time: '11:00:00',
         service_ic_username: 'test',
         promotional_image: imgB64,
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       await ServiceModel.createService(serviceData);
@@ -395,6 +429,8 @@ suite.getAllServices = [
           start_time: '10:00:00',
           end_time: '11:00:00',
           service_ic_username: 'test' + id,
+          service_hours: 1,
+          enable_scheduled: true,
         };
         await signUpUser(id, 'test' + id);
         await ServiceModel.createService(serviceData);
@@ -424,6 +460,9 @@ suite.createServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const id = await ServiceModel.createService(serviceData);
@@ -437,6 +476,7 @@ suite.createServiceSession = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
@@ -458,6 +498,8 @@ suite.createServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const id = await ServiceModel.createService(serviceData);
@@ -473,6 +515,7 @@ suite.createServiceSession = [
           start_time: now.toISOString(),
           end_time: inOneHour.toISOString(),
           ad_hoc_enabled: true,
+          service_hours: 1,
         };
         const sessionId = await ServiceModel.createServiceSession(sessionData);
         expect(sessionId).toBe(id);
@@ -497,6 +540,7 @@ suite.createServiceSession = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       expect(ServiceModel.createServiceSession(sessionData)).rejects.toThrow(
         'Service with service_id 2 does not exist',
@@ -516,6 +560,8 @@ suite.createServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const id = await ServiceModel.createService(serviceData);
@@ -529,6 +575,7 @@ suite.createServiceSession = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       expect(ServiceModel.createServiceSession(sessionData)).rejects.toThrow(
         'Start time must be before end time',
@@ -551,6 +598,8 @@ suite.createServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       await signUpUser(1, 'test');
       const id = await ServiceModel.createService(serviceData);
@@ -561,6 +610,7 @@ suite.createServiceSession = [
         start_time: 'invalid',
         end_time: 'invalid',
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       expect(ServiceModel.createServiceSession(sessionData)).rejects.toThrow();
     },
@@ -584,6 +634,8 @@ suite.getServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const now = new Date();
       const inOneHour = new Date();
@@ -593,6 +645,7 @@ suite.getServiceSession = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       await signUpUser(1, 'test');
       await ServiceModel.createService(serviceData);
@@ -635,6 +688,8 @@ suite.updateServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -647,6 +702,7 @@ suite.updateServiceSession = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
@@ -675,6 +731,7 @@ suite.updateServiceSession = [
         start_time: new Date().toISOString(),
         end_time: new Date().toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       expect(ServiceModel.updateServiceSession(sessionData)).rejects.toThrow(
         'Service with service_id 1 does not exist',
@@ -698,6 +755,8 @@ suite.updateServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -710,6 +769,7 @@ suite.updateServiceSession = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
@@ -742,6 +802,8 @@ suite.deleteServiceSession = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -754,6 +816,7 @@ suite.deleteServiceSession = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
@@ -789,6 +852,8 @@ suite.createServiceSessionUser = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -801,6 +866,7 @@ suite.createServiceSessionUser = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
@@ -835,6 +901,8 @@ suite.createServiceSessionUser = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const serviceId = await ServiceModel.createService(serviceData);
       expect(serviceId).toBe(1);
@@ -848,6 +916,7 @@ suite.createServiceSessionUser = [
           start_time: now.toISOString(),
           end_time: inOneHour.toISOString(),
           ad_hoc_enabled: true,
+          service_hours: 1,
         };
         const sessionId = await ServiceModel.createServiceSession(sessionData);
         expect(sessionId).toBe(id);
@@ -916,6 +985,8 @@ suite.createServiceSessionUsers = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const serviceId = await ServiceModel.createService(serviceData);
       expect(serviceId).toBe(1);
@@ -929,6 +1000,7 @@ suite.createServiceSessionUsers = [
           start_time: now.toISOString(),
           end_time: inOneHour.toISOString(),
           ad_hoc_enabled: true,
+          service_hours: 1,
         };
         const sessionId = await ServiceModel.createServiceSession(sessionData);
         expect(sessionId).toBe(id);
@@ -980,6 +1052,8 @@ suite.getServiceSessionUser = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -992,6 +1066,7 @@ suite.getServiceSessionUser = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
@@ -1037,6 +1112,8 @@ suite.getServiceSessionUsers = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -1049,6 +1126,7 @@ suite.getServiceSessionUsers = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       };
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
@@ -1099,6 +1177,8 @@ suite.updateServiceSessionUser = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       });
       expect(id).toBe(1);
       // create service session
@@ -1110,6 +1190,7 @@ suite.updateServiceSessionUser = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       });
       expect(sessionId).toBe(1);
       // create service session user
@@ -1149,6 +1230,8 @@ suite.deleteServiceSessionUser = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test',
+        service_hours: 1,
+        enable_scheduled: true,
       });
       expect(id).toBe(1);
       // create service session
@@ -1161,6 +1244,7 @@ suite.deleteServiceSessionUser = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       });
       expect(sessionId).toBe(1);
       // create service session user
@@ -1213,6 +1297,8 @@ suite.deleteServiceSessionUsers = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -1226,6 +1312,7 @@ suite.deleteServiceSessionUsers = [
         start_time: now.toISOString(),
         end_time: inOneHour.toISOString(),
         ad_hoc_enabled: true,
+        service_hours: 1,
       });
       expect(sessionId).toBe(1);
       // create service session users
@@ -1264,6 +1351,8 @@ suite.getAllServiceSessions = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -1277,6 +1366,7 @@ suite.getAllServiceSessions = [
           start_time: now.toISOString(),
           end_time: inOneHour.toISOString(),
           ad_hoc_enabled: true,
+          service_hours: 1,
         };
         const sessionId = await ServiceModel.createServiceSession(sessionData);
         expect(sessionId).toBe(id);
@@ -1316,6 +1406,8 @@ suite.getAdHocServiceSessions = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -1331,6 +1423,7 @@ suite.getAdHocServiceSessions = [
           start_time: now.toISOString(),
           end_time: inOneHour.toISOString(),
           ad_hoc_enabled: ad_hoc,
+          service_hours: 1,
         };
         const sessionId = await ServiceModel.createServiceSession(sessionData);
         expect(sessionId).toBe(id);
@@ -1366,6 +1459,8 @@ suite.getActiveServiceSessions = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -1382,6 +1477,7 @@ suite.getActiveServiceSessions = [
           start_time: now.toISOString(),
           end_time: inOneHour.toISOString(),
           ad_hoc_enabled: true,
+          service_hours: 1,
         };
         const sessionId = await ServiceModel.createServiceSession(sessionData);
         expect(sessionId).toBe(id);
@@ -1424,6 +1520,8 @@ suite.verifyAttendance = [
         start_time: '10:00:00',
         end_time: '11:00:00',
         service_ic_username: 'test1',
+        service_hours: 1,
+        enable_scheduled: true,
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
@@ -1438,6 +1536,7 @@ suite.verifyAttendance = [
           start_time: now.toISOString(),
           end_time: inOneHour.toISOString(),
           ad_hoc_enabled: true,
+          service_hours: 1,
         };
         const sessionId = await ServiceModel.createServiceSession(sessionData);
         expect(sessionId).toBe(1);

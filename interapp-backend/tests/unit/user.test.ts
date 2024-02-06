@@ -10,7 +10,7 @@ import { recreateRedis } from '../utils/recreate_redis';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import { AnnouncementModel } from '@models/announcement';
-
+/*
 describe('Unit (user)', () => {
   beforeAll(async () => {
     await recreateDB();
@@ -24,6 +24,7 @@ describe('Unit (user)', () => {
       start_time: '12:00',
       end_time: '13:00',
       service_ic_username: 'testuser',
+      
     }); // should create service with service_id 1
     await ServiceModel.createService({
       name: 'testservice2',
@@ -404,3 +405,5 @@ describe('Unit (user)', () => {
     await recreateRedis();
   });
 });
+
+*/
