@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Table, Select, Group } from '@mantine/core';
+import { useDebouncedState } from '@mantine/hooks';
 import { ServiceSessionsWithMeta, ServiceMeta } from '../types';
 import { useMediaQuery } from '@mantine/hooks';
 import PageController from '@components/PageController/PageController';
@@ -29,7 +30,7 @@ const ServiceSessionContent = ({
 }: ServiceSessionContentProps) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [serviceId, setServiceId] = useState<number>();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useDebouncedState(1, 200);
   const [totalPagesState, setTotalPagesState] = useState(totalPages);
 
   useEffect(() => {

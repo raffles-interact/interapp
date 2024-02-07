@@ -109,7 +109,7 @@ schedule('0 */1 * * * *', async () => {
     // setting expiry is not possible with hset, so we need to check if the hash is expired
     // if yes, remove it from redis
     else {
-      const hash = Object.values(hashes).find((k) => k === String(session.service_session_id))!;
+      const hash = Object.values(hashes).find((k) => k === String(session.service_session_id));
       if (hash) await redisClient.hDel('service_session', hash);
     }
   }
