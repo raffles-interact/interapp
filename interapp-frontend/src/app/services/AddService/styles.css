@@ -21,3 +21,8 @@
 .add-service-times > * {
   width: 100%;
 }
+
+.add-service-service-hours {
+  align-items: flex-end;
+  width: 100%;
+}

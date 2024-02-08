@@ -1,5 +1,13 @@
 'use client';
-import { Group, NumberInput, TextInput, Textarea, Button, TagsInput } from '@mantine/core';
+import {
+  Group,
+  NumberInput,
+  TextInput,
+  Textarea,
+  Button,
+  TagsInput,
+  Checkbox,
+} from '@mantine/core';
 import { TimeInput } from '@mantine/dates';
 import { IconPlus } from '@tabler/icons-react';
 import { useForm } from '@mantine/form';
@@ -17,6 +25,19 @@ import { Permissions } from '@/app/route_permissions';
 import { getAllUsernames } from '@api/utils';
 import { useRouter } from 'next/navigation';
 import { CreateServiceWithUsers } from '../types';
+
+const calculateInterval = (start: string, end: string) => {
+  if (!start || !end) return 0;
+  const [startHours, startMinutes] = start.split(':').map((x) => parseInt(x));
+  const [endHours, endMinutes] = end.split(':').map((x) => parseInt(x));
+
+  const diff =
+    new Date().setHours(endHours, endMinutes).valueOf() -
+    new Date().setHours(startHours, startMinutes).valueOf();
+  const diffToHours = Math.round(diff / 1000 / 60 / 60);
+
+  return diffToHours < 0 ? 0 : diffToHours;
+};
 
 const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: string[] }) => {
   const { user } = useContext(AuthContext);
@@ -50,6 +71,8 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
       end_time: '',
       promotional_image: '',
       service_ic_username: '',
+      enable_scheduled: true,
+      service_hours: 0,
       usernames: [],
     },
     validate: {
@@ -76,15 +99,18 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
     setLoading(true);
     const serviceUsers = data.usernames;
 
-    // nullify empty fields
-    const nulledData = {
-      ...data,
-      description: data.description ? data.description : null,
-      contact_number: data.contact_number ? data.contact_number : null,
-      website: data.website ? data.website : null,
-      promotional_image: data.promotional_image ? data.promotional_image : null,
-    };
-    const res = await apiClient.post('/service', nulledData);
+    const optionalFields: (keyof CreateServiceWithUsers)[] = [
+      'description',
+      'contact_number',
+      'website',
+      'promotional_image',
+    ];
+
+    for (const field of optionalFields) {
+      if (!data[field]) delete data[field];
+    }
+
+    const res = await apiClient.post('/service', data);
 
     switch (res.status) {
       case 200:
@@ -101,7 +127,7 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
       case 400:
         notifications.show({
           title: 'Error',
-          message: 'Invalid data',
+          message: JSON.stringify(res.data),
           color: 'red',
         });
         setLoading(false);
@@ -188,6 +214,32 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
             <TimeInput label='Start Time' required {...form.getInputProps('start_time')} />
             <TimeInput label='End Time' required {...form.getInputProps('end_time')} />
           </div>
+          <Group className='add-service-service-hours'>
+            <NumberInput
+              label='Service Hours'
+              {...form.getInputProps('service_hours')}
+              required
+              min={0}
+              step={1}
+            />
+            <Button
+              onClick={() =>
+                form.setFieldValue(
+                  'service_hours',
+                  calculateInterval(form.values.start_time, form.values.end_time),
+                )
+              }
+              variant='outline'
+            >
+              Calculate Hours
+            </Button>
+          </Group>
+          <Group w='100%' justify='center'>
+            <Checkbox
+              {...form.getInputProps('enable_scheduled', { type: 'checkbox' })}
+              label='Enable Scheduled'
+            />
+          </Group>
 
           <SearchableSelect
             defaultValue={form.values.service_ic_username}

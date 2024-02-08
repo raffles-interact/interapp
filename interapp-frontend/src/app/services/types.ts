@@ -10,6 +10,8 @@ export interface Service {
   start_time: string;
   end_time: string;
   service_ic_username: string;
+  service_hours: number;
+  enable_scheduled: boolean;
 }
 
 export type ServiceWithUsers = Service & { usernames: string[] };
