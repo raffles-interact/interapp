@@ -60,7 +60,3 @@ export function parseErrorMessage(resBody: unknown) {
     .flat();
   return errorMessages.join('\n');
 }
-
-export type Nullable<T> = {
-  [P in keyof T]: T[P] | null;
-};

@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form';
 import { TextInput, Textarea, NumberInput, Button, Group, Checkbox } from '@mantine/core';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
-import { parseErrorMessage, type Nullable } from '@api/utils';
+import { parseErrorMessage } from '@api/utils';
 import { TimeInput } from '@mantine/dates';
 import { useState, useContext, memo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';

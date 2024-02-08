@@ -1,9 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Table, Select, Group } from '@mantine/core';
-import { useDebouncedState } from '@mantine/hooks';
+import { useDebouncedState, useMediaQuery } from '@mantine/hooks';
 import { ServiceSessionsWithMeta, ServiceMeta } from '../types';
-import { useMediaQuery } from '@mantine/hooks';
 import PageController from '@components/PageController/PageController';
 import ServiceSessionRow from './ServiceSessionRow/ServiceSessionRow';
 import AddAction from './AddAction/AddAction';
