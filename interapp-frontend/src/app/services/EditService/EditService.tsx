@@ -174,7 +174,7 @@ const EditService = ({
           </div>
           <Group className='add-service-service-hours'>
             <NumberInput
-              label='Service Hours'
+              label='CCA Hours'
               {...form.getInputProps('service_hours')}
               required
               min={0}

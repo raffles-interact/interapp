@@ -168,7 +168,7 @@ function EditAction({
 
         <Group className='edit-modal-service-hours'>
           <NumberInput
-            label='Service Hours'
+            label='CCA Hours'
             {...form.getInputProps('service_hours')}
             min={0}
             step={1}

@@ -76,7 +76,7 @@ const updateServiceHours = async (newHours: number) => {
   const res = await apiClient.patch('/user/service_hours', {
     hours: newHours,
   });
-  if (res.status !== 204) throw new Error('Failed to update service hours');
+  if (res.status !== 204) throw new Error('Failed to update CCA hours');
 };
 
 const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
