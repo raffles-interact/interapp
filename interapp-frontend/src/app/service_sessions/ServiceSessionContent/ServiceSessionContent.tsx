@@ -72,7 +72,7 @@ const ServiceSessionContent = ({
               <Table.Th>Session ID</Table.Th>
               <Table.Th>Service</Table.Th>
               <Table.Th>Date</Table.Th>
-              <Table.Th>Time</Table.Th>
+
               <Table.Th>Ad hoc?</Table.Th>
               <Table.Th>Attendees</Table.Th>
               <Table.Th>Actions</Table.Th>
@@ -96,6 +96,7 @@ const ServiceSessionContent = ({
                   service_session_users={serviceSession.service_session_users}
                   isDesktop={isDesktop ?? false}
                   refreshData={refresh}
+                  service_hours={serviceSession.service_hours}
                 />
               );
             })}

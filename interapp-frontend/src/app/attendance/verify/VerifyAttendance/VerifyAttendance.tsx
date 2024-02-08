@@ -26,14 +26,10 @@ const fetchDuration = async (id: number) => {
     end_time: string;
     ad_hoc_enabled: boolean;
     service_session_id: number;
+    service_hours: number;
   } = res.data;
 
-  const diff =
-    new Date(sessionDetails.end_time).getTime() - new Date(sessionDetails.start_time).getTime();
-
-  const diffHours = diff / (1000 * 60 * 60);
-
-  const rounded = parseFloat(diffHours.toFixed(1));
+  const rounded = parseFloat(sessionDetails.service_hours.toFixed(1));
 
   return rounded;
 };

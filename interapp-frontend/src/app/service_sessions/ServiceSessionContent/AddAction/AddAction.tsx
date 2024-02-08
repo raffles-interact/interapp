@@ -1,7 +1,7 @@
 'use client';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
-import { Button, Group, Checkbox, Select } from '@mantine/core';
+import { Button, Group, Checkbox, Select, NumberInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { DateTimePicker } from '@mantine/dates';
 import ServiceSessionUserInput from '../ServiceSessionUserInput/ServiceSessionUserInput';
@@ -36,6 +36,13 @@ const generateDefaultStartAndEndTimes = () => {
   return [start, end] as const;
 };
 
+const calculateInterval = (start: Date, end: Date) => {
+  const diff = end.getTime() - start.getTime();
+  const diffHours = diff / 1000 / 60 / 60;
+  const rounded = Math.floor(diffHours);
+  return rounded < 0 ? 0 : rounded;
+};
+
 function AddAction({ refreshData }: Readonly<AddActionProps>) {
   const apiClient = new APIClient().instance;
   const [opened, { open, close }] = useDisclosure(false);
@@ -54,6 +61,7 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
       end_time: defaultEndDate,
       ad_hoc_enabled: false,
       attendees: [] as ServiceSessionUser[],
+      service_hours: 1,
     },
     validate: {
       end_time: (value, values) =>
@@ -70,6 +78,7 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
       start_time: values.start_time.toISOString(),
       end_time: values.end_time.toISOString(),
       ad_hoc_enabled: values.ad_hoc_enabled,
+      service_hours: values.service_hours,
     };
 
     const res = await apiClient.post('/service/session', body);
@@ -124,8 +133,8 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
 
   useEffect(() => {
     const hasAdHocUser = form.values.attendees.some((user) => user.ad_hoc);
-    if (hasAdHocUser) setDisableSelectAdHoc(true);
-    else setDisableSelectAdHoc(false);
+
+    setDisableSelectAdHoc(hasAdHocUser);
     if (hasAdHocUser && !form.values.ad_hoc_enabled) form.setFieldValue('ad_hoc_enabled', true);
   }, [form.values.attendees]);
 
@@ -159,6 +168,26 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
         <Group className='add-modal-form-datetime'>
           <DateTimePicker label='Start Date' {...form.getInputProps('start_time')} />
           <DateTimePicker label='End Date' {...form.getInputProps('end_time')} />
+        </Group>
+
+        <Group className='add-modal-service-hours'>
+          <NumberInput
+            label='Service Hours'
+            {...form.getInputProps('service_hours')}
+            min={0}
+            step={1}
+          />
+          <Button
+            onClick={() =>
+              form.setFieldValue(
+                'service_hours',
+                calculateInterval(form.values.start_time, form.values.end_time),
+              )
+            }
+            variant='outline'
+          >
+            Calculate Hours
+          </Button>
         </Group>
 
         <Checkbox
