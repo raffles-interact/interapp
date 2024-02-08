@@ -24,8 +24,8 @@ const _CreateServiceFields = z.object({
   name: z.string(),
   contact_email: z.string().email(),
   day_of_week: z.number().int().min(0).max(6),
-  start_time: z.string().regex(/^([0-1]\d|2[0-3]):[0-5]\d$/),
-  end_time: z.string().regex(/^([0-1]\d|2[0-3]):[0-5]\d$/),
+  start_time: z.string().regex(/^([0-1]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/),
+  end_time: z.string().regex(/^([0-1]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/),
   service_ic_username: z.string(),
   description: z.string().optional(),
   contact_number: z
@@ -34,6 +34,8 @@ const _CreateServiceFields = z.object({
     .optional(),
   website: z.string().optional(),
   promotional_image: z.string().optional(),
+  enable_scheduled: z.boolean(),
+  service_hours: z.number().int().nonnegative(),
 });
 
 export const UpdateServiceFields = z
@@ -70,6 +72,7 @@ const _CreateServiceSessionFields = z.object({
   start_time: z.string(),
   end_time: z.string(),
   ad_hoc_enabled: z.boolean(),
+  service_hours: z.number().int().nonnegative(),
 });
 
 export const CreateServiceSessionFields = _CreateServiceSessionFields.refine(

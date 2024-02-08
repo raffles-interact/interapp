@@ -19,6 +19,7 @@ exec "touch /tmp/$1.sql"
 exec "PGPASSWORD=postgres pg_dump -U postgres -a interapp > /tmp/$1.sql"
 
 container_id=$(docker ps -aqf "name=interapp-postgres")
+touch $2/$1.sql
 docker cp $container_id:/tmp/$1.sql $2/$1.sql
 
 exec "rm /tmp/$1.sql"

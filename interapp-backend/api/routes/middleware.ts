@@ -39,10 +39,10 @@ export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema:
 
     if (!validationResult.success) {
       throw new HTTPError(
-        'Invalid fields',
+        'zodError',
         validationResult.error.message,
         HTTPErrorCode.BAD_REQUEST_ERROR,
-        validationResult.error.issues,
+        validationResult.error.flatten(),
       );
     }
 

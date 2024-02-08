@@ -22,15 +22,7 @@ async function getCurrentServices() {
   // get current date and time
   // get service days of week and start and end time
   const services = await ServiceModel.getAllServices();
-  return services.map((service) => {
-    return {
-      service_id: service.service_id,
-      service_ic_username: service.service_ic_username,
-      day_of_week: service.day_of_week,
-      start_time: service.start_time,
-      end_time: service.end_time,
-    };
-  });
+  return services.filter((service) => service.enable_scheduled);
 }
 
 schedule(
@@ -51,6 +43,7 @@ schedule(
         end_time: constructDate(service.day_of_week, service.end_time).toISOString(),
         ad_hoc_enabled: false,
         attending_users: [] as string[],
+        service_hours: service.service_hours,
       };
 
       const service_session_id = await ServiceModel.createServiceSession(detail);
@@ -62,16 +55,16 @@ schedule(
         console.log(err);
       }
 
-      for (const user of users) {
-        await ServiceModel.createServiceSessionUser({
-          service_session_id,
-          username: user.username,
-          ad_hoc: false,
-          attended: AttendanceStatus.Absent,
-          is_ic: user.username === service.service_ic_username,
-        });
-        detail.attending_users.push(user.username);
-      }
+      const toCreate = users.map((user) => ({
+        service_session_id,
+        username: user.username,
+        ad_hoc: false,
+        attended: AttendanceStatus.Absent,
+        is_ic: user.username === service.service_ic_username,
+      }));
+
+      await ServiceModel.createServiceSessionUsers(toCreate);
+      detail.attending_users = toCreate.map((u) => u.username);
 
       created_services.push({ [service_session_id]: detail });
     }
@@ -94,8 +87,7 @@ schedule('0 */1 * * * *', async () => {
 
   // get all hashes from redis and check if service session id is in redis else add it
   const hashes = await redisClient.hGetAll('service_session');
-
-  console.log(hashes);
+  console.log('hashes: ', hashes);
   for (const session of service_sessions) {
     const start_time = new Date(session.start_time);
     const end_time = new Date(session.end_time);
@@ -116,11 +108,9 @@ schedule('0 */1 * * * *', async () => {
     }
     // setting expiry is not possible with hset, so we need to check if the hash is expired
     // if yes, remove it from redis
-    else if (Object.values(hashes).find((k) => k === String(session.service_session_id))) {
-      await redisClient.hDel(
-        'service_session',
-        Object.keys(hashes).find((k) => hashes[k] === String(session.service_session_id))!,
-      );
+    else {
+      const hash = Object.values(hashes).find((k) => k === String(session.service_session_id));
+      if (hash) await redisClient.hDel('service_session', hash);
     }
   }
 });

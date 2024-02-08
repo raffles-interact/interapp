@@ -7,6 +7,7 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { remapAssetUrl } from '@api/utils';
 import { Title, Text, Group, ActionIcon } from '@mantine/core';
+import { useDebouncedState } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import './styles.css';
 import { IconPlus } from '@tabler/icons-react';
@@ -14,7 +15,7 @@ import { Permissions } from '../route_permissions';
 
 const handleFetch = async (page: number) => {
   const apiClient = new APIClient().instance;
-  const res = await apiClient.get('/announcement/all', { params: { page: page, page_size: 10 } });
+  const res = await apiClient.get('/announcement/all', { params: { page: page, page_size: 8 } });
   if (res.status !== 200) throw new Error('Failed to fetch announcements');
 
   const resData: {
@@ -42,7 +43,7 @@ export default function AnnouncementsPage() {
   const router = useRouter();
   const [data, setData] = useState<AllAnnouncements | null>(null);
 
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useDebouncedState(1, 200);
 
   useEffect(() => {
     handleFetch(page).then((res) => setData(res));

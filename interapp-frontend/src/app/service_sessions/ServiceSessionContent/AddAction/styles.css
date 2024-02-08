@@ -9,6 +9,11 @@
   width: 100%;
 }
 
+.add-modal-service-hours {
+  align-items: flex-end;
+  width: 100%;
+}
+
 .add-modal-form-datetime > * {
   flex-grow: 1;
 }

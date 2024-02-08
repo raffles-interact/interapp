@@ -114,6 +114,8 @@ const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) 
             start_time={service.start_time}
             end_time={service.end_time}
             day_of_week={service.day_of_week}
+            enable_scheduled={service.enable_scheduled}
+            service_hours={service.service_hours}
           />
         </div>
       </div>

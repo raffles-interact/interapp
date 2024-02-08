@@ -1,8 +1,8 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { Table, Select, Group } from '@mantine/core';
+import { useDebouncedState, useMediaQuery } from '@mantine/hooks';
 import { ServiceSessionsWithMeta, ServiceMeta } from '../types';
-import { useMediaQuery } from '@mantine/hooks';
 import PageController from '@components/PageController/PageController';
 import ServiceSessionRow from './ServiceSessionRow/ServiceSessionRow';
 import AddAction from './AddAction/AddAction';
@@ -29,7 +29,7 @@ const ServiceSessionContent = ({
 }: ServiceSessionContentProps) => {
   const isDesktop = useMediaQuery('(min-width: 768px)');
   const [serviceId, setServiceId] = useState<number>();
-  const [page, setPage] = useState(1);
+  const [page, setPage] = useDebouncedState(1, 200);
   const [totalPagesState, setTotalPagesState] = useState(totalPages);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ const ServiceSessionContent = ({
               <Table.Th>Session ID</Table.Th>
               <Table.Th>Service</Table.Th>
               <Table.Th>Date</Table.Th>
-              <Table.Th>Time</Table.Th>
+
               <Table.Th>Ad hoc?</Table.Th>
               <Table.Th>Attendees</Table.Th>
               <Table.Th>Actions</Table.Th>
@@ -95,6 +95,7 @@ const ServiceSessionContent = ({
                   service_session_users={serviceSession.service_session_users}
                   isDesktop={isDesktop ?? false}
                   refreshData={refresh}
+                  service_hours={serviceSession.service_hours}
                 />
               );
             })}

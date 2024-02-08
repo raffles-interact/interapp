@@ -24,6 +24,9 @@ export class ServiceSession {
   end_time: string;
 
   @Column()
+  service_hours: number;
+
+  @Column()
   ad_hoc_enabled: boolean;
 
   @ManyToOne(() => Service, (service) => service.service_sessions, {
