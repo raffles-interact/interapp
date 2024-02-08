@@ -13,7 +13,7 @@ import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
 import './styles.css';
 import { ServiceSessionUser } from '../../types';
-import { getAllUsernames } from '@api/utils';
+import { getAllUsernames, parseErrorMessage } from '@api/utils';
 
 const calculateInterval = (start: Date, end: Date) => {
   const diff = end.getTime() - start.getTime();
@@ -78,7 +78,7 @@ function EditAction({
     if (res.status !== 200) {
       notifications.show({
         title: 'Error',
-        message: 'Failed to update service session.',
+        message: parseErrorMessage(res.data),
         color: 'red',
       });
 

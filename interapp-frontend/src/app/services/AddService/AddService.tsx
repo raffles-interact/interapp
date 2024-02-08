@@ -22,7 +22,7 @@ import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import UploadImage, { convertToBase64, allowedFormats } from '@components/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
-import { getAllUsernames } from '@api/utils';
+import { getAllUsernames, parseErrorMessage } from '@api/utils';
 import { useRouter } from 'next/navigation';
 import { CreateServiceWithUsers } from '../types';
 
@@ -127,7 +127,7 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
       case 400:
         notifications.show({
           title: 'Error',
-          message: JSON.stringify(res.data),
+          message: parseErrorMessage(res.data),
           color: 'red',
         });
         setLoading(false);
