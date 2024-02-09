@@ -71,6 +71,7 @@ function EditAction({
       start_time: values.start_time.toISOString(),
       end_time: values.end_time.toISOString(),
       ad_hoc_enabled: values.ad_hoc_enabled,
+      service_hours: values.service_hours,
     };
 
     const res = await apiClient.patch('/service/session', body);

@@ -36,7 +36,6 @@ const fetchDuration = async (id: number) => {
 
 const verifyAttendanceUser = async (
   hash: string,
-  username: string,
 ): Promise<{ status: 'Success' | 'Error'; message: string }> => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.post('/service/verify_attendance', {
@@ -87,7 +86,7 @@ const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
   const [gainedHours, setGainedHours] = useState(0);
 
   const handleVerify = (user: User) => {
-    verifyAttendanceUser(hash, user.username).then(({ status, message }) => {
+    verifyAttendanceUser(hash).then(({ status, message }) => {
       setMessage(message);
       setStatus(status);
 
