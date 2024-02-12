@@ -9,7 +9,11 @@ export default function Page429({
   searchParams: { [key: string]: string | string[] | undefined };
 }>) {
   const reset = useMemo(() => {
-    if (searchParams['reset'] && typeof searchParams['reset'] === 'string' && !isNaN(parseInt(searchParams['reset']))) {
+    if (
+      searchParams['reset'] &&
+      typeof searchParams['reset'] === 'string' &&
+      !isNaN(parseInt(searchParams['reset']))
+    ) {
       return parseInt(searchParams['reset']);
     }
     return null;
