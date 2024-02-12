@@ -10,7 +10,6 @@ import {
   IconRadioactive,
   IconSettings,
   IconUserSquare,
-  IconTableOptions,
   IconSpeakerphone,
   IconPlaylistAdd,
   IconHomeQuestion,
