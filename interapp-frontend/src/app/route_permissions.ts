@@ -18,13 +18,14 @@ export const noLoginRequiredRoutes = [
 ];
 
 export const routePermissions = {
-  [Permissions.VISTOR]: ['/', '/auth/verify_email', '/settings', '/profile', '/error/*'],
+  [Permissions.VISTOR]: ['/', '/auth/verify_email', '/settings', '/error/*'],
   [Permissions.CLUB_MEMBER]: [
     '/announcements',
     '/services',
     '/attendance/verify',
     '/attendance/absence',
     '/announcements/*',
+    '/profile',
   ],
   [Permissions.SERVICE_IC]: ['/service_sessions', '/attendance'],
   [Permissions.MENTORSHIP_IC]: ['/service_sessions', '/attendance'],
