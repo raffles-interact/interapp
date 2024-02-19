@@ -4,11 +4,34 @@ import { describe, test, expect } from 'bun:test';
 import { recreateDB, recreateRedis } from '../utils';
 import redisClient from '@utils/init_redis';
 import { Permissions } from '@utils/permissions';
+import { AttendanceStatus } from '@db/entities';
 
 const suite = testSuites.UserModel;
 
 const signUp = async (id: number, username: string) =>
-  AuthModel.signUp(id, username, 'test@email.com', 'pass');
+  await AuthModel.signUp(id, username, 'test@email.com', 'pass');
+
+const createService = async (name?: string, service_ic_username?: string) =>
+  await ServiceModel.createService({
+    name: name ?? 'test service',
+    description: 'test description',
+    contact_email: 'fkjsf@fjsdakfjsa',
+    day_of_week: 1,
+    start_time: '10:00',
+    end_time: '11:00',
+    service_ic_username: service_ic_username ?? 'user',
+    service_hours: 1,
+    enable_scheduled: true,
+  });
+
+const createServiceSession = async (service_id: number) =>
+  await ServiceModel.createServiceSession({
+    service_id,
+    start_time: new Date().toISOString(),
+    end_time: new Date().toISOString(),
+    service_hours: 1,
+    ad_hoc_enabled: true,
+  });
 
 suite.getUser = [
   {
@@ -400,17 +423,7 @@ suite.addServiceUser = [
     name: 'should add service user',
     cb: async () => {
       await signUp(1, 'user');
-      const id = await ServiceModel.createService({
-        name: 'test service',
-        description: 'test description',
-        contact_email: 'fkjsf@fjsdakfjsa',
-        day_of_week: 1,
-        start_time: '10:00',
-        end_time: '11:00',
-        service_ic_username: 'user',
-        service_hours: 1,
-        enable_scheduled: true,
-      });
+      const id = await createService();
       expect(id).toBe(1);
       await UserModel.addServiceUser(1, 'user');
 
@@ -453,17 +466,7 @@ suite.addServiceUser = [
     cb: async () => {
       for (let i = 0; i < 10; i++) {
         await signUp(i, `user${i}`);
-        const id = await ServiceModel.createService({
-          name: `test service ${i}`,
-          description: 'test description',
-          contact_email: 'fkjsf@fjsdakfjsa',
-          day_of_week: 1,
-          start_time: '10:00',
-          end_time: '11:00',
-          service_ic_username: `user${i}`,
-          service_hours: 1,
-          enable_scheduled: true,
-        });
+        const id = await createService(`test service ${i}`, `user${i}`);
         expect(id).toBe(i + 1);
         await UserModel.addServiceUser(i + 1, `user${i}`);
       }
@@ -480,17 +483,7 @@ suite.removeServiceUser = [
     name: 'should remove service user',
     cb: async () => {
       await signUp(1, 'user');
-      const id = await ServiceModel.createService({
-        name: 'test service',
-        description: 'test description',
-        contact_email: 'fkjsf@fjsdakfjsa',
-        day_of_week: 1,
-        start_time: '10:00',
-        end_time: '11:00',
-        service_ic_username: 'user',
-        service_hours: 1,
-        enable_scheduled: true,
-      });
+      const id = await createService();
       expect(id).toBe(1);
 
       await UserModel.addServiceUser(1, 'user');
@@ -523,17 +516,7 @@ suite.removeServiceUser = [
     name: 'should throw when user is not in service',
     cb: async () => {
       await signUp(1, 'user');
-      const id = await ServiceModel.createService({
-        name: 'test service',
-        description: 'test description',
-        contact_email: 'fkjsf@fjsdakfjsa',
-        day_of_week: 1,
-        start_time: '10:00',
-        end_time: '11:00',
-        service_ic_username: 'user',
-        service_hours: 1,
-        enable_scheduled: true,
-      });
+      const id = await createService();
       expect(id).toBe(1);
       expect(UserModel.removeServiceUser(1, 'user')).resolves.toBeUndefined();
 
@@ -546,17 +529,7 @@ suite.removeServiceUser = [
     cb: async () => {
       for (let i = 0; i < 10; i++) {
         await signUp(i, `user${i}`);
-        const id = await ServiceModel.createService({
-          name: `test service ${i}`,
-          description: 'test description',
-          contact_email: 'fkjsf@fjsdakfjsa',
-          day_of_week: 1,
-          start_time: '10:00',
-          end_time: '11:00',
-          service_ic_username: `user${i}`,
-          service_hours: 1,
-          enable_scheduled: true,
-        });
+        const id = await createService(`test service ${i}`, `user${i}`);
         expect(id).toBe(i + 1);
         await UserModel.addServiceUser(i + 1, `user${i}`);
       }
@@ -578,30 +551,9 @@ suite.updateServiceUserBulk = [
       }
 
       // create 2 svcs
-      const svc1 = await ServiceModel.createService({
-        name: `test service`,
-        description: 'test description',
-        contact_email: 'fkjsf@fjsdakfjsa',
-        day_of_week: 1,
-        start_time: '10:00',
-        end_time: '11:00',
-        service_ic_username: 'user0',
-        service_hours: 1,
-        enable_scheduled: true,
-      });
+      const svc1 = await createService('test service', 'user0');
 
-      const svc2 = await ServiceModel.createService({
-        name: `test service 2`,
-        description: 'test description',
-        contact_email: 'fkjsf@fjsdakfjsa',
-        day_of_week: 1,
-        start_time: '10:00',
-        end_time: '11:00',
-        service_ic_username: 'user1',
-        service_hours: 1,
-        enable_scheduled: true,
-      });
-
+      const svc2 = await createService('test service 2', 'user1');
       expect(svc1).toBe(1);
       expect(svc2).toBe(2);
 
@@ -638,14 +590,165 @@ suite.getAllServicesByUser = [
     name: 'should get services from username',
     cb: async () => {
       await signUp(1, 'user');
+      const id = await createService();
+      expect(id).toBe(1);
+      await UserModel.addServiceUser(1, 'user');
+      const result = await UserModel.getAllServicesByUser('user');
+      expect(result).toBeArrayOfSize(1);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when user does not exist',
+    cb: async () => {
+      expect(UserModel.getAllServicesByUser('user')).rejects.toThrow();
+    },
+  },
+  {
+    name: 'should throw when user has no services',
+    cb: async () => {
+      await signUp(1, 'user');
+      expect(UserModel.getAllServicesByUser('user')).rejects.toThrow();
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should get all services from all users',
+    cb: async () => {
+      for (let i = 0; i < 10; i++) {
+        await signUp(i, `user${i}`);
+        const id = await createService(`test service ${i}`, `user${i}`);
+        expect(id).toBe(i + 1);
+        await UserModel.addServiceUser(i + 1, `user${i}`);
+      }
+      for (let i = 0; i < 10; i++) {
+        const result = await UserModel.getAllServicesByUser(`user${i}`);
+        expect(result).toBeArrayOfSize(1);
+      }
     },
     cleanup: async () => await recreateDB(),
   },
 ];
 
-suite.getAllServiceSessionsByUser = [];
+suite.getAllServiceSessionsByUser = [
+  {
+    name: 'should get all service sessions by user',
+    cb: async () => {
+      for (let i = 0; i < 10; i++) {
+        await signUp(i, `user${i}`);
+        const id = await createService(`test service ${i}`, `user${i}`);
+        expect(id).toBe(i + 1);
+      }
 
-suite.getAllUsersByService = [];
+      for (let i = 0; i < 10; i++) {
+        await createServiceSession(i + 1);
+        await ServiceModel.createServiceSessionUser({
+          service_session_id: i + 1,
+          username: `user0`,
+          ad_hoc: true,
+          attended: AttendanceStatus.Absent,
+          is_ic: false,
+        });
+      }
+
+      expect(UserModel.getAllServiceSessionsByUser('user0')).resolves.toBeArrayOfSize(10);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when user does not exist',
+    cb: async () => {
+      expect(UserModel.getAllServiceSessionsByUser('user')).resolves.toBeArrayOfSize(0);
+    },
+  },
+  {
+    name: 'should throw when user has no services',
+    cb: async () => {
+      await signUp(1, 'user');
+      expect(UserModel.getAllServiceSessionsByUser('user')).resolves.toBeArrayOfSize(0);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should get all services from all users',
+    cb: async () => {
+      for (let i = 0; i < 10; i++) {
+        await signUp(i, `user${i}`);
+        const id = await createService(`test service ${i}`, `user${i}`);
+        expect(id).toBe(i + 1);
+
+        await createServiceSession(i + 1);
+      }
+      // add all users to all services
+      for (let i = 0; i < 10; i++) {
+        for (let j = 0; j < 10; j++) {
+          await ServiceModel.createServiceSessionUser({
+            service_session_id: j + 1,
+            username: `user${i}`,
+            ad_hoc: true,
+            attended: AttendanceStatus.Absent,
+            is_ic: false,
+          });
+        }
+      }
+      for (let i = 0; i < 10; i++) {
+        expect(UserModel.getAllServiceSessionsByUser(`user${i}`)).resolves.toBeArrayOfSize(10);
+      }
+    },
+    cleanup: async () => await recreateDB(),
+  },
+];
+
+suite.getAllUsersByService = [
+  {
+    name: 'should get all users by service',
+    cb: async () => {
+      for (let i = 0; i < 10; i++) {
+        await signUp(i, `user${i}`);
+        const id = await createService(`test service ${i}`, `user${i}`);
+        expect(id).toBe(i + 1);
+      }
+
+      for (let i = 0; i < 10; i++) {
+        await UserModel.addServiceUser(1, `user${i}`);
+      }
+
+      await UserModel.getAllUsersByService(1);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when service does not exist',
+    cb: async () => {
+      expect(UserModel.getAllUsersByService(1)).rejects.toThrow();
+    },
+  },
+  {
+    name: 'should throw when service has no users',
+    cb: async () => {
+      await signUp(1, 'user');
+      const id = await createService();
+      expect(id).toBe(1);
+      expect(UserModel.getAllUsersByService(1)).rejects.toThrow();
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should get all users from all services',
+    cb: async () => {
+      for (let i = 0; i < 10; i++) {
+        await signUp(i, `user${i}`);
+        const id = await createService(`test service ${i}`, `user${i}`);
+        expect(id).toBe(i + 1);
+        await UserModel.addServiceUser(i + 1, `user${i}`);
+      }
+      for (let i = 0; i < 10; i++) {
+        expect(UserModel.getAllUsersByService(i + 1)).resolves.toBeArrayOfSize(1);
+      }
+    },
+    cleanup: async () => await recreateDB(),
+  },
+];
 
 suite.updateServiceHours = [];
 
