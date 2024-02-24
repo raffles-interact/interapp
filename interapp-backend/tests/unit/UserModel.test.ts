@@ -1,10 +1,11 @@
 import { testSuites } from '../constants.test';
-import { AuthModel, UserModel, ServiceModel } from '../../api/models';
+import { AuthModel, UserModel, ServiceModel, AnnouncementModel } from '../../api/models';
 import { describe, test, expect } from 'bun:test';
 import { recreateDB, recreateRedis } from '../utils';
 import redisClient from '@utils/init_redis';
 import { Permissions } from '@utils/permissions';
 import { AttendanceStatus } from '@db/entities';
+import { readFileSync } from 'fs';
 
 const suite = testSuites.UserModel;
 
@@ -24,14 +25,18 @@ const createService = async (name?: string, service_ic_username?: string) =>
     enable_scheduled: true,
   });
 
-const createServiceSession = async (service_id: number) =>
+const createServiceSession = async (service_id: number) => {
+  const now = new Date();
+  const end = new Date(now);
+  end.setHours(end.getHours() + 1);
   await ServiceModel.createServiceSession({
     service_id,
-    start_time: new Date().toISOString(),
-    end_time: new Date().toISOString(),
+    start_time: now.toISOString(),
+    end_time: end.toISOString(),
     service_hours: 1,
     ad_hoc_enabled: true,
   });
+};
 
 suite.getUser = [
   {
@@ -750,13 +755,166 @@ suite.getAllUsersByService = [
   },
 ];
 
-suite.updateServiceHours = [];
+suite.updateServiceHours = [
+  {
+    name: 'should update service hours',
+    cb: async () => {
+      await signUp(1, 'user');
+      await UserModel.updateServiceHours('user', 10);
+      const result = await UserModel.getUserDetails('user');
+      expect(result.service_hours).toBe(10);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when user does not exist',
+    cb: async () => {
+      expect(UserModel.updateServiceHours('user', 10)).rejects.toThrow();
+    },
+  },
+  {
+    name: 'should work when service hours is negative',
+    cb: async () => {
+      await signUp(1, 'user');
+      await UserModel.updateServiceHours('user', -10);
+      const result = await UserModel.getUserDetails('user');
+      expect(result.service_hours).toBe(-10);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+];
 
-suite.updateProfilePicture = [];
+suite.updateProfilePicture = [
+  {
+    name: 'should update profile picture',
+    cb: async () => {
+      await signUp(1, 'user');
+      const img = readFileSync('tests/utils/assets/interact-logo.png', 'base64');
+      const imgB64 = `data:image/png;base64,${img}`;
 
-suite.deleteProfilePicture = [];
+      await UserModel.updateProfilePicture('user', imgB64);
+      const result = await UserModel.getUserDetails('user');
+      expect(result.profile_picture).toBeDefined();
+      // fetch the image and convert to b64, then compare
+      const fetched = await fetch(result.profile_picture as string)
+        .then((response) => response.arrayBuffer())
+        .then((buffer) => Buffer.from(buffer).toString('base64'));
+      expect(fetched).toBe(img);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when user does not exist',
+    cb: async () => {
+      expect(UserModel.updateProfilePicture('user', 'a')).rejects.toThrow();
+    },
+  },
+  {
+    name: 'should throw when profile picture is invalid',
+    cb: async () => {
+      await signUp(1, 'user');
+      expect(UserModel.updateProfilePicture('user', 'a')).rejects.toThrow();
+    },
+    cleanup: async () => await recreateDB(),
+  },
+];
 
-suite.getNotifications = [];
+suite.deleteProfilePicture = [
+  {
+    name: 'should delete profile picture',
+    cb: async () => {
+      await signUp(1, 'user');
+      const img = readFileSync('tests/utils/assets/interact-logo.png', 'base64');
+      const imgB64 = `data:image/png;base64,${img}`;
+
+      await UserModel.updateProfilePicture('user', imgB64);
+      const result = await UserModel.getUserDetails('user');
+      expect(result.profile_picture).toBeDefined();
+
+      await UserModel.deleteProfilePicture('user');
+      const result2 = await UserModel.getUserDetails('user');
+      expect(result2.profile_picture).toBeNull();
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when user does not exist',
+    cb: async () => {
+      expect(UserModel.deleteProfilePicture('user')).rejects.toThrow();
+    },
+  },
+  {
+    name: 'should do nothing when profile picture is already null',
+    cb: async () => {
+      await signUp(1, 'user');
+      expect(UserModel.deleteProfilePicture('user')).resolves.toBeUndefined();
+    },
+    cleanup: async () => await recreateDB(),
+  },
+];
+
+suite.getNotifications = [
+  {
+    name: 'should get notifications',
+    cb: async () => {
+      await signUp(1, 'user');
+      // create an announcement
+      const id = await AnnouncementModel.createAnnouncement({
+        creation_date: new Date().toISOString(),
+        description: 'test description',
+        username: 'user',
+        title: 'test title2',
+      });
+      expect(id).toBe(1);
+
+      // create a service session and add user to it
+      const svc = await createService();
+      expect(svc).toBe(1);
+      await createServiceSession(1);
+      await ServiceModel.createServiceSessionUser({
+        service_session_id: 1,
+        username: 'user',
+        ad_hoc: true,
+        attended: AttendanceStatus.Absent,
+        is_ic: false,
+      });
+
+      const result = await UserModel.getNotifications('user');
+
+      expect(result.verified).toBeFalse();
+      expect(result.unread_announcements).toBeArrayOfSize(1);
+      expect(result.unread_announcements[0]).toMatchObject({
+        announcement_id: 1,
+        announcement: {
+          title: 'test title2',
+          description: 'test description',
+          creation_date: expect.any(Object),
+        },
+      });
+      expect(result.active_sessions).toBeArrayOfSize(1);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when user does not exist',
+    cb: async () => {
+      expect(UserModel.getNotifications('user')).rejects.toThrow();
+    },
+  },
+  {
+    name: 'should return nothing when no notifications',
+    cb: async () => {
+      await signUp(1, 'user');
+      const result = await UserModel.getNotifications('user');
+      expect(result).toMatchObject({
+        verified: false,
+        unread_announcements: [],
+        active_sessions: [],
+      });
+    },
+    cleanup: async () => await recreateDB(),
+  },
+];
 
 console.log(suite);
 describe('UserModel', () => {
@@ -773,7 +931,7 @@ describe('UserModel', () => {
       }
     });
   }
-  test.todo('make sure suite is exhaustive', () => {
+  test('make sure suite is exhaustive', () => {
     Object.values(suite).forEach((tests) => {
       expect(tests).toBeArray();
       expect(tests).not.toBeEmpty();
