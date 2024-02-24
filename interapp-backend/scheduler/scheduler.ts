@@ -5,6 +5,8 @@ import { User } from '@db/entities/user';
 import { AttendanceStatus } from '@db/entities/service_session_user';
 import redisClient from '@utils/init_redis';
 import { randomBytes } from 'crypto';
+import { $ } from 'bun';
+import { existsSync, mkdirSync } from 'fs';
 
 function constructDate(day_of_week: number, time: string) {
   const d = new Date();
@@ -113,4 +115,19 @@ schedule('0 */1 * * * *', async () => {
       if (hash) await redisClient.hDel('service_session', hash);
     }
   }
+});
+
+schedule('0 0 0 */1 * *', async () => {
+  // this is mounted on the host machine -- see docker compose file
+  const path = '/tmp/dump';
+  if (!existsSync(path)) mkdirSync(path);
+
+  const d = new Date();
+  const fmted = `interapp_${d.toLocaleDateString().replace(/\//g, '')}`;
+
+  const newFile = `${path}/${fmted}.sql`;
+  await $`touch ${newFile}`;
+  await $`PGPASSWORD=postgres pg_dump -U postgres -a interapp -h interapp-postgres > ${newFile}`;
+
+  console.log('db snapshot taken at location: ', newFile);
 });

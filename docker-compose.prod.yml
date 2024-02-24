@@ -3,7 +3,7 @@ version: "3"
 services:
   postgres:
     container_name: interapp-postgres
-    image: postgres:alpine
+    image: postgres:16-alpine
     restart: always
     ports:
       - 5432:5432
@@ -52,6 +52,10 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+    volumes:
+        - type: bind
+          source: ./dump
+          target: /tmp/dump
 
   minio:
     container_name: interapp-minio
