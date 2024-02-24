@@ -74,7 +74,7 @@ function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: (
           <NumberInput
             allowNegative={false}
             allowLeadingZeros={false}
-            label='Service Hours'
+            label='CCA Hours'
             {...form.getInputProps('service_hours')}
           />
           <div className='edit-modal-form-buttons'>

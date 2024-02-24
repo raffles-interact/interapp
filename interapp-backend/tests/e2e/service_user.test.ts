@@ -78,6 +78,8 @@ describe('API (user service)', async () => {
         start_time: '09:00',
         end_time: '10:00',
         service_ic_username: 'testuser',
+        service_hours: 1,
+        enable_scheduled: true,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -91,6 +93,8 @@ describe('API (user service)', async () => {
         start_time: '10:00',
         end_time: '10:01',
         service_ic_username: 'testuser2',
+        service_hours: 1,
+        enable_scheduled: true,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -102,6 +106,7 @@ describe('API (user service)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -172,6 +177,8 @@ describe('API (user service)', async () => {
         website: null,
         promotional_image: null,
         service_ic_username: 'testuser',
+        service_hours: 1,
+        enable_scheduled: true,
       },
       {
         service_id: 2,
@@ -185,6 +192,8 @@ describe('API (user service)', async () => {
         website: null,
         promotional_image: null,
         service_ic_username: 'testuser2',
+        service_hours: 1,
+        enable_scheduled: true,
       },
     ]);
   });

@@ -8,6 +8,7 @@ export interface ServiceSession {
   end_time: string;
   ad_hoc_enabled: boolean;
   service_session_users: ServiceSessionUser[];
+  service_hours: number;
 }
 
 export const AttendanceStatus = ['Absent', 'Attended', 'Valid Reason'];

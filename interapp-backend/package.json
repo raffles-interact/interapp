@@ -1,6 +1,6 @@
 {
   "name": "interapp-backend",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "module": "index.ts",
   "type": "module",
   "scripts": {
@@ -46,6 +46,7 @@
     "pg": "^8.11.3",
     "redis": "^4.6.10",
     "swagger-ui-express": "^5.0.0",
-    "typeorm": "^0.3.17"
+    "typeorm": "^0.3.17",
+    "zod": "^3.22.4"
   }
 }

@@ -14,16 +14,18 @@ export const noLoginRequiredRoutes = [
   '/auth/signup',
   '/auth/forgot_password',
   '/auth/forgot_password_verify',
+  '/error/*',
 ];
 
 export const routePermissions = {
-  [Permissions.VISTOR]: ['/', '/auth/verify_email', '/settings', '/profile'],
+  [Permissions.VISTOR]: ['/', '/auth/verify_email', '/settings', '/error/*'],
   [Permissions.CLUB_MEMBER]: [
     '/announcements',
     '/services',
     '/attendance/verify',
     '/attendance/absence',
     '/announcements/*',
+    '/profile',
   ],
   [Permissions.SERVICE_IC]: ['/service_sessions', '/attendance'],
   [Permissions.MENTORSHIP_IC]: ['/service_sessions', '/attendance'],

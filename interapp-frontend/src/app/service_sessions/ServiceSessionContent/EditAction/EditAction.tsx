@@ -1,7 +1,7 @@
 'use client';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
-import { Button, Group, Checkbox } from '@mantine/core';
+import { Button, Group, Checkbox, NumberInput } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { DateTimePicker } from '@mantine/dates';
 import ServiceSessionUserInput from '../ServiceSessionUserInput/ServiceSessionUserInput';
@@ -13,7 +13,14 @@ import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
 import './styles.css';
 import { ServiceSessionUser } from '../../types';
-import { getAllUsernames } from '@api/utils';
+import { getAllUsernames, parseErrorMessage } from '@api/utils';
+
+const calculateInterval = (start: Date, end: Date) => {
+  const diff = end.getTime() - start.getTime();
+  const diffHours = diff / 1000 / 60 / 60;
+  const rounded = Math.floor(diffHours);
+  return rounded < 0 ? 0 : rounded;
+};
 
 export interface EditActionProps {
   service_session_id: number;
@@ -21,6 +28,7 @@ export interface EditActionProps {
   end_time: string;
   ad_hoc_enabled: boolean;
   attendees: ServiceSessionUser[];
+  service_hours: number;
   refreshData: () => void;
 }
 
@@ -30,7 +38,7 @@ function EditAction({
   end_time,
   ad_hoc_enabled,
   attendees,
-
+  service_hours,
   refreshData,
 }: Readonly<EditActionProps>) {
   const apiClient = new APIClient().instance;
@@ -47,6 +55,7 @@ function EditAction({
       end_time: new Date(end_time),
       ad_hoc_enabled,
       attendees,
+      service_hours,
     },
     validate: {
       end_time: (value, values) =>
@@ -62,6 +71,7 @@ function EditAction({
       start_time: values.start_time.toISOString(),
       end_time: values.end_time.toISOString(),
       ad_hoc_enabled: values.ad_hoc_enabled,
+      service_hours: values.service_hours,
     };
 
     const res = await apiClient.patch('/service/session', body);
@@ -69,7 +79,7 @@ function EditAction({
     if (res.status !== 200) {
       notifications.show({
         title: 'Error',
-        message: 'Failed to update service session.',
+        message: parseErrorMessage(res.data),
         color: 'red',
       });
 
@@ -124,6 +134,7 @@ function EditAction({
     else setDisableSelectAdHoc(false);
     if (hasAdHocUser && !form.values.ad_hoc_enabled) form.setFieldValue('ad_hoc_enabled', true);
   }, [form.values.attendees]);
+
   useEffect(() => {
     if (opened) getAllUsernames().then((allUsernames) => setAllUsernames(allUsernames));
   }, [opened]);
@@ -154,6 +165,26 @@ function EditAction({
             defaultValue={new Date(end_time)}
             {...form.getInputProps('end_time')}
           />
+        </Group>
+
+        <Group className='edit-modal-service-hours'>
+          <NumberInput
+            label='CCA Hours'
+            {...form.getInputProps('service_hours')}
+            min={0}
+            step={1}
+          />
+          <Button
+            onClick={() =>
+              form.setFieldValue(
+                'service_hours',
+                calculateInterval(form.values.start_time, form.values.end_time),
+              )
+            }
+            variant='outline'
+          >
+            Calculate Hours
+          </Button>
         </Group>
 
         <Checkbox

@@ -3,7 +3,7 @@ version: "3"
 services:
   postgres:
     container_name: interapp-postgres-test
-    image: postgres:alpine
+    image: postgres:16-alpine
     restart: on-failure
     ports:
       - 2345:2345

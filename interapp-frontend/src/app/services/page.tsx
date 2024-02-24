@@ -10,7 +10,7 @@ import { Service } from './types';
 import './styles.css';
 
 const fetchAllServices = async () => {
-  const apiClient = new APIClient({ useClient: false }).instance;
+  const apiClient = new APIClient().instance;
   try {
     const res = await apiClient.get('/service/all');
 
@@ -67,6 +67,8 @@ export default async function ServicesPage() {
               end_time={service.end_time}
               service_ic_username={service.service_ic_username}
               service_id={service.service_id}
+              service_hours={service.service_hours}
+              enable_scheduled={service.enable_scheduled}
               alreadyServiceICUsernames={allServices.map((service) => service.service_ic_username)}
             />
           ))}

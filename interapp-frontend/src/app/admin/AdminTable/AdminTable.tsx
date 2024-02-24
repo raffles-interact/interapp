@@ -1,5 +1,5 @@
 'use client';
-import { Table, Loader, Pill, TextInput } from '@mantine/core';
+import { Table, Pill, TextInput } from '@mantine/core';
 import APIClient from '@api/api_client';
 import { memo, useEffect, useState } from 'react';
 import { User } from '@providers/AuthProvider/types';
@@ -10,6 +10,7 @@ import DeleteAction from './DeleteAction/DeleteAction';
 import PageController, { paginateItems } from '@components/PageController/PageController';
 import { IconSearch } from '@tabler/icons-react';
 import './styles.css';
+import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
 
 const fetchUserData = async () => {
   const apiClient = new APIClient().instance;
@@ -50,7 +51,7 @@ const AdminTable = () => {
   return (
     <div>
       {loading ? (
-        <Loader />
+        <PageSkeleton />
       ) : (
         <>
           <TextInput
@@ -68,7 +69,7 @@ const AdminTable = () => {
                   <Table.Th>Email</Table.Th>
                   <Table.Th>Verified</Table.Th>
                   <Table.Th>Permissions</Table.Th>
-                  <Table.Th>Service Hours</Table.Th>
+                  <Table.Th>CCA Hours</Table.Th>
                   <Table.Th>Actions</Table.Th>
                 </Table.Tr>
               </Table.Thead>

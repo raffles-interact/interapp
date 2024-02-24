@@ -130,7 +130,6 @@ describe('API (announcements)', () => {
       method: 'PATCH',
       body: JSON.stringify({
         announcement_id: 1,
-        username: 'testuser',
         completed: true,
       }),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },

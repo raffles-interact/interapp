@@ -5,7 +5,7 @@ import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import GoBackButton from '@components/GoBackButton/GoBackButton';
 import { remapAssetUrl } from '@api/utils';
-import { Skeleton, Title, Text, Group, Stack, ActionIcon, Button } from '@mantine/core';
+import { Title, Text, Group, Stack, ActionIcon, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconClock, IconUser, IconPencil, IconTrash } from '@tabler/icons-react';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
@@ -14,6 +14,7 @@ import { useRouter } from 'next/navigation';
 import './styles.css';
 import { notifications } from '@mantine/notifications';
 import { Permissions } from '@/app/route_permissions';
+import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
 
 const handleFetch = async (id: number) => {
   const apiClient = new APIClient().instance;
@@ -88,7 +89,7 @@ export default function AnnouncementPage({ params }: Readonly<{ params: { id: st
     handleRead(data.announcement_id).catch((err) => console.error(err));
   }, [data, user]);
 
-  if (loading) return <Skeleton width='100%' height={30} />;
+  if (loading) return <PageSkeleton />;
 
   return (
     <>

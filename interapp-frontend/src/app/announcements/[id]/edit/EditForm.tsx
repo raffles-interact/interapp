@@ -10,13 +10,14 @@ import { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { type AnnouncementWithMeta, type AnnouncementForm } from '../../types';
 import { useParams, useRouter } from 'next/navigation';
-import { remapAssetUrl } from '@api/utils';
+import { parseErrorMessage, remapAssetUrl } from '@api/utils';
 import { notifications } from '@mantine/notifications';
-import { Button, Group, Skeleton, TextInput, Title, Text, Stack } from '@mantine/core';
+import { Button, Group, TextInput, Title, Text, Stack } from '@mantine/core';
 import { IconClock, IconUser } from '@tabler/icons-react';
 import { allowedImgFormats, allowedDocFormats } from '../../utils';
 import './styles.css';
 import { FileWithPath } from '@mantine/dropzone';
+import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
 
 const fetchAnnouncement = async (id: number) => {
   const apiClient = new APIClient().instance;
@@ -85,7 +86,7 @@ function EditForm() {
         default:
           notifications.show({
             title: 'Error',
-            message: JSON.stringify(data),
+            message: parseErrorMessage(data),
             color: 'red',
           });
       }
@@ -161,7 +162,7 @@ function EditForm() {
   }, []);
 
   if (!user) return null;
-  if (loading) return <Skeleton width='100%' height={30} />;
+  if (loading) return <PageSkeleton />;
 
   return (
     <form onSubmit={form.onSubmit(handleSubmit)}>

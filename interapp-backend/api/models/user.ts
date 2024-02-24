@@ -22,6 +22,11 @@ interface EmailOptions extends Mail.Options {
   context: Record<string, unknown>;
 }
 
+type UserWithoutSensitiveFields = Omit<
+  User,
+  'password_hash' | 'refresh_token' | 'user_permissions' | 'user_services' | 'service_session_users'
+>;
+
 export class UserModel {
   public static async getUser(username: string) {
     const user = await appDataSource.manager
@@ -43,7 +48,12 @@ export class UserModel {
     await appDataSource.manager.delete(User, { username });
   }
   // the following function does not expose sensitive information
-  public static async getUserDetails(username?: string) {
+  static async getUserDetails(username: string): Promise<UserWithoutSensitiveFields>;
+  static async getUserDetails(username?: undefined): Promise<UserWithoutSensitiveFields[]>;
+
+  public static async getUserDetails(
+    username?: string,
+  ): Promise<UserWithoutSensitiveFields | UserWithoutSensitiveFields[]> {
     const condition = username ? 'user.username = :username' : '1=1';
     const users = await appDataSource.manager
       .createQueryBuilder()
@@ -78,14 +88,7 @@ export class UserModel {
             HTTPErrorCode.NOT_FOUND_ERROR,
           );
         case 1:
-          return users[0] as Omit<
-            User,
-            | 'password_hash'
-            | 'refresh_token'
-            | 'user_permissions'
-            | 'user_services'
-            | 'service_session_users'
-          >;
+          return users[0];
         default:
           throw new HTTPError(
             'Multiple users found',
@@ -95,14 +98,7 @@ export class UserModel {
       }
     }
 
-    return users as Omit<
-      User,
-      | 'password_hash'
-      | 'refresh_token'
-      | 'user_permissions'
-      | 'user_services'
-      | 'service_session_users'
-    >[];
+    return users;
   }
   public static async changeEmail(username: string, new_email: string) {
     const user = await appDataSource.manager
@@ -214,11 +210,11 @@ export class UserModel {
 
     const email: EmailOptions = {
       from: {
-        name: 'Interapp',
+        name: 'OneInteract',
         address: process.env.EMAIL_USER as string,
       },
       to: [user.email],
-      subject: 'Reset Password from Interapp',
+      subject: 'Reset Password from OneInteract',
       template: 'reset_password',
       context: {
         username: username,
@@ -293,11 +289,11 @@ export class UserModel {
 
     const email: EmailOptions = {
       from: {
-        name: 'Interapp',
+        name: 'OneInteract',
         address: process.env.EMAIL_USER as string,
       },
       to: [user.email],
-      subject: 'Verify Email from Interapp',
+      subject: 'Verify Email from OneInteract',
       template: 'verify_email',
       context: {
         username: username,
@@ -427,7 +423,7 @@ export class UserModel {
       .leftJoin('service_session.service', 'service')
       .addSelect(['service.name', 'service.promotional_image'])
       .orderBy('service_session.start_time', 'DESC')
-      .getMany()
+      .getMany();
 
     if (!serviceSessions) {
       throw new HTTPError(

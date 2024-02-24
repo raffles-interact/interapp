@@ -97,6 +97,8 @@ describe('API (service session)', async () => {
         start_time: '09:00',
         end_time: '10:00',
         service_ic_username: 'testuser',
+        service_hours: 1,
+        enable_scheduled: true,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -110,6 +112,8 @@ describe('API (service session)', async () => {
         start_time: '11:00',
         end_time: '12:00',
         service_ic_username: 'testuser2',
+        service_hours: 1,
+        enable_scheduled: true,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -122,6 +126,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -138,6 +143,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T17:42Z',
         end_time: '2023-11-27T16:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -151,6 +157,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -169,6 +176,7 @@ describe('API (service session)', async () => {
       start_time: '2023-11-27T16:42:00.000Z',
       end_time: '2023-11-27T17:42:00.000Z',
       ad_hoc_enabled: true,
+      service_hours: 1,
     });
 
     const res2 = await fetch(`${API_URL}/service/session?service_session_id=1234`, {
@@ -187,6 +195,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: false,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -197,6 +206,7 @@ describe('API (service session)', async () => {
       start_time: '2023-11-27T16:42:00.000Z',
       end_time: '2023-11-27T17:42:00.000Z',
       ad_hoc_enabled: false,
+      service_hours: 1,
     });
   });
 
@@ -213,6 +223,7 @@ describe('API (service session)', async () => {
       start_time: '2023-11-27T16:42:00.000Z',
       end_time: '2023-11-27T17:42:00.000Z',
       ad_hoc_enabled: false,
+      service_hours: 1,
     });
   });
 
@@ -235,6 +246,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: false,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -391,6 +403,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -439,11 +452,13 @@ describe('API (service session)', async () => {
       method: 'POST',
       body: JSON.stringify({
         name: 'test sedsfdsfdsrvice3',
-        contact_email: 'fksalfjasklf@fkjkdsjglk',
+        contact_email: 'fksalfjasklf@fkjkdsjglk.com',
         day_of_week: 2,
         start_time: '09:00',
         end_time: '10:00',
         service_ic_username: 'testuser3',
+        service_hours: 1,
+        enable_scheduled: true,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -460,6 +475,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -475,6 +491,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -490,6 +507,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -505,6 +523,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-27T16:42Z',
         end_time: '2023-11-27T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -526,6 +545,7 @@ describe('API (service session)', async () => {
       start_time: '2023-11-27T16:42:00.000Z',
       end_time: '2023-11-27T17:42:00.000Z',
       ad_hoc_enabled: true,
+      service_hours: 1,
     });
   });
 
@@ -579,6 +599,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-28T16:42Z',
         end_time: '2023-11-28T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -591,6 +612,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-29T16:42Z',
         end_time: '2023-11-29T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
@@ -603,6 +625,7 @@ describe('API (service session)', async () => {
         start_time: '2023-11-30T16:42Z',
         end_time: '2023-11-30T17:42Z',
         ad_hoc_enabled: true,
+        service_hours: 1,
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });

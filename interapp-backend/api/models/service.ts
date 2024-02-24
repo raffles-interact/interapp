@@ -16,6 +16,8 @@ export class ServiceModel {
     newService.contact_email = service.contact_email;
     newService.contact_number = service.contact_number;
     newService.website = service.website;
+    newService.enable_scheduled = service.enable_scheduled;
+    newService.service_hours = service.service_hours;
 
     if (!service.promotional_image) newService.promotional_image = null;
     else {
@@ -136,9 +138,18 @@ export class ServiceModel {
   ) {
     const session = new ServiceSession();
     session.service_id = service_session.service_id;
+    const validTime = new Date(service_session.start_time) > new Date(service_session.end_time);
+    if (validTime) {
+      throw new HTTPError(
+        'Invalid time',
+        'Start time must be before end time',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
     session.start_time = service_session.start_time;
     session.end_time = service_session.end_time;
     session.ad_hoc_enabled = service_session.ad_hoc_enabled;
+    session.service_hours = service_session.service_hours;
     session.service = await this.getService(service_session.service_id);
     try {
       await appDataSource.manager.insert(ServiceSession, session);
@@ -163,8 +174,19 @@ export class ServiceModel {
     }
     return res;
   }
-  public static async updateServiceSession(service_session: ServiceSession) {
+  public static async updateServiceSession(
+    service_session: Omit<ServiceSession, 'service_session_users' | 'service'>,
+  ) {
     const service = await this.getService(service_session.service_id); // check if service exists
+
+    const validTime = new Date(service_session.start_time) > new Date(service_session.end_time);
+    if (validTime) {
+      throw new HTTPError(
+        'Invalid time',
+        'Start time must be before end time',
+        HTTPErrorCode.BAD_REQUEST_ERROR,
+      );
+    }
     try {
       await appDataSource.manager.update(
         ServiceSession,

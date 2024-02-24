@@ -5,10 +5,11 @@ import { ServiceSession } from '@/app/service_sessions/types';
 import { remapAssetUrl } from '@api/utils';
 import ServiceCard from './ServiceCard/ServiceCard';
 import { useState, useEffect } from 'react';
-import { Skeleton, Title } from '@mantine/core';
+import { Title } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import AdHocSignUp from './AdHocSignUp/AdHocSignUp';
 import './styles.css';
+import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
 
 const fetchServices = async (username: string) => {
   const apiClient = new APIClient().instance;
@@ -139,9 +140,7 @@ const ServiceCardDisplay = ({ username }: ServicesPageProps) => {
       });
   };
 
-  if (loading) {
-    return <Skeleton width='100%' height={30} />;
-  }
+  if (loading) return <PageSkeleton />;
 
   return (
     <div className='service-cards-container'>

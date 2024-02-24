@@ -5,10 +5,10 @@ import APIClient from '@api/api_client';
 import { Service } from '../types';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
-import { TextInput, Textarea, NumberInput, Button, Group } from '@mantine/core';
+import { TextInput, Textarea, NumberInput, Button, Group, Checkbox } from '@mantine/core';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
-import { type Nullable } from '@api/utils';
+import { parseErrorMessage } from '@api/utils';
 import { TimeInput } from '@mantine/dates';
 import { useState, useContext, memo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -26,6 +26,19 @@ const parsePromotionalImage = async (promotional_image: string | null | undefine
   return promotional_image;
 };
 
+const calculateInterval = (start: string, end: string) => {
+  if (!start || !end) return 0;
+  const [startHours, startMinutes] = start.split(':').map((x) => parseInt(x));
+  const [endHours, endMinutes] = end.split(':').map((x) => parseInt(x));
+
+  const diff =
+    new Date().setHours(endHours, endMinutes).valueOf() -
+    new Date().setHours(startHours, startMinutes).valueOf();
+  const diffToHours = Math.round(diff / 1000 / 60 / 60);
+
+  return diffToHours < 0 ? 0 : diffToHours;
+};
+
 const EditService = ({
   service_id,
   name,
@@ -37,6 +50,8 @@ const EditService = ({
   start_time,
   end_time,
   day_of_week,
+  enable_scheduled,
+  service_hours,
 }: Omit<Service, 'service_ic_username'>) => {
   const apiClient = new APIClient().instance;
   const { user } = useContext(AuthContext);
@@ -64,6 +79,8 @@ const EditService = ({
     start_time,
     end_time,
     day_of_week,
+    enable_scheduled,
+    service_hours,
   };
 
   const form = useForm({
@@ -82,20 +99,22 @@ const EditService = ({
 
   const handleSubmit = async (data: Omit<Service, 'service_ic_username' | 'service_id'>) => {
     setLoading(true);
-    const body: Nullable<Partial<typeof initial>> & { service_id: number } = {
-      ...data,
-      service_id,
-      description: data.description ? data.description : null,
-      contact_number: data.contact_number ? data.contact_number : null,
-      website: data.website ? data.website : null,
-      promotional_image: data.promotional_image ? data.promotional_image : null,
-    };
 
-    const res = await apiClient.patch('/service', body);
+    const optionalFields: (keyof typeof data)[] = [
+      'description',
+      'contact_number',
+      'website',
+      'promotional_image',
+    ];
+
+    for (const field of optionalFields) {
+      if (!data[field]) delete data[field];
+    }
+    const res = await apiClient.patch('/service', { ...data, service_id });
     if (res.status !== 200) {
       notifications.show({
         title: 'Error',
-        message: res.data,
+        message: parseErrorMessage(res.data),
         color: 'red',
       });
       setLoading(false);
@@ -117,7 +136,7 @@ const EditService = ({
       opened={opened}
       open={open}
       close={close}
-      title='Add Service'
+      title='Edit Service'
       Icon={IconPencil}
       show={() => !!user && user.permissions.includes(Permissions.EXCO)}
     >
@@ -153,6 +172,32 @@ const EditService = ({
             <TimeInput label='Start Time' required {...form.getInputProps('start_time')} />
             <TimeInput label='End Time' required {...form.getInputProps('end_time')} />
           </div>
+          <Group className='add-service-service-hours'>
+            <NumberInput
+              label='CCA Hours'
+              {...form.getInputProps('service_hours')}
+              required
+              min={0}
+              step={1}
+            />
+            <Button
+              onClick={() =>
+                form.setFieldValue(
+                  'service_hours',
+                  calculateInterval(form.values.start_time, form.values.end_time),
+                )
+              }
+              variant='outline'
+            >
+              Calculate Hours
+            </Button>
+          </Group>
+          <Group w='100%' justify='center'>
+            <Checkbox
+              {...form.getInputProps('enable_scheduled', { type: 'checkbox' })}
+              label='Enable Scheduled'
+            />
+          </Group>
 
           <Group gap={3} justify='center'>
             <Button onClick={close} variant='outline' color='red'>

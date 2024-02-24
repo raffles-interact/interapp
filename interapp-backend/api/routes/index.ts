@@ -1,9 +1,50 @@
+// check that all attributes in process env is set
+const requiredEnv = [
+  'POSTGRES_USER',
+  'POSTGRES_PASSWORD',
+  'POSTGRES_DB',
+  'POSTGRES_HOST',
+  'POSTGRES_PORT',
+  'API_PORT',
+  'REDIS_URL',
+  'FRONTEND_URL',
+  'SCHOOL_EMAIL_REGEX',
+  'MINIO_ROOT_USER',
+  'MINIO_ROOT_PASSWORD',
+  'MINIO_ADDRESS',
+  'MINIO_CONSOLE_ADDRESS',
+  'MINIO_ACCESSKEY',
+  'MINIO_SECRETKEY',
+  'MINIO_BUCKETNAME',
+  'MINIO_ENDPOINT',
+  'JWT_ACCESS_SECRET',
+  'JWT_REFRESH_SECRET',
+  'JWT_ACCESS_EXPIRATION',
+  'JWT_REFRESH_EXPIRATION',
+  'JWT_ISSUER',
+  'JWT_AUDIENCE',
+  'EMAIL_USER',
+  'EMAIL_PASSWORD',
+];
+
+const missing = requiredEnv.reduce((acc, curr) => {
+  if (process.env[curr] === undefined) acc.push(curr);
+  return acc;
+}, [] as string[]);
+
+if (missing.length > 0) {
+  console.error(`Missing environment variables: ${missing.join(', ')}\nBackend will crash now :(`);
+  process.exit(1);
+}
+
 import express from 'express';
-import helloRouter from './endpoints/hello';
-import authRouter from './endpoints/auth';
-import userRouter from './endpoints/user';
-import serviceRouter from './endpoints/service';
-import announcementRouter from './endpoints/announcement';
+import {
+  helloRouter,
+  authRouter,
+  userRouter,
+  serviceRouter,
+  announcementRouter,
+} from './endpoints';
 
 import 'express-async-errors';
 import cors from 'cors';
@@ -24,6 +65,11 @@ if (['development', 'test'].includes(process.env.NODE_ENV ?? '')) {
   app.use('/api/docs', serve, setup(swagger_docs, { swaggerOptions: { validatorUrl: null } }));
 }
 
+if (process.env.NODE_ENV === 'production') {
+  app.set('trust proxy', 1);
+  app.use(generateRateLimit(1000 * 60, 500)); // 500 requests per 1 minute
+}
+
 app.use('/api/hello', helloRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/user', userRouter);
@@ -31,7 +77,6 @@ app.use('/api/service', serviceRouter);
 app.use('/api/announcement', announcementRouter);
 
 app.use(handleError);
-if (process.env.NODE_ENV === 'production') app.use(generateRateLimit(1000 * 60, 50)); // 50 requests per minute
 
 try {
   app.listen(PORT, () => console.log('Server running on port 8000!'));
