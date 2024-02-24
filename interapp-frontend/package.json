@@ -1,6 +1,6 @@
 {
   "name": "interapp-frontend",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "scripts": {
     "prettier": "prettier --write .",
@@ -32,7 +32,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@types/node": "^20",
+    "@types/node": "^20.11.20",
     "@types/qrcode": "^1.5.5",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -40,6 +40,6 @@
     "eslint": "^8",
     "eslint-config-next": ">=14.1.0",
     "prettier": "^3.1.0",
-    "typescript": "^5.3.2"
+    "typescript": "^5.3.3"
   }
 }
