@@ -53,9 +53,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-        - type: mount
-          source: ./dump
-          target: /tmp/dump
+        - ./:/tmp/dump
 
   minio:
     container_name: interapp-minio
