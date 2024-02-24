@@ -28,7 +28,7 @@ async function getCurrentServices() {
 }
 
 schedule(
-  '0 0 * * * Sunday',
+  '0 0 0 * * Sunday',
   async () => {
     const to_be_scheduled = await getCurrentServices();
     if (to_be_scheduled.length === 0) return;
