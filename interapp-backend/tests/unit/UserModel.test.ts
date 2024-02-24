@@ -916,7 +916,6 @@ suite.getNotifications = [
   },
 ];
 
-console.log(suite);
 describe('UserModel', () => {
   for (const [method, tests] of Object.entries(suite)) {
     describe(method, async () => {
