@@ -53,7 +53,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-        - type: bind
+        - type: mount
           source: ./dump
           target: /tmp/dump
 
