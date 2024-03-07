@@ -4,7 +4,7 @@ export interface AppError extends Error {
   data?: Record<string, any> | Array<unknown>;
 }
 
-export class HTTPError extends Error implements Partial<AppError> {
+export class HTTPError extends Error implements AppError {
   public readonly name: string;
   public readonly message: string;
   public readonly data?: Record<string, any> | Array<unknown>;
@@ -27,26 +27,16 @@ export class HTTPError extends Error implements Partial<AppError> {
   }
 }
 
-export class DatabaseError extends Error implements Partial<AppError> {
+export class TestError extends Error implements AppError {
   public readonly name: string;
   public readonly message: string;
-  public readonly data?: Record<string, any>;
-  public readonly query: string;
-  public readonly parameters?: any[];
+  public readonly data?: Record<string, any> | Array<unknown>;
 
-  constructor(
-    name: string,
-    message: string,
-    query: string,
-    parameters?: any[],
-    data?: Record<string, any>,
-  ) {
+  constructor(name: string, message: string, data?: Record<string, any> | Array<unknown>) {
     super(message);
     this.name = name;
     this.message = message;
     this.data = data;
-    this.query = query;
-    this.parameters = parameters;
   }
 }
 
@@ -62,3 +52,8 @@ export enum HTTPErrorCode {
   INTERNAL_SERVER_ERROR = 500,
   NOT_IMPLEMENTED_ERROR = 501,
 }
+
+export const TestErrors = {
+  NO_ACCESS_TOKEN: new TestError('NoAccessToken', 'No access token found'),
+  USER_NOT_FOUND: new TestError('UserNotFound', 'User not found'),
+};
