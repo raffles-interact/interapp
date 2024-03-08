@@ -102,7 +102,7 @@ export class AnnouncementModel {
           attachments.map((attachment) => ({ ...attachment, announcement_id: announcementId })),
         );
     } catch (e) {
-      throw HTTPErrors.ALREADY_EXISTS
+      throw HTTPErrors.ALREADY_EXISTS;
     }
 
     return newAnnouncement.announcement_id;
@@ -118,7 +118,7 @@ export class AnnouncementModel {
       .getOne();
 
     if (!announcement) {
-      throw HTTPErrors.RESOURCE_NOT_FOUND
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     if (announcement.image)
       announcement.image = await minioClient.presignedGetObject(
@@ -192,7 +192,7 @@ export class AnnouncementModel {
   ) {
     const announcement = await this.getAnnouncement(newAnnouncement.announcement_id);
     if (!announcement) {
-      throw HTTPErrors.RESOURCE_NOT_FOUND
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     const updatedAnnouncement = new Announcement();
     updatedAnnouncement.announcement_id = newAnnouncement.announcement_id;
