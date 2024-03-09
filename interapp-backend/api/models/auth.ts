@@ -1,6 +1,6 @@
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
-import { HTTPError, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors, HTTPErrorCode } from '@utils/errors';
 import { SignJWT, jwtVerify, JWTPayload, JWTVerifyResult } from 'jose';
 
 import redisClient from '@utils/init_redis';
@@ -51,25 +51,14 @@ export class AuthModel {
     try {
       user.password_hash = await Bun.password.hash(password);
     } catch (err) {
-      // err should be of type Error always
-      if (err instanceof Error) {
-        throw new HTTPError(
-          'Password hashing error',
-          err.message || 'An error occurred while hashing the password',
-          HTTPErrorCode.INTERNAL_SERVER_ERROR,
-        );
-      }
+      throw HTTPErrors.FAILED_HASHING_PASSWORD;
     }
 
     try {
       // if the user already exists, throw an error
       await appDataSource.manager.insert(User, user);
     } catch (err) {
-      throw new HTTPError(
-        'User already exists',
-        `The user with username ${username} already exists in the database`,
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw HTTPErrors.ALREADY_EXISTS;
     }
 
     // init a new permission entry for the user, will insert/update regardless if this entry already exists
@@ -97,18 +86,10 @@ export class AuthModel {
       .getOne();
 
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     if (!(await Bun.password.verify(password, user.password_hash))) {
-      throw new HTTPError(
-        'Invalid password',
-        'The password you entered is incorrect',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_PASSWORD;
     }
 
     const JWTBody: UserJWT = {
@@ -139,22 +120,14 @@ export class AuthModel {
   }
   public static async getNewAccessToken(refreshToken: string) {
     if (!refreshToken) {
-      throw new HTTPError(
-        'Invalid refresh token',
-        'The refresh token you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_REFRESH_TOKEN;
     }
 
     const result = await this.verify(refreshToken, 'refresh');
     const username = result.payload.username;
 
     if (!username) {
-      throw new HTTPError(
-        'Invalid refresh token',
-        'The refresh token you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_REFRESH_TOKEN;
     }
 
     const user = await appDataSource.manager
@@ -164,19 +137,11 @@ export class AuthModel {
       .where('user.username = :username', { username: username })
       .getOne();
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
 
     if (user.refresh_token !== refreshToken) {
-      throw new HTTPError(
-        'Invalid refresh token',
-        'The refresh token you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_REFRESH_TOKEN;
     }
 
     // passed all checks, sign a new access token and return it
@@ -199,11 +164,7 @@ export class AuthModel {
       const blacklisted = await redisClient.get(`blacklist:${token}`);
 
       if (blacklisted) {
-        throw new HTTPError(
-          'Invalid JWT',
-          'The JWT you provided is invalid',
-          HTTPErrorCode.UNAUTHORIZED_ERROR,
-        );
+        throw HTTPErrors.INVALID_ACCESS_TOKEN;
       }
       const payload: JWTVerifyResult<JWTPayload & UserJWT> = await jwtVerify(
         token,
@@ -211,11 +172,7 @@ export class AuthModel {
       );
       return payload;
     } catch (err) {
-      throw new HTTPError(
-        'Invalid JWT',
-        'The JWT you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_ACCESS_TOKEN;
     }
   }
 }
