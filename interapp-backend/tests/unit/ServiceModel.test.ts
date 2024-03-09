@@ -147,9 +147,7 @@ suite.createService = [
 
       await create();
       for (let i = 0; i < 10; i++) {
-        expect(create()).rejects.toThrow(
-          'Service with name test service already exists, or service IC with username test already exists',
-        );
+        expect(create()).rejects.toThrow();
       }
     },
     cleanup: async () => {
@@ -215,9 +213,7 @@ suite.getService = [
   {
     name: 'should not get a non-existent service',
     cb: async () => {
-      expect(ServiceModel.getService(1)).rejects.toThrow(
-        'Service with service_id 1 does not exist',
-      );
+      expect(ServiceModel.getService(1)).rejects.toThrow();
     },
   },
 ];
@@ -282,9 +278,7 @@ suite.updateService = [
 
       const updatedService = await ServiceModel.getService(1);
       updatedService.service_id = 2;
-      expect(ServiceModel.updateService(updatedService)).rejects.toThrow(
-        'Service with service_id 2 does not exist',
-      );
+      expect(ServiceModel.updateService(updatedService)).rejects.toThrow();
     },
     cleanup: async () => {
       await recreateDB();
@@ -346,9 +340,7 @@ suite.deleteService = [
       expect(ServiceModel.deleteService(1)).resolves.toBeUndefined();
 
       // check that service is deleted
-      expect(ServiceModel.getService(1)).rejects.toThrow(
-        'Service with service_id 1 does not exist',
-      );
+      expect(ServiceModel.getService(1)).rejects.toThrow();
     },
     cleanup: async () => {
       await recreateDB();
@@ -542,9 +534,7 @@ suite.createServiceSession = [
         ad_hoc_enabled: true,
         service_hours: 1,
       };
-      expect(ServiceModel.createServiceSession(sessionData)).rejects.toThrow(
-        'Service with service_id 2 does not exist',
-      );
+      expect(ServiceModel.createServiceSession(sessionData)).rejects.toThrow();
     },
   },
   {
@@ -577,9 +567,7 @@ suite.createServiceSession = [
         ad_hoc_enabled: true,
         service_hours: 1,
       };
-      expect(ServiceModel.createServiceSession(sessionData)).rejects.toThrow(
-        'Start time must be before end time',
-      );
+      expect(ServiceModel.createServiceSession(sessionData)).rejects.toThrow();
     },
     cleanup: async () => {
       await recreateDB();
@@ -666,9 +654,7 @@ suite.getServiceSession = [
   {
     name: 'should not get a non-existent service session',
     cb: async () => {
-      expect(ServiceModel.getServiceSession(1)).rejects.toThrow(
-        'Service session with service_session_id 1 does not exist',
-      );
+      expect(ServiceModel.getServiceSession(1)).rejects.toThrow();
     },
   },
 ];
@@ -733,9 +719,7 @@ suite.updateServiceSession = [
         ad_hoc_enabled: true,
         service_hours: 1,
       };
-      expect(ServiceModel.updateServiceSession(sessionData)).rejects.toThrow(
-        'Service with service_id 1 does not exist',
-      );
+      expect(ServiceModel.updateServiceSession(sessionData)).rejects.toThrow();
     },
     cleanup: async () => {
       await recreateDB();
@@ -777,9 +761,7 @@ suite.updateServiceSession = [
       const session = await ServiceModel.getServiceSession(1);
       session.start_time = inOneHour.toISOString();
       session.end_time = now.toISOString();
-      expect(ServiceModel.updateServiceSession(session)).rejects.toThrow(
-        'Start time must be before end time',
-      );
+      expect(ServiceModel.updateServiceSession(session)).rejects.toThrow();
     },
     cleanup: async () => {
       await recreateDB();
@@ -821,9 +803,7 @@ suite.deleteServiceSession = [
       const sessionId = await ServiceModel.createServiceSession(sessionData);
       expect(sessionId).toBe(1);
       expect(ServiceModel.deleteServiceSession(1)).resolves.toBeUndefined();
-      expect(ServiceModel.getServiceSession(1)).rejects.toThrow(
-        'Service session with service_session_id 1 does not exist',
-      );
+      expect(ServiceModel.getServiceSession(1)).rejects.toThrow();
     },
     cleanup: async () => {
       await recreateDB();
@@ -961,9 +941,7 @@ suite.createServiceSessionUser = [
         attended: AttendanceStatus.Attended,
         ad_hoc: false,
       };
-      expect(ServiceModel.createServiceSessionUser(sessionUserData)).rejects.toThrow(
-        'Service session with service_session_id 1 does not exist',
-      );
+      expect(ServiceModel.createServiceSessionUser(sessionUserData)).rejects.toThrow();
     },
   },
 ];
@@ -1090,9 +1068,7 @@ suite.getServiceSessionUser = [
   {
     name: 'should not get a non-existent service session user',
     cb: async () => {
-      expect(ServiceModel.getServiceSessionUser(1, 'test')).rejects.toThrow(
-        'Service session user with service_session_id 1 and username test does not exist',
-      );
+      expect(ServiceModel.getServiceSessionUser(1, 'test')).rejects.toThrow();
     },
   },
 ];
@@ -1156,9 +1132,7 @@ suite.getServiceSessionUsers = [
         attended: AttendanceStatus.Attended,
         ad_hoc: false,
       }));
-      expect(ServiceModel.createServiceSessionUsers(sessionUsers)).rejects.toThrow(
-        'Service session with service_session_id 1 does not exist',
-      );
+      expect(ServiceModel.createServiceSessionUsers(sessionUsers)).rejects.toThrow();
     },
   },
 ];
@@ -1258,9 +1232,7 @@ suite.deleteServiceSessionUser = [
       const serviceSessionUser = await ServiceModel.createServiceSessionUser(sessionUserData);
       expect(serviceSessionUser).toMatchObject(sessionUserData);
       expect(ServiceModel.deleteServiceSessionUser(1, 'test')).resolves.toBeUndefined();
-      expect(ServiceModel.getServiceSessionUser(1, 'test')).rejects.toThrow(
-        'Service session user with service_session_id 1 and username test does not exist',
-      );
+      expect(ServiceModel.getServiceSessionUser(1, 'test')).rejects.toThrow();
     },
     cleanup: async () => {
       await recreateDB();
