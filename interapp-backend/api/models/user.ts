@@ -9,7 +9,7 @@ import {
   AnnouncementCompletion,
   AttendanceStatus,
 } from '@db/entities';
-import { HTTPError, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors, HTTPErrorCode } from '@utils/errors';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import transporter from '@email_handler/index';
@@ -36,11 +36,7 @@ export class UserModel {
       .where('user.username = :username', { username: username })
       .getOne();
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     return user;
   }
@@ -82,19 +78,11 @@ export class UserModel {
     if (username) {
       switch (users.length) {
         case 0:
-          throw new HTTPError(
-            'User not found',
-            `The user with username ${username} was not found in the database`,
-            HTTPErrorCode.NOT_FOUND_ERROR,
-          );
+          throw HTTPErrors.RESOURCE_NOT_FOUND;
         case 1:
           return users[0];
         default:
-          throw new HTTPError(
-            'Multiple users found',
-            `Multiple users with username ${username} were found in the database`,
-            HTTPErrorCode.INTERNAL_SERVER_ERROR,
-          );
+          throw HTTPErrors.DATABASE_CORRUPTED;
       }
     }
 
@@ -109,11 +97,7 @@ export class UserModel {
       .getOne();
 
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
 
     user.email = new_email;
@@ -129,19 +113,11 @@ export class UserModel {
       .getOne();
 
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
 
     if (!(await Bun.password.verify(old_password, user.password_hash))) {
-      throw new HTTPError(
-        'Invalid password',
-        'The old password you entered is incorrect',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_PASSWORD;
     }
 
     try {
@@ -149,11 +125,7 @@ export class UserModel {
     } catch (err) {
       // err should be of type Error always
       if (err instanceof Error) {
-        throw new HTTPError(
-          'Password hashing error',
-          err.message || 'An error occurred while hashing the password',
-          HTTPErrorCode.INTERNAL_SERVER_ERROR,
-        );
+        throw HTTPErrors.FAILED_HASHING_PASSWORD;
       }
     }
     await appDataSource.manager.update(User, { username: username }, user);
@@ -162,11 +134,7 @@ export class UserModel {
     // check if the user exists in redis
     const username = await redisClient.get(`resetpw:${token}`);
     if (!username) {
-      throw new HTTPError(
-        'Invalid token',
-        'The token you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_HASH;
     }
 
     // generate a random password
@@ -196,11 +164,7 @@ export class UserModel {
       .getOne();
 
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
 
     const token = randomBytes(128).toString('hex'); // minimum 128 bytes for security
@@ -229,11 +193,7 @@ export class UserModel {
     // check if the user exists in redis
     const username = await redisClient.get(`verify:${token}`);
     if (!username) {
-      throw new HTTPError(
-        'Invalid token',
-        'The token you provided is invalid',
-        HTTPErrorCode.UNAUTHORIZED_ERROR,
-      );
+      throw HTTPErrors.INVALID_HASH;
     }
 
     // delete the token
@@ -251,11 +211,7 @@ export class UserModel {
       .where('user.username = :username', { username: username })
       .getOne();
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
   }
   public static async sendVerifyEmail(username: string) {
@@ -267,19 +223,11 @@ export class UserModel {
       .getOne();
 
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
 
     if (user.verified) {
-      throw new HTTPError(
-        'User already verified',
-        'The user has already been verified',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
+      throw HTTPErrors.ALREADY_VERIFIED;
     }
 
     const token = randomBytes(128).toString('hex'); // minimum 128 bytes for security
@@ -313,11 +261,7 @@ export class UserModel {
       .where('user.username = :username', { username: username })
       .getOne();
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
 
     const perms = user.user_permissions.map((perm) => perm.permission_id);
@@ -333,11 +277,7 @@ export class UserModel {
       .where('user.username = :username', { username: username })
       .getOne();
     if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     // delete all permissions
     await appDataSource.manager.delete(UserPermission, { username });
@@ -355,11 +295,7 @@ export class UserModel {
       .where(username ? 'user_permissions.username = :username' : '1=1', { username })
       .getMany();
     if (perms.length === 0) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     return perms.reduce(
       (acc, perm) => {
@@ -378,19 +314,11 @@ export class UserModel {
       .where('user_service.username = :username', { username })
       .getMany();
     if (!user_services) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} has no services`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.NO_SERVICES_FOUND;
     }
     const service_ids = user_services.map((service) => service.service_id);
     if (service_ids.length === 0) {
-      throw new HTTPError(
-        'Service not found',
-        `The user with username ${username} has no services`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.NO_SERVICES_FOUND;
     }
     return await appDataSource.manager
       .createQueryBuilder()
@@ -426,11 +354,7 @@ export class UserModel {
       .getMany();
 
     if (!serviceSessions) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} has no service sessions`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.NO_SERVICE_SESSION_FOUND;
     }
 
     for (const session of serviceSessions) {
@@ -477,19 +401,11 @@ export class UserModel {
       .where('user_service.service_id = :service_id', { service_id })
       .getMany();
     if (!service_users) {
-      throw new HTTPError(
-        'Service not found',
-        `The service with service_id ${service_id} has no users`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.SERVICE_NO_USER_FOUND;
     }
     const usernames = service_users.map((service) => service.username);
     if (usernames.length === 0) {
-      throw new HTTPError(
-        'Service not found',
-        `The service with service_id ${service_id} has no users`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.SERVICE_NO_USER_FOUND;
     }
     const users: Pick<User, 'username' | 'user_id' | 'email' | 'verified' | 'service_hours'>[] =
       await appDataSource.manager
@@ -514,32 +430,18 @@ export class UserModel {
       .from(User, 'user')
       .where('user.username = :username', { username })
       .getOne();
-    if (!user)
-      throw new HTTPError(
-        'User not found',
-        `User with username ${user} was not found`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+    if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
     const service = await appDataSource.manager
       .createQueryBuilder()
       .select(['service'])
       .from(Service, 'service')
       .where('service.service_id = :service_id', { service_id })
       .getOne();
-    if (!service)
-      throw new HTTPError(
-        'Service not found',
-        `Service with id ${service_id} was not found`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+    if (!service) throw HTTPErrors.RESOURCE_NOT_FOUND;
     try {
       await appDataSource.manager.insert(UserService, { service_id, username, user, service });
     } catch (e) {
-      throw new HTTPError(
-        'Already exists',
-        'User already has been added to this service',
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw HTTPErrors.ALREADY_PART_OF_SERVICE;
     }
   }
   public static async removeServiceUser(service_id: number, username: string) {
@@ -555,12 +457,7 @@ export class UserModel {
       .from(Service, 'service')
       .where('service.service_id = :service_id', { service_id })
       .getOne();
-    if (!service)
-      throw new HTTPError(
-        'Service not found',
-        `Service with id ${service_id} was not found`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+    if (!service) throw HTTPErrors.RESOURCE_NOT_FOUND;
 
     const findUsers = async (usernames: string[]) => {
       if (findUsers.length === 0) return [];
@@ -602,12 +499,7 @@ export class UserModel {
       .from(User, 'user')
       .where('user.username = :username', { username })
       .getOne();
-    if (!user)
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+    if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
     user.service_hours = hours;
     await appDataSource.manager.update(User, { username }, user);
   }
@@ -618,20 +510,10 @@ export class UserModel {
       .from(User, 'user')
       .where('user.username = :username', { username })
       .getOne();
-    if (!user)
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+    if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
     const converted = dataUrlToBuffer(profile_picture);
 
-    if (!converted)
-      throw new HTTPError(
-        'Invalid image',
-        'The image you provided is invalid',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
+    if (!converted) throw HTTPErrors.INVALID_DATA_URL;
     await minioClient.putObject(
       process.env.MINIO_BUCKETNAME as string,
       `profile_pictures/${username}`,
@@ -649,12 +531,7 @@ export class UserModel {
       .from(User, 'user')
       .where('user.username = :username', { username })
       .getOne();
-    if (!user)
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+    if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
 
     await minioClient.removeObject(
       process.env.MINIO_BUCKETNAME as string,
@@ -675,11 +552,7 @@ export class UserModel {
     )?.verified;
 
     if (isVerified === undefined) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
 
     const unreadAnnouncements: {

@@ -497,9 +497,7 @@ suite.removeServiceUser = [
       expect(resultAdded).toBeArrayOfSize(1);
 
       await UserModel.removeServiceUser(1, 'user');
-      expect(UserModel.getAllServicesByUser('user')).rejects.toThrow(
-        'The user with username user has no services',
-      );
+      expect(UserModel.getAllServicesByUser('user')).rejects.toThrow();
     },
     cleanup: async () => await recreateDB(),
   },
