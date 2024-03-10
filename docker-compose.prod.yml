@@ -53,7 +53,7 @@ services:
       redis:
         condition: service_healthy
     volumes:
-        - ./:/tmp/dump
+        - ./dump:/tmp/dump
 
   minio:
     container_name: interapp-minio
