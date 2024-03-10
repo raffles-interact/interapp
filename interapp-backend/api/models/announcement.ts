@@ -1,6 +1,6 @@
 import appDataSource from '@utils/init_datasource';
 import { Announcement, AnnouncementCompletion, AnnouncementAttachment, User } from '@db/entities';
-import { HTTPErrors, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors } from '@utils/errors';
 import { UserModel } from './user';
 import minioClient from '@utils/init_minio';
 import dataUrlToBuffer from '@utils/dataUrlToBuffer';
