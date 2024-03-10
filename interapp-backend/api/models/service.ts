@@ -1,4 +1,4 @@
-import { HTTPErrors, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
 import minioClient from '@utils/init_minio';
 import dataUrlToBuffer from '@utils/dataUrlToBuffer';

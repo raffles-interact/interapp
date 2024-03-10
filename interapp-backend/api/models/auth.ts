@@ -1,6 +1,6 @@
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
-import { HTTPErrors, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors } from '@utils/errors';
 import { SignJWT, jwtVerify, JWTPayload, JWTVerifyResult } from 'jose';
 
 import redisClient from '@utils/init_redis';

@@ -9,7 +9,7 @@ import {
   AnnouncementCompletion,
   AttendanceStatus,
 } from '@db/entities';
-import { HTTPErrors, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors } from '@utils/errors';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import transporter from '@email_handler/index';
