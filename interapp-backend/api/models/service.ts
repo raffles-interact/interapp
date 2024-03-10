@@ -6,6 +6,7 @@ import { AttendanceStatus, Service, ServiceSession, ServiceSessionUser } from '@
 import { UserModel } from './user';
 import redisClient from '@utils/init_redis';
 
+const MINIO_BUCKETNAME = process.env.MINIO_BUCKETNAME as string;
 export class ServiceModel {
   public static async createService(
     service: Omit<Service, 'service_id' | 'service_ic' | 'user_service' | 'service_sessions'>,
@@ -26,7 +27,7 @@ export class ServiceModel {
         throw HTTPErrors.INVALID_DATA_URL;
       }
       await minioClient.putObject(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         'service/' + service.name,
         convertedFile.buffer,
         { 'Content-Type': convertedFile.mimetype },
@@ -61,7 +62,7 @@ export class ServiceModel {
     }
     if (service.promotional_image)
       service.promotional_image = await minioClient.presignedGetObject(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         service.promotional_image as string,
       );
     return service;
@@ -80,7 +81,7 @@ export class ServiceModel {
           throw HTTPErrors.INVALID_DATA_URL;
         }
         await minioClient.putObject(
-          process.env.MINIO_BUCKETNAME as string,
+          MINIO_BUCKETNAME,
           'service/' + service.name,
           convertedFile.buffer,
         );
@@ -108,7 +109,7 @@ export class ServiceModel {
     for (const service of services) {
       if (service.promotional_image)
         service.promotional_image = await minioClient.presignedGetObject(
-          process.env.MINIO_BUCKETNAME as string,
+          MINIO_BUCKETNAME,
           service.promotional_image as string,
         );
     }

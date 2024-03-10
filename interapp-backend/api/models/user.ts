@@ -27,6 +27,7 @@ type UserWithoutSensitiveFields = Omit<
   'password_hash' | 'refresh_token' | 'user_permissions' | 'user_services' | 'service_session_users'
 >;
 
+const MINIO_BUCKETNAME = process.env.MINIO_BUCKETNAME as string;
 export class UserModel {
   public static async getUser(username: string) {
     const user = await appDataSource.manager
@@ -67,10 +68,7 @@ export class UserModel {
 
     for (const user of users) {
       if (user.profile_picture) {
-        const url = await minioClient.presignedGetObject(
-          process.env.MINIO_BUCKETNAME as string,
-          user.profile_picture,
-        );
+        const url = await minioClient.presignedGetObject(MINIO_BUCKETNAME, user.profile_picture);
         user.profile_picture = url;
       }
     }
@@ -360,7 +358,7 @@ export class UserModel {
     for (const session of serviceSessions) {
       if (session.service_session.service.promotional_image) {
         const url = await minioClient.presignedGetObject(
-          process.env.MINIO_BUCKETNAME as string,
+          MINIO_BUCKETNAME,
           session.service_session.service.promotional_image,
         );
         session.service_session.service.promotional_image = url;
@@ -515,7 +513,7 @@ export class UserModel {
 
     if (!converted) throw HTTPErrors.INVALID_DATA_URL;
     await minioClient.putObject(
-      process.env.MINIO_BUCKETNAME as string,
+      MINIO_BUCKETNAME,
       `profile_pictures/${username}`,
       converted.buffer,
       { 'Content-Type': converted.mimetype },
@@ -533,10 +531,7 @@ export class UserModel {
       .getOne();
     if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
 
-    await minioClient.removeObject(
-      process.env.MINIO_BUCKETNAME as string,
-      `profile_pictures/${username}`,
-    );
+    await minioClient.removeObject(MINIO_BUCKETNAME, `profile_pictures/${username}`);
     user.profile_picture = null;
 
     await appDataSource.manager.update(User, { username }, user);
