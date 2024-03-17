@@ -3,7 +3,6 @@ import { useContext } from 'react';
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import { ActiveTabContext } from './utils';
 
-import UnderConstruction from '@components/UnderConstruction/UnderContruction';
 import Overview from './Overview/Overview';
 import ServiceSessionsPage from './ServiceSessionsPage/ServiceSessionsPage';
 import ServiceCardDisplay from './ServiceCardDisplay/ServiceCardDisplay';
