@@ -15,7 +15,7 @@
     "typeorm:sync": "typeorm-ts-node-esm schema:sync -d db/data-source.ts"
   },
   "devDependencies": {
-    "@types/bun": "^1.0.3",
+    "@types/bun": "^1.0.8",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.16",
     "@types/express": "^4.17.21",
