@@ -19,7 +19,6 @@ import {
 import { ServiceModel } from '@models/service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
-import { AttendanceStatus } from '@db/entities';
 import { UserModel } from '@models/user';
 import { z } from 'zod';
 
@@ -111,7 +110,7 @@ serviceRouter.get(
   validateRequiredFieldsV2(ServiceSessionIdFields),
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof ServiceSessionIdFields>;
-    const session = await ServiceModel.getServiceSession(Number(req.query.service_session_id));
+    const session = await ServiceModel.getServiceSession(Number(query.service_session_id));
     res.status(200).send(session);
   },
 );

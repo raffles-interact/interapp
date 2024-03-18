@@ -5,7 +5,7 @@ import GoHomeButton from '@/components/GoHomeButton/GoHomeButton';
 export default function Page({
   searchParams,
 }: Readonly<{
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
 }>) {
   if (searchParams.id instanceof Array || searchParams.id === undefined)
     return (
