@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const path = require('path');
+const { withSentryConfig } = require('@sentry/nextjs');
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -15,6 +17,7 @@ const nextConfig = {
       '@api': path.resolve('./src/api'),
       '@components': path.resolve('./src/components'),
       '@providers': path.resolve('./src/providers'),
+      '@hooks': path.resolve('./src/hooks'),
     };
     return config;
   },
@@ -42,6 +45,17 @@ const nextConfig = {
           ]
         : [],
   },
+  sentry: {
+    tunnelRoute: '/sentry',
+    hideSourceMaps: true,
+  },
+};
+const sentryWebpackPluginOption = {
+  org: process.env.SENTRY_ORGANISATION,
+  project: process.env.SENTRY_PROJECT,
+  authToken: process.env.SENTRY_AUTH_TOKEN,
+
+  silent: true,
 };
 
-module.exports = nextConfig;
+module.exports = withSentryConfig(nextConfig, sentryWebpackPluginOption);

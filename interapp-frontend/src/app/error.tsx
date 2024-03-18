@@ -1,6 +1,7 @@
 'use client';
 import GoHomeButton from '@components/GoHomeButton/GoHomeButton';
 import { Title, Text, Stack, Button, Code } from '@mantine/core';
+import useSentryCaptureError from '@hooks/useSentryCaptureError/useSentryCaptureError';
 
 export default function ErrorPage({
   error,
@@ -9,6 +10,7 @@ export default function ErrorPage({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useSentryCaptureError(error);
   return (
     <Stack align='center' gap={10} p='lg'>
       <Title>Uh Oh!</Title>
