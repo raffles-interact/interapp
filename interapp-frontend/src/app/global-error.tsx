@@ -1,4 +1,5 @@
 'use client';
+import useSentryCaptureError from '@hooks/useSentryCaptureError/useSentryCaptureError';
 
 export default function GlobalError({
   error,
@@ -7,6 +8,7 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }>) {
+  useSentryCaptureError(error);
   const handleGoHome = () => {
     window.location.href = '/';
   };
