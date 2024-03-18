@@ -6,7 +6,7 @@ import GoHomeButton from '@components/GoHomeButton/GoHomeButton';
 export default async function ForgotPasswordVerifyPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
 }) {
   const apiClient = new APIClient().instance;
   const token = searchParams.token as string | undefined;

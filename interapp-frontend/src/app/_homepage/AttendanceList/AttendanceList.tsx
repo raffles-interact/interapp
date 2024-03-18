@@ -26,12 +26,15 @@ interface AttendanceListProps {
   sessionCount: number;
 }
 
-export default function AttendanceList({ attendance, sessionCount }: AttendanceListProps) {
+export default function AttendanceList({
+  attendance,
+  sessionCount,
+}: Readonly<AttendanceListProps>) {
   if (attendance === null) {
     return (
       <Stack gap={5}>
-        {[...Array(sessionCount)].map((_, i) => (
-          <Skeleton width='100%' height={30} key={i} />
+        {[...Array(sessionCount)].map(() => (
+          <Skeleton width='100%' height={30} key={Math.random()} /> // arbitrary key
         ))}
       </Stack>
     );

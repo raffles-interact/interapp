@@ -6,7 +6,7 @@ import { useInterval } from '@mantine/hooks';
 export default function Page429({
   searchParams,
 }: Readonly<{
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
 }>) {
   const reset = useMemo(() => {
     if (

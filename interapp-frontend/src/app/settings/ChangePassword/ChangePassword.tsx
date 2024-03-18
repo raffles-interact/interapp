@@ -67,26 +67,24 @@ const ChangePassword = () => {
     setLoading(false);
   };
   return (
-    <>
-      <form onSubmit={form.onSubmit(handlePasswordChange)}>
-        <div className='change-password-container'>
-          <Title order={3}>Change Password</Title>
-          <div className='change-password-form'>
-            <Text className='change-password-form-label'>Old Password:</Text>
-            <PasswordInput {...form.getInputProps('currentPassword')} />
-            <Text className='change-password-form-label'>New Password:</Text>
-            <PasswordInput {...form.getInputProps('newPassword')} />
-            <Text className='change-password-form-label'>Confirm New Password:</Text>
-            <PasswordInput {...form.getInputProps('confirmPassword')} />
-          </div>
+    <form onSubmit={form.onSubmit(handlePasswordChange)}>
+      <div className='change-password-container'>
+        <Title order={3}>Change Password</Title>
+        <div className='change-password-form'>
+          <Text className='change-password-form-label'>Old Password:</Text>
+          <PasswordInput {...form.getInputProps('currentPassword')} />
+          <Text className='change-password-form-label'>New Password:</Text>
+          <PasswordInput {...form.getInputProps('newPassword')} />
+          <Text className='change-password-form-label'>Confirm New Password:</Text>
+          <PasswordInput {...form.getInputProps('confirmPassword')} />
         </div>
-        <div className='change-password-button-container'>
-          <Button variant='outline' loading={loading} type='submit'>
-            Change Password
-          </Button>
-        </div>
-      </form>
-    </>
+      </div>
+      <div className='change-password-button-container'>
+        <Button variant='outline' loading={loading} type='submit'>
+          Change Password
+        </Button>
+      </div>
+    </form>
   );
 };
 

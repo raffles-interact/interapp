@@ -5,7 +5,7 @@ import { Title } from '@mantine/core';
 export default async function VerifyEmailPage({
   searchParams,
 }: {
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
 }) {
   return (
     <div className='verify-container'>
