@@ -8,7 +8,7 @@ const config = {
 };
 
 if (Object.values(config).some((x) => x === undefined)) {
-  console.log('Minio env vars not set');
+  console.error('Minio env vars not set');
   process.exit(1);
 }
 
