@@ -59,33 +59,31 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     if (allowedRoutes.some((route) => memoWildcardMatcher(pathname, route))) {
       return;
-    } else {
-      if (!user) {
-        notifications.show({
-          title: 'Error',
-          message: 'You must be logged in to access this page',
-          color: 'red',
-        });
-        router.replace('/auth/login');
-        return;
-      }
-      if (user && (pathname === '/auth/login' || pathname === '/auth/signup')) {
-        notifications.show({
-          title: 'Info',
-          message: 'You are already logged in. Redirecting to home page.',
-          color: 'red',
-        });
-        router.replace('/');
-        return;
-      }
+    }
+    if (!user) {
       notifications.show({
         title: 'Error',
-        message: 'You do not have permission to access this page',
+        message: 'You must be logged in to access this page',
+        color: 'red',
+      });
+      router.replace('/auth/login');
+      return;
+    }
+    if (user && (pathname === '/auth/login' || pathname === '/auth/signup')) {
+      notifications.show({
+        title: 'Info',
+        message: 'You are already logged in. Redirecting to home page.',
         color: 'red',
       });
       router.replace('/');
       return;
     }
+    notifications.show({
+      title: 'Error',
+      message: 'You do not have permission to access this page',
+      color: 'red',
+    });
+    router.replace('/');
   }, [user, loading]);
 
   useEffect(() => {
@@ -122,14 +120,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     );
     const { access_token, expire, user } = data;
 
-    if (status !== 200) return status;
+    if (status === 200) {
+      localStorage.setItem('access_token_expire', expire.toString());
+      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('user', JSON.stringify(user));
+      setUser(user);
+      setJustLoggedIn(true);
+      router.refresh(); // invalidate browser cache
+    }
 
-    localStorage.setItem('access_token_expire', expire.toString());
-    localStorage.setItem('access_token', access_token);
-    localStorage.setItem('user', JSON.stringify(user));
-    setUser(user);
-    setJustLoggedIn(true);
-    router.refresh(); // invalidate browser cache
     return status;
   }, []);
 

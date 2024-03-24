@@ -6,7 +6,7 @@ interface NextAttendanceProps {
   nextSession: FetchAttendanceResponse[0] | null;
 }
 
-export default function NextAttendance({ nextSession }: NextAttendanceProps) {
+export default function NextAttendance({ nextSession }: Readonly<NextAttendanceProps>) {
   if (nextSession === null) {
     return (
       <Paper shadow='sm' p='md' radius='md'>

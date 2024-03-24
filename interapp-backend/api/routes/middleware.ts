@@ -51,15 +51,17 @@ export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema:
 }
 
 export async function verifyJWT(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.authorization?.split(' ')[1];
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
     throw new HTTPError(
       'Missing JWT',
       'You must provide a JWT token in the Authorization header',
       HTTPErrorCode.UNAUTHORIZED_ERROR,
     );
   }
+
+  const token = authHeader.split(' ')[1];
   const { user_id, username } = (await AuthModel.verify(token, 'access')).payload;
 
   req.headers.user_id = String(user_id);

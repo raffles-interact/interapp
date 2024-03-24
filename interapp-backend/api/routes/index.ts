@@ -79,7 +79,7 @@ app.use('/api/announcement', announcementRouter);
 app.use(handleError);
 
 try {
-  app.listen(PORT, () => console.log('Server running on port 8000!'));
+  app.listen(PORT, () => console.info(`Server running on port ${PORT}!`));
 } catch (err) {
   console.error(err);
   process.exit(1);

@@ -54,7 +54,7 @@ schedule(
       try {
         users = await UserModel.getAllUsersByService(service.service_id);
       } catch (err) {
-        console.log(err);
+        console.error(err);
       }
 
       const toCreate = users.map((user) => ({
@@ -71,7 +71,7 @@ schedule(
       created_services.push({ [service_session_id]: detail });
     }
 
-    console.log('created service sessions: ', created_services);
+    console.info('created service sessions: ', created_services);
   },
   {
     timezone: 'Asia/Singapore',
@@ -89,7 +89,7 @@ schedule('0 */1 * * * *', async () => {
 
   // get all hashes from redis and check if service session id is in redis else add it
   const hashes = await redisClient.hGetAll('service_session');
-  console.log('hashes: ', hashes);
+  console.info('hashes: ', hashes);
   for (const session of service_sessions) {
     const start_time = new Date(session.start_time);
     const end_time = new Date(session.end_time);
@@ -129,5 +129,5 @@ schedule('0 0 0 */1 * *', async () => {
   await $`touch ${newFile}`;
   await $`PGPASSWORD=postgres pg_dump -U postgres -a interapp -h interapp-postgres > ${newFile}`;
 
-  console.log('db snapshot taken at location: ', newFile);
+  console.info('db snapshot taken at location: ', newFile);
 });

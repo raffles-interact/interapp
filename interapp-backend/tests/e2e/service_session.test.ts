@@ -6,6 +6,7 @@ import { ServiceModel } from '@models/service';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import { recreateRedis } from '../utils/recreate_redis';
+import { TestErrors } from '@utils/errors';
 
 const API_URL = process.env.API_URL;
 
@@ -55,7 +56,7 @@ describe('API (service session)', async () => {
     const response_as_json = (await res.json()) as Object;
     if ('access_token' in response_as_json) {
       accessToken = response_as_json.access_token as string;
-    } else throw new Error('No access token found');
+    } else throw TestErrors.NO_ACCESS_TOKEN;
 
     const queryRunner = appDataSource.createQueryRunner();
 
@@ -68,7 +69,7 @@ describe('API (service session)', async () => {
         .leftJoinAndSelect('user.user_permissions', 'user_permissions')
         .where('user.username = :username', { username: 'testuser' })
         .getOne();
-      if (!user) throw new Error('User not found');
+      if (!user) throw TestErrors.USER_NOT_FOUND;
       await appDataSource.manager.insert(UserPermission, {
         user: user,
         username: 'testuser',

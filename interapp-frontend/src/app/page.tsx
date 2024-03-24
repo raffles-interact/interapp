@@ -65,7 +65,7 @@ const sessionCount = 4;
 export default function Home() {
   const { user, loading } = useContext(AuthContext);
 
-  const [attendancelist, setAttendanceList] = useState<FetchAttendanceResponse | null>(null);
+  const [attendanceList, setAttendanceList] = useState<FetchAttendanceResponse | null>(null);
   const [nextSession, setNextSession] = useState<FetchAttendanceResponse[0] | null>(null);
 
   useEffect(() => {
@@ -102,7 +102,7 @@ export default function Home() {
           </Stack>
           <Stack gap={5}>
             <Title order={2}>Recent Attendance</Title>
-            <AttendanceList attendance={attendancelist} sessionCount={sessionCount} />
+            <AttendanceList attendance={attendanceList} sessionCount={sessionCount} />
           </Stack>
         </SimpleGrid>
         <Stack gap={5}>

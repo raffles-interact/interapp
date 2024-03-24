@@ -6,7 +6,7 @@ import './error-styles.css';
 export default async function AttendancePage({
   searchParams,
 }: Readonly<{
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams: Readonly<{ [key: string]: string | string[] | undefined }>;
 }>) {
   // if there is an id, it must be a number
   if (searchParams.id instanceof Array || (searchParams.id && !/^\d+$/.test(searchParams.id)))

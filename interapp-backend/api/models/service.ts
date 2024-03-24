@@ -1,4 +1,4 @@
-import { HTTPError, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors } from '@utils/errors';
 import appDataSource from '@utils/init_datasource';
 import minioClient from '@utils/init_minio';
 import dataUrlToBuffer from '@utils/dataUrlToBuffer';
@@ -6,6 +6,7 @@ import { AttendanceStatus, Service, ServiceSession, ServiceSessionUser } from '@
 import { UserModel } from './user';
 import redisClient from '@utils/init_redis';
 
+const MINIO_BUCKETNAME = process.env.MINIO_BUCKETNAME as string;
 export class ServiceModel {
   public static async createService(
     service: Omit<Service, 'service_id' | 'service_ic' | 'user_service' | 'service_sessions'>,
@@ -23,14 +24,10 @@ export class ServiceModel {
     else {
       const convertedFile = dataUrlToBuffer(service.promotional_image);
       if (!convertedFile) {
-        throw new HTTPError(
-          'Invalid promotional image',
-          'Promotional image is not a valid data URL',
-          HTTPErrorCode.BAD_REQUEST_ERROR,
-        );
+        throw HTTPErrors.INVALID_DATA_URL;
       }
       await minioClient.putObject(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         'service/' + service.name,
         convertedFile.buffer,
         { 'Content-Type': convertedFile.mimetype },
@@ -48,11 +45,7 @@ export class ServiceModel {
     try {
       await appDataSource.manager.insert(Service, newService);
     } catch (e) {
-      throw new HTTPError(
-        'Service already exists',
-        `Service with name ${service.name} already exists, or service IC with username ${service.service_ic_username} already exists`,
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw HTTPErrors.ALREADY_EXISTS;
     }
 
     return newService.service_id;
@@ -65,15 +58,11 @@ export class ServiceModel {
       .where('service_id = :id', { id: service_id })
       .getOne();
     if (!service) {
-      throw new HTTPError(
-        'Service not found',
-        `Service with service_id ${service_id} does not exist`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     if (service.promotional_image)
       service.promotional_image = await minioClient.presignedGetObject(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         service.promotional_image as string,
       );
     return service;
@@ -89,14 +78,10 @@ export class ServiceModel {
       if (service.promotional_image.startsWith('data:')) {
         const convertedFile = dataUrlToBuffer(service.promotional_image);
         if (!convertedFile) {
-          throw new HTTPError(
-            'Invalid promotional image',
-            'Promotional image is not a valid data URL',
-            HTTPErrorCode.BAD_REQUEST_ERROR,
-          );
+          throw HTTPErrors.INVALID_DATA_URL;
         }
         await minioClient.putObject(
-          process.env.MINIO_BUCKETNAME as string,
+          MINIO_BUCKETNAME,
           'service/' + service.name,
           convertedFile.buffer,
         );
@@ -108,7 +93,7 @@ export class ServiceModel {
     try {
       await appDataSource.manager.update(Service, { service_id: service.service_id }, service);
     } catch (e) {
-      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
+      throw HTTPErrors.ALREADY_EXISTS;
     }
     return await this.getService(service.service_id);
   }
@@ -124,7 +109,7 @@ export class ServiceModel {
     for (const service of services) {
       if (service.promotional_image)
         service.promotional_image = await minioClient.presignedGetObject(
-          process.env.MINIO_BUCKETNAME as string,
+          MINIO_BUCKETNAME,
           service.promotional_image as string,
         );
     }
@@ -140,11 +125,7 @@ export class ServiceModel {
     session.service_id = service_session.service_id;
     const validTime = new Date(service_session.start_time) > new Date(service_session.end_time);
     if (validTime) {
-      throw new HTTPError(
-        'Invalid time',
-        'Start time must be before end time',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
+      throw HTTPErrors.INVALID_TIME_INTERVAL;
     }
     session.start_time = service_session.start_time;
     session.end_time = service_session.end_time;
@@ -154,7 +135,7 @@ export class ServiceModel {
     try {
       await appDataSource.manager.insert(ServiceSession, session);
     } catch (e) {
-      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
+      throw HTTPErrors.ALREADY_EXISTS;
     }
     return session.service_session_id;
   }
@@ -166,11 +147,7 @@ export class ServiceModel {
       .where('service_session_id = :id', { id: service_session_id })
       .getOne();
     if (!res) {
-      throw new HTTPError(
-        'Service session not found',
-        `Service session with service_session_id ${service_session_id} does not exist`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     return res;
   }
@@ -181,11 +158,7 @@ export class ServiceModel {
 
     const validTime = new Date(service_session.start_time) > new Date(service_session.end_time);
     if (validTime) {
-      throw new HTTPError(
-        'Invalid time',
-        'Start time must be before end time',
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
+      throw HTTPErrors.INVALID_TIME_INTERVAL;
     }
     try {
       await appDataSource.manager.update(
@@ -194,7 +167,7 @@ export class ServiceModel {
         { ...service_session, service },
       );
     } catch (e) {
-      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
+      throw HTTPErrors.ALREADY_EXISTS;
     }
     return await this.getServiceSession(service_session.service_session_id);
   }
@@ -213,21 +186,13 @@ export class ServiceModel {
     session.is_ic = user_session.is_ic;
     session.service_session = await this.getServiceSession(user_session.service_session_id);
     if (!session.service_session.ad_hoc_enabled && session.ad_hoc) {
-      throw new HTTPError(
-        'Ad hoc not enabled',
-        `Ad hoc is not enabled for service session with service_session_id ${user_session.service_session_id}`,
-        HTTPErrorCode.FORBIDDEN_ERROR,
-      );
+      throw HTTPErrors.AD_HOC_NOT_ENABLED;
     }
     session.user = await UserModel.getUser(user_session.username);
     try {
       await appDataSource.manager.insert(ServiceSessionUser, session);
     } catch (e) {
-      throw new HTTPError(
-        'Service session user already exists',
-        `Service session user with service_session_id ${user_session.service_session_id} and username ${user_session.username} already exists`,
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw HTTPErrors.ALREADY_EXISTS;
     }
     return session;
   }
@@ -244,11 +209,7 @@ export class ServiceModel {
       session.is_ic = user_session.is_ic;
       session.service_session = await this.getServiceSession(user_session.service_session_id);
       if (!session.service_session.ad_hoc_enabled && session.ad_hoc) {
-        throw new HTTPError(
-          'Ad hoc not enabled',
-          `Ad hoc is not enabled for service session with service_session_id ${user_session.service_session_id}`,
-          HTTPErrorCode.FORBIDDEN_ERROR,
-        );
+        throw HTTPErrors.AD_HOC_NOT_ENABLED;
       }
       session.user = await UserModel.getUser(user_session.username);
       sessions.push(session);
@@ -256,11 +217,7 @@ export class ServiceModel {
     try {
       await appDataSource.manager.insert(ServiceSessionUser, sessions);
     } catch (e) {
-      throw new HTTPError(
-        'DB error',
-        `Error inserting service session users: ${String(e)}`,
-        HTTPErrorCode.INTERNAL_SERVER_ERROR,
-      );
+      throw HTTPErrors.ALREADY_EXISTS;
     }
     return sessions;
   }
@@ -273,11 +230,7 @@ export class ServiceModel {
       .andWhere('username = :username', { username })
       .getOne();
     if (!res) {
-      throw new HTTPError(
-        'Service session user not found',
-        `Service session user with service_session_id ${service_session_id} and username ${username} does not exist`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     return res;
   }
@@ -307,7 +260,7 @@ export class ServiceModel {
         { ...new_service_session_user, service_session, user },
       );
     } catch (e) {
-      throw new HTTPError('DB error', String(e), HTTPErrorCode.BAD_REQUEST_ERROR);
+      throw HTTPErrors.ALREADY_EXISTS;
     }
     return await this.getServiceSessionUser(
       new_service_session_user.service_session_id,
@@ -396,11 +349,7 @@ export class ServiceModel {
   public static async verifyAttendance(hash: string, username: string) {
     const service_session_id = await redisClient.hGet('service_session', hash);
     if (!service_session_id) {
-      throw new HTTPError(
-        'Invalid hash',
-        `Hash ${hash} is not a valid hash`,
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
+      throw HTTPErrors.INVALID_HASH;
     }
     const service_session_user = await this.getServiceSessionUser(
       parseInt(service_session_id),
@@ -408,11 +357,7 @@ export class ServiceModel {
     );
 
     if (service_session_user.attended === AttendanceStatus.Attended) {
-      throw new HTTPError(
-        'Already attended',
-        `User ${username} has already attended service session with service_session_id ${service_session_id}`,
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw HTTPErrors.ALREADY_ATTENDED;
     }
     service_session_user.attended = AttendanceStatus.Attended;
     await this.updateServiceSessionUser(service_session_user);

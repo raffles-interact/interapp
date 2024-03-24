@@ -2,7 +2,7 @@ import AppDataSource from '@db/data-source';
 
 AppDataSource.initialize()
   .then(() => {
-    console.log('Database initialized');
+    console.info('Database initialized');
     process.exit(0);
   })
   .catch((err) => {

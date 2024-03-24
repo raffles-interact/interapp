@@ -3,7 +3,7 @@ import './styles.css';
 import APIClient from '@api/api_client';
 import { remapAssetUrl } from '@api/utils';
 import { AnnouncementWithMeta } from '@/app/announcements/types';
-import { Card, ActionIcon, Text, Title, Image, Skeleton, Stack, SimpleGrid } from '@mantine/core';
+import { Card, ActionIcon, Text, Title, Image, Skeleton, Stack } from '@mantine/core';
 import { IconExternalLink, IconClock, IconUser } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';

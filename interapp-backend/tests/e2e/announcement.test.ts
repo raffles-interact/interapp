@@ -2,6 +2,7 @@ import { test, expect, describe, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
+import { TestErrors } from '@utils/errors';
 
 const API_URL = process.env.API_URL;
 
@@ -39,7 +40,7 @@ describe('API (announcements)', () => {
     const response_as_json = (await res.json()) as Object;
     if ('access_token' in response_as_json) {
       accessToken = response_as_json.access_token as string;
-    } else throw new Error('No access token found');
+    } else throw TestErrors.NO_ACCESS_TOKEN;
 
     const queryRunner = appDataSource.createQueryRunner();
 
@@ -52,7 +53,7 @@ describe('API (announcements)', () => {
         .leftJoinAndSelect('user.user_permissions', 'user_permissions')
         .where('user.username = :username', { username: 'testuser' })
         .getOne();
-      if (!user) throw new Error('User not found');
+      if (!user) throw TestErrors.USER_NOT_FOUND;
       await appDataSource.manager.insert(UserPermission, {
         user: user,
         username: 'testuser',

@@ -1,10 +1,11 @@
 import appDataSource from '@utils/init_datasource';
 import { Announcement, AnnouncementCompletion, AnnouncementAttachment, User } from '@db/entities';
-import { HTTPError, HTTPErrorCode } from '@utils/errors';
+import { HTTPErrors } from '@utils/errors';
 import { UserModel } from './user';
 import minioClient from '@utils/init_minio';
 import dataUrlToBuffer from '@utils/dataUrlToBuffer';
 
+const MINIO_BUCKETNAME = process.env.MINIO_BUCKETNAME as string;
 export class AnnouncementModel {
   public static async createAnnouncement(
     announcement: Omit<
@@ -23,14 +24,10 @@ export class AnnouncementModel {
       const convertedFile = dataUrlToBuffer(announcement.image);
 
       if (!convertedFile) {
-        throw new HTTPError(
-          'Invalid promotional image',
-          'Promotional image is not a valid data URL',
-          HTTPErrorCode.BAD_REQUEST_ERROR,
-        );
+        throw HTTPErrors.INVALID_DATA_URL;
       }
       await minioClient.putObject(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         'announcement/' + announcement.title,
         convertedFile.buffer,
         { 'Content-Type': convertedFile.mimetype },
@@ -73,7 +70,7 @@ export class AnnouncementModel {
           newAttachment.attachment_loc =
             'announcement-attachment/' + announcement.title + '-' + idx;
           await minioClient.putObject(
-            process.env.MINIO_BUCKETNAME as string,
+            MINIO_BUCKETNAME,
             newAttachment.attachment_loc,
             attachment.buffer,
             { 'Content-Type': attachment.mimetype },
@@ -106,11 +103,7 @@ export class AnnouncementModel {
           attachments.map((attachment) => ({ ...attachment, announcement_id: announcementId })),
         );
     } catch (e) {
-      throw new HTTPError(
-        'Announcement already exists',
-        `Announcement with title ${announcement.title} already exists`,
-        HTTPErrorCode.CONFLICT_ERROR,
-      );
+      throw HTTPErrors.ALREADY_EXISTS;
     }
 
     return newAnnouncement.announcement_id;
@@ -126,22 +119,18 @@ export class AnnouncementModel {
       .getOne();
 
     if (!announcement) {
-      throw new HTTPError(
-        'Announcement not found',
-        `Announcement with id ${announcementId} not found`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     if (announcement.image)
       announcement.image = await minioClient.presignedGetObject(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         announcement.image,
         60 * 60 * 24 * 7,
       );
     announcement.announcement_attachments = await Promise.all(
       announcement.announcement_attachments.map(async (attachment) => {
         attachment.attachment_loc = await minioClient.presignedGetObject(
-          process.env.MINIO_BUCKETNAME as string,
+          MINIO_BUCKETNAME,
           attachment.attachment_loc,
           60 * 60 * 24 * 7,
         );
@@ -173,14 +162,14 @@ export class AnnouncementModel {
       data.map(async (announcement) => {
         if (announcement.image)
           announcement.image = await minioClient.presignedGetObject(
-            process.env.MINIO_BUCKETNAME as string,
+            MINIO_BUCKETNAME,
             announcement.image,
             60 * 60 * 24 * 7,
           );
         announcement.announcement_attachments = await Promise.all(
           announcement.announcement_attachments.map(async (attachment) => {
             attachment.attachment_loc = await minioClient.presignedGetObject(
-              process.env.MINIO_BUCKETNAME as string,
+              MINIO_BUCKETNAME,
               attachment.attachment_loc,
               60 * 60 * 24 * 7,
             );
@@ -204,11 +193,7 @@ export class AnnouncementModel {
   ) {
     const announcement = await this.getAnnouncement(newAnnouncement.announcement_id);
     if (!announcement) {
-      throw new HTTPError(
-        'Announcement not found',
-        `Announcement with id ${newAnnouncement.announcement_id} not found`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     const updatedAnnouncement = new Announcement();
     updatedAnnouncement.announcement_id = newAnnouncement.announcement_id;
@@ -223,10 +208,7 @@ export class AnnouncementModel {
 
     const deleteOldImage = () => {
       if (announcement.image) {
-        return minioClient.removeObject(
-          process.env.MINIO_BUCKETNAME as string,
-          'announcement/' + announcement.title,
-        );
+        return minioClient.removeObject(MINIO_BUCKETNAME, 'announcement/' + announcement.title);
       }
     };
 
@@ -240,14 +222,10 @@ export class AnnouncementModel {
       // update image
       const convertedFile = dataUrlToBuffer(newAnnouncement.image);
       if (!convertedFile) {
-        throw new HTTPError(
-          'Invalid promotional image',
-          'Promotional image is not a valid data URL',
-          HTTPErrorCode.BAD_REQUEST_ERROR,
-        );
+        throw HTTPErrors.INVALID_DATA_URL;
       }
       await minioClient.putObject(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         'announcement/' + updatedAnnouncement.title,
         convertedFile.buffer,
         { 'Content-Type': convertedFile.mimetype },
@@ -258,7 +236,7 @@ export class AnnouncementModel {
     const deleteOldAttachments = () => {
       const deleteObjects = new Promise<void>((resolve, reject) => {
         const stream = minioClient.listObjectsV2(
-          process.env.MINIO_BUCKETNAME as string,
+          MINIO_BUCKETNAME,
           'announcement-attachment/' + announcement.title,
         );
         const objects: string[] = [];
@@ -267,7 +245,7 @@ export class AnnouncementModel {
           reject(err);
         });
         stream.on('end', async () => {
-          await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
+          await minioClient.removeObjects(MINIO_BUCKETNAME, objects);
           resolve();
         });
       });
@@ -296,7 +274,7 @@ export class AnnouncementModel {
             'announcement-attachment/' + updatedAnnouncement.title + '-' + idx;
 
           await minioClient.putObject(
-            process.env.MINIO_BUCKETNAME as string,
+            MINIO_BUCKETNAME,
             newAttachment.attachment_loc,
             attachment.buffer,
             { 'Content-Type': attachment.mimetype },
@@ -324,7 +302,7 @@ export class AnnouncementModel {
     const announcement = await this.getAnnouncement(announcement_id);
     const deleteObjects = new Promise<void>((resolve, reject) => {
       const stream = minioClient.listObjectsV2(
-        process.env.MINIO_BUCKETNAME as string,
+        MINIO_BUCKETNAME,
         'announcement-attachment/' + announcement.title,
       );
       const objects: string[] = [];
@@ -333,7 +311,7 @@ export class AnnouncementModel {
         reject(err);
       });
       stream.on('end', async () => {
-        await minioClient.removeObjects(process.env.MINIO_BUCKETNAME as string, objects);
+        await minioClient.removeObjects(MINIO_BUCKETNAME, objects);
         resolve();
       });
     });
@@ -343,11 +321,7 @@ export class AnnouncementModel {
   public static async getAnnouncementCompletions(announcement_id: number) {
     const announcement = await this.getAnnouncement(announcement_id);
     if (!announcement) {
-      throw new HTTPError(
-        'Announcement not found',
-        `Announcement with id ${announcement_id} not found`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     const completions = await appDataSource.manager
       .createQueryBuilder()
@@ -366,19 +340,8 @@ export class AnnouncementModel {
   ) {
     const user = await UserModel.getUser(username);
     const announcement = await this.getAnnouncement(announcement_id);
-    if (!user) {
-      throw new HTTPError(
-        'User not found',
-        `The user with username ${username} was not found in the database`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
-    }
-    if (!announcement) {
-      throw new HTTPError(
-        'Announcement not found',
-        `Announcement with id ${announcement_id} not found`,
-        HTTPErrorCode.NOT_FOUND_ERROR,
-      );
+    if (!user || !announcement) {
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
     }
     await appDataSource.manager.update(
       AnnouncementCompletion,
