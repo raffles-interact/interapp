@@ -144,7 +144,7 @@ export default function Home() {
           <Stack align='center'>
             <Image src='/interact-members.jpg' className='homepage-image' />
             <Text c='dimmed' size='sm'>
-              Interact Club, 2023
+              Interact Club, 2024
             </Text>
           </Stack>
           <Stack>
@@ -160,7 +160,7 @@ export default function Home() {
               low-income families, the elderly, persons with disabilities and those in need beyond
               the shores of Singapore. Drawing upon the{' '}
               <span className='homepage-bold'>Rotary Club of Singapore's</span> motto of '
-              <span className='homepage-bold'>Service before self</span>', we have the simple wish
+              <span className='homepage-bold'>Service above self</span>', we have the simple wish
               of bringing happiness and warmth to the people around us. Ultimately, we hope your
               service journey will allow you to see that there is much to life beyond yourself, and
               that we all can bring light to others. What unites our family of Interactors is our
