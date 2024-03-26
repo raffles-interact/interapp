@@ -4,7 +4,7 @@ import { UserWithProfilePicture } from '../providers/AuthProvider/types';
 export function remapAssetUrl(url: string) {
   const minioURL = new URL(url);
   const path = minioURL.pathname.split('/').slice(2).join('/');
-  return `http://localhost:3000/assets/${path}`;
+  return `${process.env.NEXT_PUBLIC_WEBSITE_URL}/assets/${path}`;
 }
 
 export async function getAllUsernames() {
