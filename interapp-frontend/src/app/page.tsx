@@ -160,8 +160,8 @@ export default function Home() {
               low-income families, the elderly, persons with disabilities and those in need beyond
               the shores of Singapore. Drawing upon the{' '}
               <span className='homepage-bold'>Rotary Club of Singapore's</span> motto of '
-              <span className='homepage-bold'>Service above self</span>', we have the simple wish
-              of bringing happiness and warmth to the people around us. Ultimately, we hope your
+              <span className='homepage-bold'>Service above self</span>', we have the simple wish of
+              bringing happiness and warmth to the people around us. Ultimately, we hope your
               service journey will allow you to see that there is much to life beyond yourself, and
               that we all can bring light to others. What unites our family of Interactors is our
               love for the community that we hold so dear to our hearts.
