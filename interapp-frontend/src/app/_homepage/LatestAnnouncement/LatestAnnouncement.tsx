@@ -22,6 +22,8 @@ const handleFetch = async () => {
   } = res.data;
 
   const announcement = resData.data[0];
+  if (!announcement) return null;
+
   announcement.announcement_attachments = announcement.announcement_attachments.map(
     (attachment) => {
       attachment.attachment_loc = remapAssetUrl(attachment.attachment_loc);
@@ -45,7 +47,7 @@ export default function LatestAnnouncement() {
     });
   }, []);
 
-  if (isLoading || !announcement) {
+  if (isLoading) {
     return (
       <Card shadow='sm' padding='md' radius='md'>
         <Card.Section>
@@ -60,6 +62,12 @@ export default function LatestAnnouncement() {
       </Card>
     );
   }
+  if (!announcement)
+    return (
+      <Card shadow='sm' padding='md' radius='md'>
+        <Text>No announcements found :(</Text>
+      </Card>
+    );
   return (
     <Card shadow='sm' padding='md' radius='md' className='announcement'>
       <Card.Section>
