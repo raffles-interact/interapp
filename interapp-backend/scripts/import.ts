@@ -1,4 +1,3 @@
-
 // Generate db dump from csv file
 // place the csv file in the same directory as this script
 // usage: POSTGRES_HOST=localhost REDIS_URL=redis://localhost:6379 MINIO_ENDPOINT=localhost bun run scripts/import.ts
@@ -10,7 +9,7 @@ const csv = readFileSync('scripts/usernames.csv', 'utf8');
 const lines = csv.split('\n');
 
 const defaultPassword = 'password';
-const defaultEmail = 'default1234@email.com'
+const defaultEmail = 'default1234@email.com';
 const data = lines.map((line) => {
   const regex = /"([^"]*)"|([^,]+)/g;
   const fields = [];
@@ -18,10 +17,10 @@ const data = lines.map((line) => {
   while ((match = regex.exec(line)) !== null) {
     fields.push(match[1] ? match[1] : match[2]);
   }
-  const [,,, id, username] = fields;
+  const [, , , id, username] = fields;
   console.log(id, username);
   return [Number(id), username.replace('\r', ''), defaultEmail, defaultPassword] as const;
-})
+});
 
 //generate sql
 
@@ -35,10 +34,7 @@ async function signUp(user_id: number, username: string, email: string, password
   user.verified = false;
   user.profile_picture = null;
 
-
   user.password_hash = await Bun.password.hash(password);
-  
-  
 
   // init a new permission entry for the user, will insert/update regardless if this entry already exists
   const userPermission = new UserPermission();
@@ -53,9 +49,8 @@ async function signUp(user_id: number, username: string, email: string, password
       .into(obj)
       .values(values)
       .getQueryAndParameters();
-    
-  
-    let paramIndex = 0; 
+
+    let paramIndex = 0;
     const filledQuery = query.replace(/\$[0-9]+/g, () => {
       const value = params[paramIndex++];
       if (typeof value === 'string') {
@@ -71,28 +66,25 @@ async function signUp(user_id: number, username: string, email: string, password
         return 'NULL';
       } else {
         throw new Error(`Unhandled parameter type: ${typeof value}`);
-        
       }
-      
     });
-  
+
     return filledQuery;
   }
-
 
   const userSql = await convert(User, user);
   const userPermissionSql = await convert(UserPermission, userPermission);
 
-
   return [userSql, userPermissionSql];
 }
 
-const queries = Promise.all(data.map(async (d) => {
-  return await signUp(...d);
-}))
+const queries = Promise.all(
+  data.map(async (d) => {
+    return await signUp(...d);
+  }),
+);
 
 queries.then((sqls) => {
   // write to file
   writeFileSync('scripts/insert.sql', sqls.flat().join(';\n') + ';');
-  
 });
