@@ -111,9 +111,22 @@ schedule('0 */1 * * * *', async () => {
     // setting expiry is not possible with hset, so we need to check if the hash is expired
     // if yes, remove it from redis
     else {
-      const hash = Object.values(hashes).find((k) => k === String(session.service_session_id));
+      const hash = Object.entries(hashes).find(
+        ([k, v]) => v === String(session.service_session_id),
+      )?.[0];
+
       if (hash) await redisClient.hDel('service_session', hash);
     }
+  }
+  // attempt to delete all ghost keys
+  // this is to prevent memory leak
+  // filter out all values that are not found in service_sessions
+  const ghost = Object.entries(hashes).filter(
+    ([k, v]) => !service_sessions.find((s) => s.service_session_id === Number(v)),
+  );
+  // remove them all
+  for (const [k, v] of ghost) {
+    await redisClient.hDel('service_session', k);
   }
 });
 

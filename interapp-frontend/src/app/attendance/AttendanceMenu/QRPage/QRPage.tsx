@@ -36,7 +36,7 @@ const refreshAttendance = async (id: number) => {
 };
 
 const QRPage = ({ id, hash }: QRPageProps) => {
-  const [detail, setDetail] = useState<fetchAttendanceDetailsType>(
+  const [detail, setDetail] = useState<fetchAttendanceDetailsType | null>(
     {} as fetchAttendanceDetailsType,
   );
   const redirectLink = useRef<string>(
@@ -75,19 +75,20 @@ const QRPage = ({ id, hash }: QRPageProps) => {
   }, [canvasRef]);
 
   useEffect(() => {
-    if (detail.service_session_id) {
+    if (detail?.service_session_id) {
       timerInterval.start();
     }
     return () => {
       timerInterval.stop();
     };
-  }, [detail.service_session_id]);
+  }, [detail?.service_session_id]);
 
   useEffect(() => {
     if (timer === 0) {
       timerInterval.stop();
       refreshAttendance(id).then((data) => {
         setDetail((prev) => {
+          if (!prev) return null;
           return { ...prev, user_details: data };
         });
         setTimer(5);
@@ -95,6 +96,8 @@ const QRPage = ({ id, hash }: QRPageProps) => {
       });
     }
   }, [timer]);
+
+  if (!detail) return null;
 
   return (
     <>
