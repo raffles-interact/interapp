@@ -137,12 +137,12 @@ export default function Home() {
               .
             </Text>
           </Stack>
-          <Image src='/oneinteract.png' className='homepage-logo' />
+          <Image src='/oneinteract.png' className='homepage-logo' alt='logo' />
         </Group>
         <hr className='homepage-divider' />
         <Group gap={20} wrap='nowrap' className='homepage-section'>
           <Stack align='center'>
-            <Image src='/interact-members.jpg' className='homepage-image' />
+            <Image src='/interact-members.jpg' className='homepage-image' alt='interact members' />
             <Text c='dimmed' size='sm'>
               Interact Club, 2024
             </Text>
