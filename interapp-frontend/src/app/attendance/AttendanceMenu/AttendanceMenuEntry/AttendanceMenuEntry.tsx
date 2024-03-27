@@ -18,6 +18,8 @@ export const fetchAttendanceDetails = async (service_session_id: number) => {
   const res = await apiClient.get('/service/session', {
     params: { service_session_id: service_session_id },
   });
+  // if the session does not exist, return null
+  if (res.status === 404) return null;
   if (res.status !== 200) throw new Error('Failed to fetch attendance details');
 
   const res2 = await apiClient.get('/service/session_user_bulk', {
@@ -62,15 +64,18 @@ export type fetchAttendanceDetailsType = Awaited<ReturnType<typeof fetchAttendan
 
 const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) => {
   const router = useRouter();
-  const [detail, setDetail] = useState<fetchAttendanceDetailsType>(
+  const [detail, setDetail] = useState<fetchAttendanceDetailsType | null>(
     {} as fetchAttendanceDetailsType,
   );
 
   useEffect(() => {
     fetchAttendanceDetails(service_session_id).then((data) => {
+
       setDetail(data);
     });
   }, []);
+
+  if (detail === null) return null;
 
   if (Object.keys(detail).length === 0) {
     return <Skeleton className='entry-skeleton' />;
