@@ -70,7 +70,6 @@ const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) =
 
   useEffect(() => {
     fetchAttendanceDetails(service_session_id).then((data) => {
-
       setDetail(data);
     });
   }, []);
