@@ -83,7 +83,7 @@ export default function AnnouncementsPage() {
       </div>
       <PageController
         activePage={page}
-        totalPages={data ? Math.ceil(data?.total_entries / data?.length_of_page) : 1}
+        totalPages={data?.data && data.total_entries != 0 ? Math.ceil(data?.total_entries / data?.length_of_page) : 1}
         handlePageChange={(page) => setPage(page)}
         className='announcement-page-controller'
       />
