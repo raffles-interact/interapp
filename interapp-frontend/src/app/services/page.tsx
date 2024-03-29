@@ -44,9 +44,7 @@ export default async function ServicesPage() {
         <div className='service-headers'>
           <Title order={1}>Services</Title>
 
-          <AddService
-            alreadyServiceICUsernames={allServices.map((service) => service.service_ic_username)}
-          />
+          <AddService />
         </div>
         <Text>View the list of Interact Club's services here!</Text>
       </div>
@@ -69,7 +67,6 @@ export default async function ServicesPage() {
               service_id={service.service_id}
               service_hours={service.service_hours}
               enable_scheduled={service.enable_scheduled}
-              alreadyServiceICUsernames={allServices.map((service) => service.service_ic_username)}
             />
           ))}
         </Suspense>
