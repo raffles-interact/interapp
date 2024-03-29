@@ -92,7 +92,6 @@ const ServiceBox = (service: Service) => {
 
   return (
     <Card shadow='sm' padding='md' radius='md' className='service-box'>
-      <button onClick={() => handleChangeServiceIc('admin')}>Change Service IC</button>
       <div className='service-box-image-container'>
         <Suspense fallback={<Skeleton className='service-box-image-skeleton' />}>
           <Image
