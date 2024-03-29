@@ -39,7 +39,7 @@ const calculateInterval = (start: string, end: string) => {
   return diffToHours < 0 ? 0 : diffToHours;
 };
 
-const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: string[] }) => {
+const AddService = () => {
   const { user } = useContext(AuthContext);
   const [opened, setOpened] = useState(false);
 
@@ -54,9 +54,7 @@ const AddService = ({ alreadyServiceICUsernames }: { alreadyServiceICUsernames: 
     if (!opened) return;
     getAllUsernames().then((allUsersNames) => {
       setAllUsernames(allUsersNames);
-      setAllValidServiceICUsernames(
-        allUsersNames.filter((username) => !alreadyServiceICUsernames.includes(username)),
-      );
+      setAllValidServiceICUsernames(allUsersNames);
     });
   }, [opened]);
   const form = useForm<CreateServiceWithUsers>({
