@@ -38,6 +38,15 @@ const fetchAllServices = async () => {
 export default async function ServicesPage() {
   const allServices: Service[] = await fetchAllServices();
 
+  // sort by name, then day of week
+  allServices.sort((a, b) => {
+    if (a.name < b.name) return -1;
+    if (a.name > b.name) return 1;
+    return a.day_of_week - b.day_of_week;
+  });
+
+  
+
   return (
     <div className='service-page'>
       <div className='service-headers-container'>
