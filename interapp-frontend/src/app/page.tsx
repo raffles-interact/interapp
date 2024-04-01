@@ -56,7 +56,7 @@ const fetchAttendance = async (username: string, sessionCount: number) => {
   if (nextSession.length === 0) {
     return [prevSessions, null] as const;
   } else {
-    return [prevSessions, nextSession[nextSession.length - 1]] as const;
+    return [prevSessions, nextSession[0]] as const;
   }
 };
 
