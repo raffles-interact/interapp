@@ -174,8 +174,9 @@ suite.createService = [
       // create 1 service first
       await create(0);
       // create 10 services with same service IC username
+      // should no longer throw an error
       for (let i = 1; i < 10; i++) {
-        expect(create(i)).rejects.toThrow();
+        expect(create(i)).resolves.toBeDefined();
       }
     },
     cleanup: async () => {
