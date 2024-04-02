@@ -44,7 +44,7 @@ const fullNames = [
 // nila and tana are service ics
 
 async function deleteUsers(names: string[]) {
-  let a = []
+  let a = [];
   for (const name of names) {
     // find if user exists
     const user = await appDataSource.manager
@@ -59,7 +59,6 @@ async function deleteUsers(names: string[]) {
       const userPermissionSql = `DELETE FROM "user_permission" WHERE username = '${name}'`;
       a.push([userSql, userPermissionSql]);
     }
-
   }
   return a.flat().flat();
 }
