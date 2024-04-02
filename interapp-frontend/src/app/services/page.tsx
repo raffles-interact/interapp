@@ -45,8 +45,6 @@ export default async function ServicesPage() {
     return a.day_of_week - b.day_of_week;
   });
 
-  
-
   return (
     <div className='service-page'>
       <div className='service-headers-container'>
