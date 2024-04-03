@@ -67,7 +67,7 @@ if (['development', 'test'].includes(process.env.NODE_ENV ?? '')) {
 
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
-  app.use(generateRateLimit(1000 * 60, 500)); // 500 requests per 1 minute
+  app.use(generateRateLimit(1000 * 60, 10000)); // 10000 requests per 1 minute
 }
 
 app.use('/api/hello', helloRouter);
