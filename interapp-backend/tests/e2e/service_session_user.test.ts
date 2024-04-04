@@ -8,6 +8,7 @@ const API_URL = process.env.API_URL;
 
 describe('API (service session user)', async () => {
   let accessToken: string;
+  let accessToken2: string;
 
   beforeAll(async () => {
     await fetch(`${API_URL}/auth/signup`, {
@@ -17,16 +18,6 @@ describe('API (service session user)', async () => {
         username: 'testuser',
         email: 'test@example.com',
         password: 'testpassword',
-      }),
-      headers: { 'Content-Type': 'application/json' },
-    });
-    await fetch(`${API_URL}/auth/signup`, {
-      method: 'POST',
-      body: JSON.stringify({
-        user_id: 2,
-        username: 'testuser2',
-        email: 'test@example.com',
-        password: 'testpasswordhhhjh',
       }),
       headers: { 'Content-Type': 'application/json' },
     });
@@ -44,6 +35,31 @@ describe('API (service session user)', async () => {
       accessToken = response_as_json.access_token as string;
     } else throw TestErrors.NO_ACCESS_TOKEN;
 
+    await fetch(`${API_URL}/auth/signup`, {
+      method: 'POST',
+      body: JSON.stringify({
+        user_id: 2,
+        username: 'testuser2',
+        email: 'test@example.com',
+        password: 'testpasswordhhhjh',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const res2 = await fetch(`${API_URL}/auth/signin`, {
+      method: 'POST',
+      body: JSON.stringify({
+        username: 'testuser2',
+        password: 'testpasswordhhhjh',
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const response_as_json2 = (await res2.json()) as Object;
+    if ('access_token' in response_as_json2) {
+      accessToken2 = response_as_json2.access_token as string;
+    } else throw TestErrors.NO_ACCESS_TOKEN;
+
     const queryRunner = appDataSource.createQueryRunner();
 
     try {
@@ -59,12 +75,31 @@ describe('API (service session user)', async () => {
       await appDataSource.manager.insert(UserPermission, {
         user: user,
         username: 'testuser',
+        permission_id: 1,
+      });
+      await appDataSource.manager.insert(UserPermission, {
+        user: user,
+        username: 'testuser',
         permission_id: 2,
       });
       await appDataSource.manager.insert(UserPermission, {
         user: user,
         username: 'testuser',
         permission_id: 4,
+      });
+
+      const user2 = await appDataSource.manager
+        .createQueryBuilder()
+        .select(['user'])
+        .from(User, 'user')
+        .leftJoinAndSelect('user.user_permissions', 'user_permissions')
+        .where('user.username = :username', { username: 'testuser2' })
+        .getOne();
+      if (!user2) throw TestErrors.USER_NOT_FOUND;
+      await appDataSource.manager.insert(UserPermission, {
+        user: user2,
+        username: 'testuser2',
+        permission_id: 1,
       });
       await queryRunner.commitTransaction();
     } catch (err) {
@@ -248,6 +283,31 @@ describe('API (service session user)', async () => {
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
     expect(res.status).toBe(200);
+  });
+
+  test('mark service session user as valid reason', async () => {
+    const res = await fetch(`${API_URL}/service/absence`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_session_id: 1,
+        username: 'testuser',
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    });
+    console.log(await res.json());
+    expect(res.status).toBe(204);
+  });
+
+  test('mark service session user with low permissions as valid reason', async () => {
+    const res = await fetch(`${API_URL}/service/absence`, {
+      method: 'PATCH',
+      body: JSON.stringify({
+        service_session_id: 1,
+        username: 'testuser2',
+      }),
+      headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken2}` },
+    });
+    expect(res.status).toBe(204);
   });
 
   test('delete service session user', async () => {
