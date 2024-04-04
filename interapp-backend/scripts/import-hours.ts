@@ -1,6 +1,6 @@
 import { readFileSync, writeFileSync } from 'fs';
 
-const csv = readFileSync('scripts/hours.csv', 'utf8');
+const csv = readFileSync('scripts/hours2.csv', 'utf8');
 const data = csv.split('\n').map((line) => {
   const [name, hours] = line.split(',');
   return [name, Number(hours)] as const;
