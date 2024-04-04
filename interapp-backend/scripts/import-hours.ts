@@ -6,9 +6,11 @@ const data = csv.split('\n').map((line) => {
   return [name, Number(hours)] as const;
 });
 
-const queries = data.map(([name, hours]) => {
-  return `UPDATE "user" SET service_hours = ${hours} WHERE username = '${name}';`;
-}).join('\n');
+const queries = data
+  .map(([name, hours]) => {
+    return `UPDATE "user" SET service_hours = ${hours} WHERE username = '${name}';`;
+  })
+  .join('\n');
 
 writeFileSync('scripts/hours.sql', queries, { flag: 'w' });
 

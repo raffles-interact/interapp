@@ -9,13 +9,12 @@ import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
 
 const handleSetValidReason = async (id: number, username: string) => {
   const apiClient = new APIClient().instance;
-  const res = await apiClient.patch('/service/session_user', {
+  const res = await apiClient.patch('/service/absence', {
     service_session_id: id,
     username: username,
-    attended: 'Valid Reason',
   });
 
-  if (res.status !== 200) throw new Error(res.data.message);
+  if (res.status !== 204) throw new Error(res.data.message);
 };
 
 interface AbsenceFormProps {
