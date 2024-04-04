@@ -100,17 +100,23 @@ schedule('0 */1 * * * *', async () => {
   // get all hashes from redis and check if service session id is in redis else add it
   const hashes = await redisClient.hGetAll('service_session');
   console.info('hashes: ', hashes);
+
+  const redisSessionIds = new Set(Object.values(hashes));
+  const toDelete = [];
+
   for (const session of service_sessions) {
     const start_time = new Date(session.start_time);
     const end_time = new Date(session.end_time);
-    const offset = new Date(start_time.getTime() - 10 * 60000);
 
-    const withinInterval = local_time <= end_time && local_time >= offset;
+    const start_offset = new Date(start_time.getTime() - 10 * 60000);
+    const end_offset = new Date(end_time.getTime() + 10 * 60000);
+
+    const withinInterval = local_time <= end_offset && local_time >= start_offset;
 
     if (withinInterval) {
       // if yes, service session is active
 
-      if (!Object.values(hashes).find((v) => v === String(session.service_session_id))) {
+      if (!redisSessionIds.has(String(session.service_session_id))) {
         // if service session id is not in redis, generate a hash as key and service session id as value
 
         const newHash = randomBytes(128).toString('hex');
@@ -125,18 +131,19 @@ schedule('0 */1 * * * *', async () => {
         ([k, v]) => v === String(session.service_session_id),
       )?.[0];
 
-      if (hash) await redisClient.hDel('service_session', hash);
+      if (hash) toDelete.push(hash);
     }
   }
   // attempt to delete all ghost keys
   // this is to prevent memory leak
   // filter out all values that are not found in service_sessions
-  const ghost = Object.entries(hashes).filter(
-    ([k, v]) => !service_sessions.find((s) => s.service_session_id === Number(v)),
-  );
+  const serviceSessionIds = new Set(service_sessions.map((s) => s.service_session_id));
+  const ghost = Object.entries(hashes).filter(([_, v]) => !serviceSessionIds.has(Number(v)));
+  toDelete.push(...ghost.map(([k, _]) => k));
   // remove them all
-  for (const [k, _] of ghost) {
-    await redisClient.hDel('service_session', k);
+  if (toDelete.length > 0) {
+    const operations = toDelete.map((k) => redisClient.hDel('service_session', k));
+    await Promise.all(operations);
   }
 });
 
