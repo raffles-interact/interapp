@@ -7,11 +7,9 @@ const data = csv.split('\n').map((line) => {
 });
 
 const queries = data.map(([name, hours]) => {
-  return `UPDATE "user" SET service_hours = service_hours + ${hours} WHERE username = '${name}';`;
-});
+  return `UPDATE "user" SET service_hours = ${hours} WHERE username = '${name}';`;
+}).join('\n');
 
-queries.forEach((query) => {
-  writeFileSync('scripts/hours.sql', query + '\n', { flag: 'a' });
-});
+writeFileSync('scripts/hours.sql', queries, { flag: 'w' });
 
 console.log(queries);
