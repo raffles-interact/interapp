@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
 
 Sentry.init({
+  enabled: process.env.NODE_ENV === 'production',
   // dsn can be public, no security risk here
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
 
