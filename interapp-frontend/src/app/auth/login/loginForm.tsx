@@ -6,16 +6,26 @@ import { useForm } from '@mantine/form';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';
 
-interface LoginFormProps {
+interface InternalLoginFormProps {
   username: string;
   password: string;
 }
 
-export default function LoginForm() {
+type LoginFormProps =
+  | {
+      redirectTo: string;
+      helperText: string;
+    }
+  | {
+      redirectTo?: never;
+      helperText?: never;
+    };
+
+export default function LoginForm({ redirectTo, helperText }: LoginFormProps) {
   const { login } = useContext(AuthContext);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const form = useForm<LoginFormProps>({
+  const form = useForm<InternalLoginFormProps>({
     initialValues: {
       username: '',
       password: '',
@@ -31,10 +41,12 @@ export default function LoginForm() {
       case 200:
         notifications.show({
           title: 'Success!',
-          message: `You have been logged in as ${form.values.username}. Redirecting you to the dashboard.`,
+          message: `You have been logged in as ${form.values.username}. ${
+            helperText ?? 'Redirecting you to the dashboard.'
+          }`,
           color: 'green',
         });
-        router.push('/');
+        router.push(redirectTo ?? '/');
         break;
       case 401:
         notifications.show({
@@ -60,7 +72,7 @@ export default function LoginForm() {
     }
   };
 
-  const handleSubmit = async (values: LoginFormProps) => {
+  const handleSubmit = async (values: InternalLoginFormProps) => {
     setLoading(true);
     login({
       username: values.username,
