@@ -157,7 +157,7 @@ const EditService = ({
           <NumberInput label='Contact Number' {...form.getInputProps('contact_number')} />
           <TextInput label='Website' {...form.getInputProps('website')} />
           <SearchableSelect
-            defaultValue={'Sun'}
+            defaultValue={daysOfWeek[day_of_week]}
             allValues={daysOfWeek}
             onChange={(day_of_week) =>
               form.setFieldValue(
