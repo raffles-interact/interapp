@@ -2,7 +2,7 @@ import Bun from 'bun';
 import { randomBytes } from 'crypto';
 
 if (process.argv.length < 3) {
-  console.error('Usage: ts-node scripts/manual-pw-reset.ts <username>');
+  console.error('Usage: bun run scripts/manual-pw-reset.ts <username>');
   process.exit(1);
 }
 const username = process.argv[2];
