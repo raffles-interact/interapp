@@ -4,7 +4,6 @@ import { UserModel } from '@models/user';
 import { User } from '@db/entities/user';
 import { AttendanceStatus } from '@db/entities/service_session_user';
 
-
 function constructDate(day_of_week: number, time: string) {
   const d = new Date();
 
@@ -23,7 +22,6 @@ function constructDate(day_of_week: number, time: string) {
 
   return d;
 }
-
 
 async function getCurrentServices() {
   // get current date and time
@@ -78,9 +76,11 @@ async function scheduleSessions() {
   console.info('created service sessions: ', created_services);
 }
 
-scheduleSessions().then(() => {
-  process.exit(0);
-}).catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+scheduleSessions()
+  .then(() => {
+    process.exit(0);
+  })
+  .catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
