@@ -58,7 +58,7 @@ const PORT = Number(process.env.API_PORT);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '50mb' }));
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL ?? true }));
 app.use(cookieParser());
 
 if (['development', 'test'].includes(process.env.NODE_ENV ?? '')) {
