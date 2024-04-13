@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
-import { AuthModel } from '@models/auth';
-import { UserModel } from '@models/user';
+import { AuthModel, UserModel } from '@models/.';
 import { z } from 'zod';
 
 import rateLimit from 'express-rate-limit';

@@ -2,7 +2,7 @@ import { test, expect, describe, afterAll, beforeAll } from 'bun:test';
 import { recreateDB } from '../utils/recreate_db';
 import appDataSource from '@utils/init_datasource';
 import { User, UserPermission } from '@db/entities';
-import { ServiceModel } from '@models/service';
+import { ServiceModel } from '@models/.';
 import { randomBytes } from 'crypto';
 import redisClient from '@utils/init_redis';
 import { recreateRedis } from '../utils/recreate_redis';

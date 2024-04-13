@@ -13,7 +13,7 @@ import {
   ProfilePictureFields,
 } from './validation';
 import { z } from 'zod';
-import { UserModel } from '@models/user';
+import { UserModel } from '@models/.';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
 

@@ -16,10 +16,9 @@ import {
   VerifyAttendanceFields,
   ServiceSessionIdFields,
 } from './validation';
-import { ServiceModel } from '@models/service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
-import { UserModel } from '@models/user';
+import { UserModel, ServiceModel } from '@models/.';
 import { z } from 'zod';
 import { AttendanceStatus } from '@db/entities';
 

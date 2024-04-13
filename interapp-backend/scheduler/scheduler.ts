@@ -1,6 +1,5 @@
 import { schedule } from 'node-cron';
-import { ServiceModel } from '@models/service';
-import { UserModel } from '@models/user';
+import { ServiceModel, UserModel } from '@models/.';
 import { User } from '@db/entities/user';
 import { AttendanceStatus } from '@db/entities/service_session_user';
 import redisClient from '@utils/init_redis';

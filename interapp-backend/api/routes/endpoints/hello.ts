@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { hello } from '@models/hello';
+import { hello } from '@models/.';
 
 const helloRouter = Router();
 
