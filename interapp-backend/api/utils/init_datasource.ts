@@ -1,4 +1,4 @@
-import { AppDataSourceOptions } from '@db/data-source';
+import { AppDataSourceOptions } from '@db/data_source';
 import { DataSource } from 'typeorm';
 
 const appDataSource = new DataSource(AppDataSourceOptions);
