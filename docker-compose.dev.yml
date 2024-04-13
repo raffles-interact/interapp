@@ -108,6 +108,8 @@ services:
           target: /app/db
     env_file:
       - ./interapp-backend/.env.development
+    environment:
+      - VERSION=${VERSION}
     ports:
       - 8000:8000
     networks:
@@ -129,6 +131,8 @@ services:
       - ./interapp-frontend/src:/app/src
     env_file:
       - ./interapp-frontend/.env.development
+    environment:
+      - VERSION=${VERSION}
     ports:
       - 3000:3000
     networks:

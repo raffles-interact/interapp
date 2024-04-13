@@ -82,6 +82,8 @@ services:
       dockerfile: tests/config/test.Dockerfile
     env_file:
       - ./interapp-backend/tests/config/.env.docker
+    environment:
+      - VERSION=${VERSION}
     ports:
       - 1234:1234
     networks:
