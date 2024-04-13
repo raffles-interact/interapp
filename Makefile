@@ -12,6 +12,13 @@ else
     tag := --$(version)
 endif
 
+VERSION := $(shell git describe --tag --abbrev=0 2>/dev/null)-$(shell git rev-parse --short HEAD 2>/dev/null)
+# if the git describe command fails, we will set the VERSION to an empty string
+ifeq ($(VERSION),-)
+    VERSION := 
+endif
+export VERSION
+
 # scenario 1: version=prod, real=true
 # we need to down the container, prune the system, and rebuild the container
 
