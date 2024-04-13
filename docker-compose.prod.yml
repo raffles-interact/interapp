@@ -108,7 +108,7 @@ services:
     env_file:
       - ./interapp-frontend/.env.production
     environment:
-      - VERSION=${VERSION}
+      - NEXT_PUBLIC_VERSION=${VERSION}
     networks:
       - interapp-network
     depends_on:
