@@ -1,5 +1,5 @@
 import { testSuites } from '../constants.test';
-import { AuthModel, UserModel } from '../../api/models';
+import { AuthModel, UserModel } from '@models/.';
 import { User } from '@db/entities';
 import { describe, test, expect } from 'bun:test';
 import { recreateDB, recreateRedis } from '../utils';

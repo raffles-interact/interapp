@@ -1,5 +1,5 @@
 import { testSuites } from '../constants.test';
-import { AuthModel, AnnouncementModel } from '../../api/models';
+import { AuthModel, AnnouncementModel } from '@models/.';
 import { User } from '@db/entities';
 import { describe, test, expect } from 'bun:test';
 import { recreateDB } from '../utils';
