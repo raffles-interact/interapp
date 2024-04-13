@@ -1,6 +1,5 @@
 // Usage: POSTGRES_HOST=localhost REDIS_URL=redis://localhost:6379 MINIO_ENDPOINT=localhost bun run scripts/create-sessions.ts
-import { ServiceModel } from '@models/service';
-import { UserModel } from '@models/user';
+import { ServiceModel, UserModel } from '@models/.';
 import { User } from '@db/entities/user';
 import { AttendanceStatus } from '@db/entities/service_session_user';
 

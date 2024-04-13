@@ -7,7 +7,7 @@ import {
   PaginationFields,
   AnnouncementCompletionFields,
 } from './validation';
-import { AnnouncementModel } from '@models/announcement';
+import { AnnouncementModel } from '@models/.';
 import { Permissions } from '@utils/permissions';
 import multer from 'multer';
 import { z } from 'zod';
