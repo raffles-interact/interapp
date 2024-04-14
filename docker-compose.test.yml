@@ -83,7 +83,7 @@ services:
     env_file:
       - ./interapp-backend/tests/config/.env.docker
     environment:
-      - VERSION=${VERSION}
+      - APP_VERSION=${APP_VERSION}
     ports:
       - 1234:1234
     networks:
