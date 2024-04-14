@@ -4,7 +4,7 @@ import APIClient from '@/api/api_client';
 import { useState, useEffect, memo } from 'react';
 import { Text, Skeleton, Paper, Title, Badge } from '@mantine/core';
 import { AxiosResponse } from 'axios';
-import { remapAssetUrl } from '@/api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { IconFlag } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import './styles.css';

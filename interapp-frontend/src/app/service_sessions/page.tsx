@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
 import APIClient from '@api/api_client';
 import { Service } from '../services/types';
 import ServiceSessionContent from './ServiceSessionContent/ServiceSessionContent';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { ServiceSessionsWithMeta, ServiceMeta } from './types';
 import { Title, Text } from '@mantine/core';
 import './styles.css';

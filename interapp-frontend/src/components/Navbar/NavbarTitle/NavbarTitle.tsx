@@ -19,7 +19,7 @@ import {
   IconPencil,
 } from '@tabler/icons-react';
 import { Group, Text } from '@mantine/core';
-import { wildcardMatcher } from '@api/utils';
+import { wildcardMatcher } from '@utils/.';
 
 interface RouteTitle {
   route: string;

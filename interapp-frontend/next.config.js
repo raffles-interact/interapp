@@ -2,6 +2,15 @@
 const path = require('path');
 const { withSentryConfig } = require('@sentry/nextjs');
 
+const aliases = {
+  '@': './src',
+  '@api': './src/api',
+  '@components': './src/components',
+  '@providers': './src/providers',
+  '@hooks': './src/hooks',
+  '@utils': './src/utils',
+}
+
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -13,11 +22,10 @@ const nextConfig = {
     };
     config.resolve.alias = {
       ...config.resolve.alias,
-      '@': path.resolve('./src'),
-      '@api': path.resolve('./src/api'),
-      '@components': path.resolve('./src/components'),
-      '@providers': path.resolve('./src/providers'),
-      '@hooks': path.resolve('./src/hooks'),
+      ...Object.entries(aliases).reduce((acc, [key, value]) => {
+        acc[key] = path.resolve(value);
+        return acc;
+      }, {})
     };
     return config;
   },
@@ -50,6 +58,7 @@ const nextConfig = {
     hideSourceMaps: true,
   },
 };
+
 const sentryWebpackPluginOption = {
   org: process.env.SENTRY_ORGANISATION,
   project: process.env.SENTRY_PROJECT,

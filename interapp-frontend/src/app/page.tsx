@@ -10,7 +10,7 @@ import AttendanceList, {
 import NextAttendance from '@/app/_homepage/NextAttendance/NextAttendance';
 
 import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import Link from 'next/link';
 import { Stack, Title, Text, SimpleGrid, Image, Group } from '@mantine/core';
 import PageSkeleton from '@components/PageSkeleton/PageSkeleton';

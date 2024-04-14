@@ -13,7 +13,7 @@ import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
 import './styles.css';
 import { ServiceSessionUser } from '../../types';
-import { getAllUsernames, parseErrorMessage } from '@api/utils';
+import { getAllUsernames, parseErrorMessage } from '@utils/.';
 
 const calculateInterval = (start: Date, end: Date) => {
   const diff = end.getTime() - start.getTime();

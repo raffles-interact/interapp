@@ -22,7 +22,7 @@ import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import UploadImage, { convertToBase64, allowedFormats } from '@components/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
-import { getAllUsernames, parseErrorMessage } from '@api/utils';
+import { getAllUsernames, parseErrorMessage } from '@utils/.';
 import { useRouter } from 'next/navigation';
 import { CreateServiceWithUsers } from '../types';
 

@@ -4,7 +4,7 @@ import { AnnouncementWithMeta } from './../types';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import GoBackButton from '@components/GoBackButton/GoBackButton';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { Title, Text, Group, Stack, ActionIcon, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconClock, IconUser, IconPencil, IconTrash } from '@tabler/icons-react';

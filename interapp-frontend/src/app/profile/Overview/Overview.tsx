@@ -3,7 +3,7 @@ import APIClient from '@api/api_client';
 import { useState, useEffect } from 'react';
 import { User, UserWithProfilePicture, validateUserType } from '@providers/AuthProvider/types';
 import { Permissions } from '../../route_permissions';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { Text, Title, Group, Stack, Badge, ActionIcon, Paper, Button } from '@mantine/core';
 import './styles.css';
 import { permissionsMap } from '@/app/admin/AdminTable/PermissionsInput/PermissionsInput';

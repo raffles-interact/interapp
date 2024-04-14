@@ -2,7 +2,7 @@
 import APIClient from '@api/api_client';
 import { Service } from '@/app/services/types';
 import { ServiceSession } from '@/app/service_sessions/types';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import ServiceCard from './ServiceCard/ServiceCard';
 import { useState, useEffect } from 'react';
 import { Title } from '@mantine/core';

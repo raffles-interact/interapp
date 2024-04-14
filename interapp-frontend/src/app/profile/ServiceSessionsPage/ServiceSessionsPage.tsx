@@ -1,6 +1,6 @@
 'use client';
 import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@/api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { useEffect, useState } from 'react';
 import ServiceSessionCard from './ServiceSessionCard/ServiceSessionCard';
 import { Text } from '@mantine/core';
