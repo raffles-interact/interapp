@@ -87,7 +87,7 @@ services:
     env_file:
       - ./interapp-backend/.env.production
     environment:
-      - VERSION=${VERSION}
+      - APP_VERSION=${APP_VERSION}
     ports:
       - 8000:8000
     networks:
@@ -108,7 +108,7 @@ services:
     env_file:
       - ./interapp-frontend/.env.production
     environment:
-      - NEXT_PUBLIC_VERSION=${VERSION}
+      - NEXT_PUBLIC_APP_VERSION=${APP_VERSION}
     networks:
       - interapp-network
     depends_on:
