@@ -12,7 +12,7 @@ import APIClient from '@api/api_client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { routePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
-import { wildcardMatcher } from '@api/utils';
+import { wildcardMatcher } from '@utils/.';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,

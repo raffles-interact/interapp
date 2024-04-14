@@ -1,7 +1,7 @@
 'use client';
 import './styles.css';
 import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { AnnouncementWithMeta } from '@/app/announcements/types';
 import { Card, ActionIcon, Text, Title, Image, Skeleton, Stack } from '@mantine/core';
 import { IconExternalLink, IconClock, IconUser } from '@tabler/icons-react';

@@ -2,7 +2,7 @@
 import './styles.css';
 import UploadImage, { convertToBase64, allowedFormats } from '@components/UploadImage/UploadImage';
 import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@/api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { useContext, useState, useEffect, memo } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { UserWithProfilePicture } from '@providers/AuthProvider/types';

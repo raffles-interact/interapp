@@ -5,7 +5,7 @@ import PageController from '@components/PageController/PageController';
 import { AnnouncementWithMeta } from './types';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { Title, Text, Group, ActionIcon } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';

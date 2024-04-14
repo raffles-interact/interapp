@@ -10,7 +10,7 @@ import { memo, useContext, useEffect, useState } from 'react';
 import APIClient from '@api/api_client';
 import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
-import { getAllUsernames, parseErrorMessage } from '@api/utils';
+import { getAllUsernames, parseErrorMessage } from '@utils/.';
 import { ServiceSessionUser } from '../../types';
 import { IconPlus } from '@tabler/icons-react';
 import { Service } from '@/app/services/types';

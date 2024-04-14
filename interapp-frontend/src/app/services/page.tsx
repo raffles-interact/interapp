@@ -5,7 +5,7 @@ import APIClient from '@api/api_client';
 const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
 import { Title, Skeleton, Text } from '@mantine/core';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { Service } from './types';
 import './styles.css';
 
