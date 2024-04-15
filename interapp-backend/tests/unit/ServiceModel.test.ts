@@ -1,6 +1,6 @@
-import { testSuites } from '../constants.test';
+import { testSuites, runSuite } from '../constants.test';
 import { AuthModel, ServiceModel } from '@models/.';
-import { describe, test, expect } from 'bun:test';
+import { expect } from 'bun:test';
 import { recreateDB, recreateRedis } from '../utils';
 import redisClient from '@utils/init_redis';
 import { AttendanceStatus } from '@db/entities/service_session_user';
@@ -8,7 +8,9 @@ import { readFileSync } from 'fs';
 import { randomBytes } from 'crypto';
 import { Service } from '@db/entities';
 
-const suite = testSuites.ServiceModel;
+const SUITE_NAME = 'ServiceModel';
+
+const suite = testSuites[SUITE_NAME];
 
 const signUpUser = async (id: number, name: string) =>
   await AuthModel.signUp(id, name, 'sfsajhjkh@fdjfas', 'pass');
@@ -1554,24 +1556,4 @@ suite.verifyAttendance = [
   },
 ];
 
-describe('ServiceModel', () => {
-  for (const [method, tests] of Object.entries(suite)) {
-    describe(method, async () => {
-      for (const { name, cb, cleanup } of tests) {
-        test(name, async () => {
-          try {
-            await cb();
-          } finally {
-            if (cleanup) await cleanup();
-          }
-        });
-      }
-    });
-  }
-  test('make sure suite is exhaustive', () => {
-    Object.values(suite).forEach((tests) => {
-      expect(tests).toBeArray();
-      expect(tests).not.toBeEmpty();
-    });
-  });
-});
+runSuite(SUITE_NAME, suite);

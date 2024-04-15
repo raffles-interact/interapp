@@ -1,11 +1,12 @@
-import { testSuites } from '../constants.test';
+import { runSuite, testSuites } from '../constants.test';
 import { AuthModel, AnnouncementModel } from '@models/.';
 import { User } from '@db/entities';
-import { describe, test, expect } from 'bun:test';
+import { expect } from 'bun:test';
 import { recreateDB } from '../utils';
 import { readFileSync } from 'fs';
 
-const suite = testSuites.AnnouncementModel;
+const SUITE_NAME = 'AnnouncementModel';
+const suite = testSuites[SUITE_NAME];
 type MulterFile = Express.Multer.File;
 
 const signUpUser = async (id: number, name: string) =>
@@ -377,24 +378,4 @@ suite.updateAnnouncementCompletion = [
   },
 ];
 
-describe('AnnouncementModel', () => {
-  for (const [method, tests] of Object.entries(suite)) {
-    describe(method, async () => {
-      for (const { name, cb, cleanup } of tests) {
-        test(name, async () => {
-          try {
-            await cb();
-          } finally {
-            if (cleanup) await cleanup();
-          }
-        });
-      }
-    });
-  }
-  test('make sure suite is exhaustive', () => {
-    Object.values(suite).forEach((tests) => {
-      expect(tests).toBeArray();
-      expect(tests).not.toBeEmpty();
-    });
-  });
-});
+runSuite(SUITE_NAME, suite);

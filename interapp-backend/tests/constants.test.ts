@@ -1,5 +1,5 @@
-import { ServiceModel, AuthModel, AnnouncementModel, UserModel } from '../api/models';
-import { expect, test } from 'bun:test';
+import { ServiceModel, AuthModel, AnnouncementModel, UserModel, ExportsModel } from '../api/models';
+import { expect, test, describe } from 'bun:test';
 
 interface Test {
   name: string;
@@ -12,7 +12,7 @@ type TestSuite = {
 };
 
 // get all models in an array
-const objs = [ServiceModel, AuthModel, AnnouncementModel, UserModel] as const;
+const objs = [ServiceModel, AuthModel, AnnouncementModel, UserModel, ExportsModel] as const;
 
 // map all models to an object with the name as key
 const models = objs.reduce(
@@ -68,6 +68,31 @@ test('test suites are of correct shape', () => {
     }
   }
 });
+
+export const runSuite = async (name: string, suite: TestSuite) => {
+  describe(name, () => {
+    for (const [method, tests] of Object.entries(suite)) {
+      describe(method, async () => {
+        for (const { name, cb, cleanup } of tests) {
+          test(name, async () => {
+            try {
+              await cb();
+            } finally {
+              if (cleanup) await cleanup();
+            }
+          });
+        }
+      });
+    }
+    test('make sure suite is exhaustive', () => {
+      Object.values(suite).forEach((tests) => {
+        expect(tests).toBeArray();
+        expect(tests).not.toBeEmpty();
+      });
+    });
+  });
+};
+
 
 // looks like this:
 /*

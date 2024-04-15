@@ -1,10 +1,11 @@
-import { testSuites } from '../constants.test';
+import { testSuites, runSuite } from '../constants.test';
 import { AuthModel, UserModel } from '@models/.';
 import { User } from '@db/entities';
-import { describe, test, expect } from 'bun:test';
+import { expect } from 'bun:test';
 import { recreateDB, recreateRedis } from '../utils';
 
-const suite = testSuites.AuthModel;
+const SUITE_NAME = 'AuthModel';
+const suite = testSuites[SUITE_NAME];
 
 const signUpUser = async (id: number, name: string) =>
   await AuthModel.signUp(id, name, 'sfsajhjkh@fdjfas', 'pass');
@@ -170,24 +171,4 @@ suite.verify = [
   },
 ];
 
-describe('AuthModel', () => {
-  for (const [method, tests] of Object.entries(suite)) {
-    describe(method, async () => {
-      for (const { name, cb, cleanup } of tests) {
-        test(name, async () => {
-          try {
-            await cb();
-          } finally {
-            if (cleanup) await cleanup();
-          }
-        });
-      }
-    });
-  }
-  test('make sure suite is exhaustive', () => {
-    Object.values(suite).forEach((tests) => {
-      expect(tests).toBeArray();
-      expect(tests).not.toBeEmpty();
-    });
-  });
-});
+runSuite(SUITE_NAME, suite);
