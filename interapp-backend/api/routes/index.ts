@@ -44,6 +44,7 @@ import {
   userRouter,
   serviceRouter,
   announcementRouter,
+  exportsRouter,
 } from './endpoints';
 
 import 'express-async-errors';
@@ -70,11 +71,18 @@ if (process.env.NODE_ENV === 'production') {
   app.use(generateRateLimit(1000 * 60, 10000)); // 10000 requests per 1 minute
 }
 
-app.use('/api/hello', helloRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/user', userRouter);
-app.use('/api/service', serviceRouter);
-app.use('/api/announcement', announcementRouter);
+const routes = {
+  '/api/hello': helloRouter,
+  '/api/auth': authRouter,
+  '/api/user': userRouter,
+  '/api/service': serviceRouter,
+  '/api/announcement': announcementRouter,
+  '/api/exports': exportsRouter,
+};
+
+for (const [route, router] of Object.entries(routes)) {
+  app.use(route, router);
+}
 
 app.use(handleError);
 
