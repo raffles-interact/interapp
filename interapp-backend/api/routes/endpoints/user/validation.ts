@@ -36,7 +36,7 @@ export const PermissionsFields = RequiredUsername.extend({
     }),
 });
 
-export const ServiceIdFields = RequiredUsername.extend({
+export const ServiceIdFieldsNumeric = RequiredUsername.extend({
   service_id: z
     .number()
     .int()

@@ -7,7 +7,7 @@ import {
   ChangeEmailFields,
   TokenFields,
   PermissionsFields,
-  ServiceIdFields,
+  ServiceIdFieldsNumeric,
   ServiceHoursFields,
   UpdateUserServicesFields,
   ProfilePictureFields,
@@ -174,9 +174,9 @@ userRouter.post(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFieldsV2(ServiceIdFields),
+  validateRequiredFieldsV2(ServiceIdFieldsNumeric),
   async (req, res) => {
-    const body: z.infer<typeof ServiceIdFields> = req.body;
+    const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
     await UserModel.addServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
@@ -186,9 +186,9 @@ userRouter.delete(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFieldsV2(ServiceIdFields),
+  validateRequiredFieldsV2(ServiceIdFieldsNumeric),
   async (req, res) => {
-    const body: z.infer<typeof ServiceIdFields> = req.body;
+    const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
     await UserModel.removeServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
