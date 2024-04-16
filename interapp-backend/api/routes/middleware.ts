@@ -23,15 +23,17 @@ export function validateRequiredFields(requiredFields: string[], optionalFields:
   };
 }
 
-type JSONValue =
-  | Partial<{ [key: string]: JSONValue }>
-  | JSONValue[]
+type ReqBody =
+  | Partial<{ [key: string]: ReqBody }>
+  | ReqBody[]
   | string
   | number
   | boolean
   | null;
 
-export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema: T) {
+type ReqQuery ={ [key: string]: string | string[] | undefined}
+
+export function validateRequiredFieldsV2<T extends z.ZodType<ReqBody | ReqQuery> >(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const content: unknown = req.method === 'GET' ? req.query : req.body;
     const validationResult = schema.safeParse(content);
@@ -44,7 +46,11 @@ export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema:
         validationResult.error.flatten(),
       );
     }
-
+    if (req.method === 'GET') {
+      req.query = validationResult.data as ReqQuery;
+    } else {
+      req.body = validationResult.data as ReqBody;
+    }
     next();
   };
 }
