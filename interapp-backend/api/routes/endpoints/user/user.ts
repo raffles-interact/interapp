@@ -11,6 +11,7 @@ import {
   ServiceHoursFields,
   UpdateUserServicesFields,
   ProfilePictureFields,
+  ServiceHoursBulkFields,
 } from './validation';
 import { z } from 'zod';
 import { UserModel } from '@models/.';
@@ -230,6 +231,18 @@ userRouter.patch(
       await UserModel.updateServiceHours(req.headers.username as string, body.hours);
       res.status(204).send();
     }
+  },
+);
+
+userRouter.patch(
+  '/service_hours_bulk',
+  validateRequiredFieldsV2(ServiceHoursBulkFields),
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
+  async (req, res) => {
+    const body: z.infer<typeof ServiceHoursBulkFields> = req.body;
+    await UserModel.updateServiceHoursBulk(body);
+    res.status(204).send();
   },
 );
 
