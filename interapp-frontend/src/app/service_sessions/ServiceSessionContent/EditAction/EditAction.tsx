@@ -87,23 +87,8 @@ function EditAction({
       setLoading(false);
       return;
     }
-    const addedAttendees = values.attendees.filter(
-      (attendee) => !attendees.find((a) => a.username === attendee.username),
-    );
-    const removedAttendees = attendees.filter(
-      (attendee) => !values.attendees.find((a) => a.username === attendee.username),
-    );
-    const updatedAttendees = values.attendees.filter((attendee) =>
-      attendees.find((a) => {
-        if (a.username !== attendee.username) {
-          return false;
-        }
-    
-        return Object.keys(attendee).some(
-          (key) => attendee[key as keyof ServiceSessionUser] !== a[key as keyof ServiceSessionUser],
-        );
-      }),
-    );
+    const addedAttendees = values.attendees.filter((attendee) => !attendees.includes(attendee));
+    const removedAttendees = attendees.filter((attendee) => !values.attendees.includes(attendee));
 
     let res1 = null;
     if (removedAttendees.length > 0)
