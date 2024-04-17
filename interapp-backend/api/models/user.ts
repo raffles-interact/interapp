@@ -501,6 +501,40 @@ export class UserModel {
     user.service_hours = hours;
     await appDataSource.manager.update(User, { username }, user);
   }
+  public static async updateServiceHoursBulk(data: { username: string; hours: number }[]) {
+    const queryRunner = appDataSource.createQueryRunner();
+  
+    // start a new transaction
+    await queryRunner.startTransaction();
+  
+    try {
+      await Promise.all(
+        data.map(async ({ username, hours }) => {
+          const user = await queryRunner.manager
+            .createQueryBuilder()
+            .select(['user'])
+            .from(User, 'user')
+            .where('user.username = :username', { username })
+            .getOne();
+  
+          if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
+  
+          user.service_hours = hours;
+          await queryRunner.manager.update(User, { username }, user);
+        }),
+      );
+  
+      // commit the transaction if no errors were thrown
+      await queryRunner.commitTransaction();
+    } catch (error) {
+      // rollback the transaction if an error was thrown
+      await queryRunner.rollbackTransaction();
+      throw error;
+    } finally {
+      // release the query runner
+      await queryRunner.release();
+    }
+  }
   public static async updateProfilePicture(username: string, profile_picture: string) {
     const user = await appDataSource.manager
       .createQueryBuilder()

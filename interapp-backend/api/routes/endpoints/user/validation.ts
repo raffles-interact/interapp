@@ -48,6 +48,13 @@ export const ServiceHoursFields = OptionalUsername.extend({
   hours: z.number().int().nonnegative(),
 });
 
+export const ServiceHoursBulkFields = z.array(
+  z.object({
+    username: z.string().min(5),
+    hours: z.number().int(),
+  }),
+);
+
 export const UpdateUserServicesFields = z.object({
   service_id: z
     .number()
