@@ -119,6 +119,46 @@ function EditAction({
       return;
     }
 
+    // calculate the updated attendance status
+    // compare the updated attendees with the original attendees
+
+    const oldAttendees = attendees.map((a) => [a.username, a.attended] as const);
+    const newAttendees = form.values.attendees.map((a) => [a.username, a.attended] as const);
+
+    // find the difference in service hours
+    const difference = Object.fromEntries(
+      newAttendees.map(([key, value]) => {
+        let offset = 0;
+        // attendees that were present before, and now present
+        if (oldAttendees.some(([k]) => k === key)) {
+          offset += form.values.service_hours - service_hours;
+
+          const oldValue = oldAttendees.find(([k]) => k === key)?.[1] as
+            | 'Absent'
+            | 'Attended'
+            | 'Valid Reason';
+          // case 1: user attended before and now not attending
+          if (oldValue === 'Attended' && value !== 'Attended') offset -= form.values.service_hours;
+          // case 2: user didn't attend before and now attending
+          if (oldValue !== 'Attended' && value === 'Attended') offset += form.values.service_hours;
+        } else {
+          // attendees that were not present before, and now present
+          if (value === 'Attended') offset += form.values.service_hours;
+        }
+
+        return [key, offset];
+      }),
+    );
+
+    // handle removed attendees that were present before, and now not present
+    oldAttendees.forEach(([key, value]) => {
+      if (!newAttendees.some(([k]) => k === key) && value === 'Attended') {
+        difference[key] = -service_hours;
+      }
+    });
+
+    console.log(difference); // UPDATE WITH ENDPOINTS ASAP
+
     notifications.show({
       title: 'Success',
       message: 'Successfully updated service session.',
