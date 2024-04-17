@@ -1,8 +1,6 @@
 import { APIClient } from '@api/api_client';
 import { UserWithProfilePicture } from '@providers/AuthProvider/types';
 
-
-
 export async function getAllUsernames() {
   const apiClient = new APIClient().instance;
 
@@ -11,5 +9,3 @@ export async function getAllUsernames() {
   const allUsersNames = all_users !== undefined ? all_users.map((user) => user.username) : [];
   return allUsersNames;
 }
-
-

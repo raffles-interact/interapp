@@ -17,7 +17,6 @@
           "@utils": "./src/utils"
         },
         "extensions": [".ts", ".tsx"]
-        
       }
     }
   }

@@ -9,7 +9,7 @@ const aliases = {
   '@providers': './src/providers',
   '@hooks': './src/hooks',
   '@utils': './src/utils',
-}
+};
 
 const nextConfig = {
   reactStrictMode: true,
@@ -25,7 +25,7 @@ const nextConfig = {
       ...Object.entries(aliases).reduce((acc, [key, value]) => {
         acc[key] = path.resolve(value);
         return acc;
-      }, {})
+      }, {}),
     };
     return config;
   },
