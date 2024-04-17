@@ -87,8 +87,24 @@ function EditAction({
       setLoading(false);
       return;
     }
-    const addedAttendees = values.attendees.filter((attendee) => !attendees.includes(attendee));
-    const removedAttendees = attendees.filter((attendee) => !values.attendees.includes(attendee));
+    const addedAttendees = values.attendees.filter(
+      (attendee) => !attendees.find((a) => a.username === attendee.username),
+    );
+    const removedAttendees = attendees.filter(
+      (attendee) => !values.attendees.find((a) => a.username === attendee.username),
+    );
+    const updatedAttendees = values.attendees.filter((attendee) =>
+      attendees.find((a) => {
+        if (a.username !== attendee.username) {
+          return false;
+        }
+    
+        return Object.keys(attendee).some(
+          (key) => attendee[key as keyof ServiceSessionUser] !== a[key as keyof ServiceSessionUser],
+        );
+      }),
+    );
+
     let res1 = null;
     if (removedAttendees.length > 0)
       res1 = await apiClient.delete('/service/session_user_bulk', {
@@ -97,6 +113,7 @@ function EditAction({
           usernames: removedAttendees.map((attendee) => attendee.username),
         },
       });
+
     let res2 = null;
     if (addedAttendees.length > 0)
       res2 = await apiClient.post('/service/session_user_bulk', {
