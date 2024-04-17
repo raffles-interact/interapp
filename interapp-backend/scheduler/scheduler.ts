@@ -151,8 +151,11 @@ schedule('0 0 0 */1 * *', async () => {
   const path = '/tmp/dump';
   if (!existsSync(path)) mkdirSync(path);
 
+  // remove all files older than 7 days
+  await $`find ${path} -type f -mtime +7 -exec rm {} +`;
+
   const d = new Date();
-  const fmted = `interapp_${d.toLocaleDateString().replace(/\//g, '')}`;
+  const fmted = `interapp_${d.toLocaleDateString('en-GB').replace(/\//g, '_')}`;
 
   const newFile = `${path}/${fmted}.sql`;
   await $`touch ${newFile}`;
