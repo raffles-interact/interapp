@@ -22,33 +22,68 @@ type ExportsResult = {
 
 type ExportsXLSX = [['username', ...string[]], ...[string, ...(AttendanceStatus | null)[]][]];
 
+type QueryExportsConditions = {
+  id: number;
+} & (
+  | {
+      start_date: string; // ISO strings, we have already validated this
+      end_date: string;
+    }
+  | {
+      start_date?: never;
+      end_date?: never;
+    }
+);
+
 export class ExportsModel {
   private static getSheetOptions = (ret: ExportsXLSX) => ({
     '!cols': [{ wch: 24 }, ...Array(ret.length).fill({ wch: 16 })],
   });
   private static constructXLSX = (...data: Parameters<typeof xlsx.build>[0]) => xlsx.build(data);
 
-  public static async queryExports(id: number) {
-    const res: ExportsResult[] = await appDataSource.manager
-      .createQueryBuilder()
-      .select([
-        'service_session.service_session_id',
-        'service_session.start_time',
-        'service_session.end_time',
-        'service.name',
-        'service.service_id',
-      ])
-      .from(ServiceSession, 'service_session')
-      .leftJoin('service_session.service', 'service')
-      .where('service.service_id = :id', { id })
-      .leftJoinAndSelect('service_session.service_session_users', 'service_session_users')
-      .orderBy('service_session.start_time', 'ASC')
-      .getMany();
+  public static async queryExports({ id, start_date, end_date }: QueryExportsConditions) {
+    let res: ExportsResult[];
+    if (start_date === undefined || end_date === undefined) {
+      res = await appDataSource.manager
+        .createQueryBuilder()
+        .select([
+          'service_session.service_session_id',
+          'service_session.start_time',
+          'service_session.end_time',
+          'service.name',
+          'service.service_id',
+        ])
+        .from(ServiceSession, 'service_session')
+        .leftJoin('service_session.service', 'service')
+        .where('service.service_id = :id', { id })
+        .leftJoinAndSelect('service_session.service_session_users', 'service_session_users')
+        .orderBy('service_session.start_time', 'ASC')
+        .getMany();
+    } else {
+      res = await appDataSource.manager
+        .createQueryBuilder()
+        .select([
+          'service_session.service_session_id',
+          'service_session.start_time',
+          'service_session.end_time',
+          'service.name',
+          'service.service_id',
+        ])
+        .from(ServiceSession, 'service_session')
+        .leftJoin('service_session.service', 'service')
+        .where('service.service_id = :id', { id })
+        .andWhere('service_session.start_time >= :start_date', { start_date })
+        .andWhere('service_session.end_time <= :end_date', { end_date })
+        .leftJoinAndSelect('service_session.service_session_users', 'service_session_users')
+        .orderBy('service_session.start_time', 'ASC')
+        .getMany();
+    }
+
     return res;
   }
 
-  public static async formatXLSX(id: number) {
-    const ret = await this.queryExports(id);
+  public static async formatXLSX(conds: QueryExportsConditions) {
+    const ret = await this.queryExports(conds);
 
     if (ret.length === 0) throw HTTPErrors.RESOURCE_NOT_FOUND;
 
@@ -96,8 +131,13 @@ export class ExportsModel {
     return { name: ret[0].service.name, data: out, options: sheetOptions };
   }
 
-  public static async packXLSX(ids: number[]) {
-    const data: WorkSheet[] = await Promise.all(ids.map((id) => this.formatXLSX(id)));
+  public static async packXLSX(ids: number[], start_date?: string, end_date?: string) {
+    const data: WorkSheet[] = await Promise.all(
+      ids.map((id) => {
+        if (start_date === undefined || end_date === undefined) return this.formatXLSX({ id });
+        return this.formatXLSX({ id, start_date, end_date });
+      }),
+    );
     return this.constructXLSX(...data);
   }
 }
