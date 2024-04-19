@@ -34,6 +34,7 @@ const redirectHelperText = {
   '/announcements': 'Redirecting you to the announcements page.',
   '/profile': 'Redirecting you to the profile page.',
   '/services': 'Redirecting you to the service page.',
+  '/exports': 'Redirecting you to the exports page.',
 };
 
 export default function Login({

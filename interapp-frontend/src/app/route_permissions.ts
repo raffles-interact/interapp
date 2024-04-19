@@ -30,6 +30,6 @@ export const routePermissions = {
   [Permissions.SERVICE_IC]: ['/service_sessions', '/attendance'],
   [Permissions.MENTORSHIP_IC]: ['/service_sessions', '/attendance'],
   [Permissions.EXCO]: ['/announcements/create', '/announcements/*/edit'],
-  [Permissions.ATTENDANCE_MANAGER]: [],
+  [Permissions.ATTENDANCE_MANAGER]: ['/exports'],
   [Permissions.ADMIN]: ['/admin'],
 } as const;
