@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
+
 import APIClient from '@api/api_client';
 import { useMemo } from 'react';
 import { Title, Text } from '@mantine/core';
