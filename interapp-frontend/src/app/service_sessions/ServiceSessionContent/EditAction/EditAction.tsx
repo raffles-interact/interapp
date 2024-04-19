@@ -14,6 +14,7 @@ import CRUDModal from '@components/CRUDModal/CRUDModal';
 import './styles.css';
 import { ServiceSessionUser } from '../../types';
 import { getAllUsernames, parseErrorMessage } from '@utils/.';
+import { type AxiosInstance } from 'axios';
 
 const calculateInterval = (start: Date, end: Date) => {
   const diff = end.getTime() - start.getTime();
@@ -30,6 +31,117 @@ export interface EditActionProps {
   attendees: ServiceSessionUser[];
   service_hours: number;
   refreshData: () => void;
+}
+
+interface EditActionFormProps {
+  start_time: Date;
+  end_time: Date;
+  ad_hoc_enabled: boolean;
+  attendees: ServiceSessionUser[];
+  service_hours: number;
+}
+
+async function updateServiceSession(
+  apiClient: AxiosInstance,
+  service_session_id: number,
+  values: EditActionFormProps,
+) {
+  return await apiClient.patch('/service/session', {
+    service_session_id,
+    start_time: values.start_time.toISOString(),
+    end_time: values.end_time.toISOString(),
+    ad_hoc_enabled: values.ad_hoc_enabled,
+    service_hours: values.service_hours,
+  });
+}
+
+async function updateServiceSessionUsers(
+  apiClient: AxiosInstance,
+  service_session_id: number,
+  attendees: ServiceSessionUser[],
+  formValues: EditActionFormProps,
+) {
+  const addedAttendees = formValues.attendees.filter((attendee) => !attendees.includes(attendee));
+  const removedAttendees = attendees.filter((attendee) => !formValues.attendees.includes(attendee));
+
+  let deletedServiceSessionUsersResponse = null;
+  if (removedAttendees.length > 0)
+    deletedServiceSessionUsersResponse = await apiClient.delete('/service/session_user_bulk', {
+      data: {
+        service_session_id,
+        usernames: removedAttendees.map((attendee) => attendee.username),
+      },
+    });
+
+  let addedServiceSessionUsersResponse = null;
+  if (addedAttendees.length > 0)
+    addedServiceSessionUsersResponse = await apiClient.post('/service/session_user_bulk', {
+      service_session_id,
+      users: addedAttendees,
+    });
+
+  return {
+    deletedServiceSessionUsersResponse,
+    addedServiceSessionUsersResponse,
+  };
+}
+
+// hope this doesn't break
+async function updateServiceHours(
+  apiClient: AxiosInstance,
+  service_hours: number,
+  attendees: ServiceSessionUser[],
+  formValues: EditActionFormProps,
+) {
+  const oldAttendees = attendees.map((a) => [a.username, a.attended] as const);
+  const newAttendees = formValues.attendees.map((a) => [a.username, a.attended] as const);
+
+  const difference = Object.fromEntries(
+    newAttendees.map(([key, value]) => {
+      let offset = 0;
+      const oldAttendee = oldAttendees.find(([k]) => k === key);
+      if (oldAttendee) {
+        const oldValue = oldAttendee[1];
+
+        // if the hours were adjusted, update the hours of those previously attending and now still attending
+        if (oldValue === 'Attended' && value === 'Attended')
+          offset += formValues.service_hours - service_hours;
+
+        // if the user was previously attended and is now not attended, subtract the hours
+        if (oldValue === 'Attended' && value !== 'Attended') offset -= service_hours;
+
+        // if the user was previously not attended and is now attended, add the hours
+        if (oldValue !== 'Attended' && value === 'Attended') offset += formValues.service_hours;
+      } else {
+        if (value === 'Attended') offset += formValues.service_hours;
+      }
+
+      return [key, offset];
+    }),
+  );
+
+  // if the user was previously attended and is now not attended, subtract the hours
+  oldAttendees.forEach(([key, value]) => {
+    if (!newAttendees.some(([k]) => k === key) && value === 'Attended') {
+      difference[key] = -service_hours;
+    }
+  });
+
+  const body = Object.entries(difference)
+    .map(([username, hours]) => ({
+      username,
+      hours,
+    }))
+    .filter((entry) => entry.hours !== 0);
+
+  if (body.length === 0) return;
+  const res = await apiClient.patch('/user/service_hours_bulk', body);
+
+  if (res.status === 204) {
+    return null;
+  } else {
+    return res.data;
+  }
 }
 
 function EditAction({
@@ -49,7 +161,7 @@ function EditAction({
   const [allUsernames, setAllUsernames] = useState<string[]>([]);
   const [disableSelectAdHoc, setDisableSelectAdHoc] = useState<boolean>(false);
 
-  const form = useForm({
+  const form = useForm<EditActionFormProps>({
     initialValues: {
       start_time: new Date(start_time),
       end_time: new Date(end_time),
@@ -63,23 +175,19 @@ function EditAction({
     },
   });
 
-  const handleSubmit = async (values: typeof form.values) => {
+  const handleSubmit = async (values: EditActionFormProps) => {
     setLoading(true);
-    const body = {
+
+    const updatedServiceSessionResponse = await updateServiceSession(
+      apiClient,
       service_session_id,
+      values,
+    );
 
-      start_time: values.start_time.toISOString(),
-      end_time: values.end_time.toISOString(),
-      ad_hoc_enabled: values.ad_hoc_enabled,
-      service_hours: values.service_hours,
-    };
-
-    const res = await apiClient.patch('/service/session', body);
-
-    if (res.status !== 200) {
+    if (updatedServiceSessionResponse.status !== 200) {
       notifications.show({
         title: 'Error',
-        message: parseErrorMessage(res.data),
+        message: parseErrorMessage(updatedServiceSessionResponse.data),
         color: 'red',
       });
 
@@ -87,30 +195,21 @@ function EditAction({
       setLoading(false);
       return;
     }
-    const addedAttendees = values.attendees.filter((attendee) => !attendees.includes(attendee));
-    const removedAttendees = attendees.filter((attendee) => !values.attendees.includes(attendee));
 
-    let res1 = null;
-    if (removedAttendees.length > 0)
-      res1 = await apiClient.delete('/service/session_user_bulk', {
-        data: {
-          service_session_id,
-          usernames: removedAttendees.map((attendee) => attendee.username),
-        },
-      });
+    const { deletedServiceSessionUsersResponse, addedServiceSessionUsersResponse } =
+      await updateServiceSessionUsers(apiClient, service_session_id, attendees, values);
 
-    let res2 = null;
-    if (addedAttendees.length > 0)
-      res2 = await apiClient.post('/service/session_user_bulk', {
-        service_session_id,
-        users: addedAttendees,
-      });
-
-    if ((res1 && res1.status >= 400) || (res2 && res2.status >= 400)) {
+    if (
+      (deletedServiceSessionUsersResponse && deletedServiceSessionUsersResponse.status >= 400) ||
+      (addedServiceSessionUsersResponse && addedServiceSessionUsersResponse.status >= 400)
+    ) {
       notifications.show({
         title: 'Error',
         message:
-          'Failed to update service session users (attendees). Changes may have been partially applied.',
+          'Failed to update attendees. Changes may have been partially applied.\n' +
+          parseErrorMessage(deletedServiceSessionUsersResponse) +
+          '\n' +
+          parseErrorMessage(addedServiceSessionUsersResponse),
         color: 'red',
       });
 
@@ -119,45 +218,26 @@ function EditAction({
       return;
     }
 
-    // calculate the updated attendance status
-    // compare the updated attendees with the original attendees
-
-    const oldAttendees = attendees.map((a) => [a.username, a.attended] as const);
-    const newAttendees = form.values.attendees.map((a) => [a.username, a.attended] as const);
-
-    // find the difference in service hours
-    const difference = Object.fromEntries(
-      newAttendees.map(([key, value]) => {
-        let offset = 0;
-        // attendees that were present before, and now present
-        if (oldAttendees.some(([k]) => k === key)) {
-          offset += form.values.service_hours - service_hours;
-
-          const oldValue = oldAttendees.find(([k]) => k === key)?.[1] as
-            | 'Absent'
-            | 'Attended'
-            | 'Valid Reason';
-          // case 1: user attended before and now not attending
-          if (oldValue === 'Attended' && value !== 'Attended') offset -= form.values.service_hours;
-          // case 2: user didn't attend before and now attending
-          if (oldValue !== 'Attended' && value === 'Attended') offset += form.values.service_hours;
-        } else {
-          // attendees that were not present before, and now present
-          if (value === 'Attended') offset += form.values.service_hours;
-        }
-
-        return [key, offset];
-      }),
+    const updateHoursResponse = await updateServiceHours(
+      apiClient,
+      service_hours,
+      attendees,
+      values,
     );
 
-    // handle removed attendees that were present before, and now not present
-    oldAttendees.forEach(([key, value]) => {
-      if (!newAttendees.some(([k]) => k === key) && value === 'Attended') {
-        difference[key] = -service_hours;
-      }
-    });
+    if (updateHoursResponse) {
+      notifications.show({
+        title: 'Error',
+        message:
+          'Failed to update service hours. Changes may have been partially applied.\n' +
+          parseErrorMessage(updateHoursResponse),
+        color: 'red',
+      });
 
-    console.log(difference); // UPDATE WITH ENDPOINTS ASAP
+      refreshData();
+      setLoading(false);
+      return;
+    }
 
     notifications.show({
       title: 'Success',
