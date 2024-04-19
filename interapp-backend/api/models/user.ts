@@ -501,6 +501,8 @@ export class UserModel {
     user.service_hours = hours;
     await appDataSource.manager.update(User, { username }, user);
   }
+  // this method is fundamentally different from the previous one
+  // it ADDS a certain number of hours to the user's service hours, and does not set it to a specific value like the previous one
   public static async updateServiceHoursBulk(data: { username: string; hours: number }[]) {
     const queryRunner = appDataSource.createQueryRunner();
   
@@ -519,7 +521,7 @@ export class UserModel {
   
           if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
   
-          user.service_hours = hours;
+          user.service_hours += hours;
           await queryRunner.manager.update(User, { username }, user);
         }),
       );
