@@ -15,6 +15,7 @@ import {
   DeleteBulkServiceSessionUserFields,
   VerifyAttendanceFields,
   ServiceSessionIdFields,
+  FindServiceSessionUserFields,
 } from './validation';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
@@ -193,9 +194,10 @@ serviceRouter.post(
 
 serviceRouter.get(
   '/session_user',
-  validateRequiredFieldsV2(ServiceSessionUserBulkFields),
+  validateRequiredFieldsV2(FindServiceSessionUserFields),
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof ServiceSessionUserIdFields>;
+    const query = req.query as unknown as z.infer<typeof FindServiceSessionUserFields>;
+
     const session_user = await ServiceModel.getServiceSessionUser(
       Number(query.service_session_id),
       String(query.username),

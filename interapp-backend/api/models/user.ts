@@ -505,10 +505,10 @@ export class UserModel {
   // it ADDS a certain number of hours to the user's service hours, and does not set it to a specific value like the previous one
   public static async updateServiceHoursBulk(data: { username: string; hours: number }[]) {
     const queryRunner = appDataSource.createQueryRunner();
-  
+
     // start a new transaction
     await queryRunner.startTransaction();
-  
+
     try {
       await Promise.all(
         data.map(async ({ username, hours }) => {
@@ -518,14 +518,14 @@ export class UserModel {
             .from(User, 'user')
             .where('user.username = :username', { username })
             .getOne();
-  
+
           if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
-  
+
           user.service_hours += hours;
           await queryRunner.manager.update(User, { username }, user);
         }),
       );
-  
+
       // commit the transaction if no errors were thrown
       await queryRunner.commitTransaction();
     } catch (error) {

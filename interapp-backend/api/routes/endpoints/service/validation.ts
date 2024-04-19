@@ -115,6 +115,15 @@ export const ServiceSessionUserBulkFields = z.union([
   }),
 ]);
 
+export const FindServiceSessionUserFields = z.object({
+  service_session_id: z.coerce
+    .number()
+    .int()
+    .nonnegative()
+    .max(2 ** 32 - 1),
+  username: z.string(),
+});
+
 const _ServiceSessionUserFields = z.object({
   ad_hoc: z.boolean(),
   attended: z.nativeEnum(AttendanceStatus),
