@@ -90,7 +90,7 @@ async function signUp(user_id: number, username: string, email: string, password
       .getQueryAndParameters();
 
     let paramIndex = 0;
-    const filledQuery = query.replace(/\$[0-9]+/g, () => {
+    const filledQuery = query.replace(/\$\d+/g, () => {
       const value = params[paramIndex++];
       if (typeof value === 'string') {
         // Escape single quotes and quote the string
