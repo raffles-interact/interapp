@@ -31,7 +31,7 @@ const PermissionsInput = ({
   });
   const [search, setSearch] = useState('');
 
-  const [value, setValue] = useState<Permissions[]>([...defaultValues]);
+  const [value, setValue] = useState<Permissions[]>(defaultValues ? [...defaultValues] : []);
 
   useEffect(() => {
     onChange(value);

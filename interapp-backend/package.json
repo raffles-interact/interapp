@@ -1,6 +1,6 @@
 {
   "name": "interapp-backend",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "module": "index.ts",
   "type": "module",
   "scripts": {
@@ -8,11 +8,11 @@
     "test": "NODE_ENV=test bun test --env-file tests/config/.env.test --coverage --timeout 10000",
     "typeorm": "typeorm-ts-node-esm",
     "typeorm:generate": "sh ./scripts/typeorm_generate.sh",
-    "typeorm:run": "typeorm-ts-node-esm migration:run -d db/data-source.ts",
-    "typeorm:revert": "typeorm-ts-node-esm migration:revert -d db/data-source.ts",
-    "typeorm:show": "typeorm-ts-node-esm migration:show -d db/data-source.ts",
-    "typeorm:drop": "typeorm-ts-node-esm schema:drop -d db/data-source.ts",
-    "typeorm:sync": "typeorm-ts-node-esm schema:sync -d db/data-source.ts"
+    "typeorm:run": "typeorm-ts-node-esm migration:run -d db/data_source.ts",
+    "typeorm:revert": "typeorm-ts-node-esm migration:revert -d db/data_source.ts",
+    "typeorm:show": "typeorm-ts-node-esm migration:show -d db/data_source.ts",
+    "typeorm:drop": "typeorm-ts-node-esm schema:drop -d db/data_source.ts",
+    "typeorm:sync": "typeorm-ts-node-esm schema:sync -d db/data_source.ts"
   },
   "devDependencies": {
     "@types/bun": "^1.0.8",
@@ -41,6 +41,7 @@
     "minio": "^7.1.3",
     "multer": "^1.4.5-lts.1",
     "node-cron": "^3.0.3",
+    "node-xlsx": "^0.23.0",
     "nodemailer": "^6.9.7",
     "nodemailer-express-handlebars": "^6.1.0",
     "pg": "^8.11.3",

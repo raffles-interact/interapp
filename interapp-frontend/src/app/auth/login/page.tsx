@@ -4,7 +4,46 @@ import Image from 'next/image';
 import Link from 'next/link';
 import './styles.css';
 
-export default function Login() {
+const generateRedirectArgs = (url: string | string[] | undefined): readonly [string, string] => {
+  const defaultRes = ['/', redirectHelperText['/']] as const;
+  if (Array.isArray(url)) return defaultRes;
+
+  if (url === undefined) return defaultRes;
+
+  const validRedirects = Object.keys(redirectHelperText);
+
+  const decodedUrl = decodeURIComponent(url);
+  const location = decodedUrl.split('?')[0];
+
+  // check if the url is a valid redirect
+  // accept query params
+  if (validRedirects.includes(location)) {
+    return [decodedUrl, redirectHelperText[location as keyof typeof redirectHelperText]];
+  } else {
+    return defaultRes;
+  }
+};
+
+const redirectHelperText = {
+  '/': 'Redirecting you to the dashboard.',
+  '/attendance/verify': 'Redirecting you to verify your attendance.',
+  '/service_sessions': 'Redirecting you to the service sessions page.',
+  '/attendance': 'Redirecting you to the attendance page.',
+  '/attendance/absence': 'Redirecting you to the absence page.',
+  '/admin': 'Redirecting you to the admin page.',
+  '/announcements': 'Redirecting you to the announcements page.',
+  '/profile': 'Redirecting you to the profile page.',
+  '/services': 'Redirecting you to the service page.',
+  '/exports': 'Redirecting you to the exports page.',
+};
+
+export default function Login({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
+  const [redirectTo, helperText] = generateRedirectArgs(searchParams.redirectTo);
+
   return (
     <div className='login-page'>
       <div className='login-headers'>
@@ -20,7 +59,7 @@ export default function Login() {
       </div>
 
       <Paper className='login-form-container' shadow='md'>
-        <LoginForm />
+        <LoginForm redirectTo={redirectTo} helperText={helperText} />
         <Text className='login-form-already-member'>
           Not a member? <Link href='/auth/signup'>Sign Up</Link>
         </Text>

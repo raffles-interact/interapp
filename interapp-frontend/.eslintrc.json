@@ -4,5 +4,20 @@
     "react-hooks/exhaustive-deps": "off",
     "react/no-unescaped-entities": "off",
     "@next/next/no-img-element": "off"
+  },
+  "settings": {
+    "import/resolver": {
+      "eslint-import-resolver-custom-alias": {
+        "alias": {
+          "@": "./src",
+          "@api": "./src/api",
+          "@components": "./src/components",
+          "@providers": "./src/providers",
+          "@hooks": "./src/hooks",
+          "@utils": "./src/utils"
+        },
+        "extensions": [".ts", ".tsx"]
+      }
+    }
   }
 }

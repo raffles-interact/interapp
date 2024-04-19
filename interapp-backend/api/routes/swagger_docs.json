@@ -6,7 +6,7 @@
     "contact": {
       "email": "sebastian.ong@hotmail.com"
     },
-    "version": "0.4.0"
+    "version": "0.4.1"
   },
   "servers": [
     {
@@ -1629,7 +1629,7 @@
               }
             }
           },
-          "required": false
+          "required": true
         },
         "responses": {
           "200": {
@@ -1678,6 +1678,49 @@
           },
           "400": {
             "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Session user not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/service/absence": {
+      "patch": {
+        "tags": ["service"],
+        "summary": "Mark a user as valid reason",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "service_session_id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1
+                  },
+                  "username": {
+                    "type": "string",
+                    "example": "joejeorjeoreorjoejroer"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Session user updated"
+          },
+          "400": {
+            "description": "Invalid input"
           },
           "404": {
             "description": "Session user not found"

@@ -1,38 +1,15 @@
 import { Request, Response, NextFunction } from 'express';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
-import { AuthModel } from '@models/auth';
-import { UserModel } from '@models/user';
+import { AuthModel, UserModel } from '@models/.';
 import { z } from 'zod';
 
 import rateLimit from 'express-rate-limit';
 
-export function validateRequiredFields(requiredFields: string[], optionalFields: string[] = []) {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const content = req.method === 'GET' ? req.query : req.body;
-    const missing = requiredFields.filter((field) => content[field] === undefined);
+type ReqBody = Partial<{ [key: string]: ReqBody }> | ReqBody[] | string | number | boolean | null;
 
-    if (missing.length > 0) {
-      throw new HTTPError(
-        'Missing fields',
-        `You are missing these field(s): ${missing.join(', ')}. ` +
-          (optionalFields.length > 0 ? 'Optional field(s): ' + optionalFields.join(', ') : ''),
-        HTTPErrorCode.BAD_REQUEST_ERROR,
-      );
-    }
+type ReqQuery = { [key: string]: string | string[] | undefined };
 
-    next();
-  };
-}
-
-type JSONValue =
-  | Partial<{ [key: string]: JSONValue }>
-  | JSONValue[]
-  | string
-  | number
-  | boolean
-  | null;
-
-export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema: T) {
+export function validateRequiredFieldsV2<T extends z.ZodType<ReqBody | ReqQuery>>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const content: unknown = req.method === 'GET' ? req.query : req.body;
     const validationResult = schema.safeParse(content);
@@ -45,7 +22,11 @@ export function validateRequiredFieldsV2<T extends z.ZodType<JSONValue>>(schema:
         validationResult.error.flatten(),
       );
     }
-
+    if (req.method === 'GET') {
+      req.query = validationResult.data as ReqQuery;
+    } else {
+      req.body = validationResult.data as ReqBody;
+    }
     next();
   };
 }

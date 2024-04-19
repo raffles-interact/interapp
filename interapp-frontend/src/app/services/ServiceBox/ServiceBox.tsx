@@ -19,7 +19,7 @@ export const roundTimeToMinutes = (time: string) => {
   return `${hours}:${minutes}`;
 };
 
-const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) => {
+const ServiceBox = (service: Service) => {
   const apiClient = new APIClient().instance;
   const router = useRouter();
 
@@ -155,7 +155,6 @@ const ServiceBox = (service: Service & { alreadyServiceICUsernames: string[] }) 
         <ServiceBoxUsers
           service_id={service.service_id}
           service_ic={service.service_ic_username}
-          alreadyServiceICUsernames={service.alreadyServiceICUsernames}
           handleChangeServiceIc={handleChangeServiceIc}
           handleChangeServiceUsers={handleChangeServiceUsers}
         />

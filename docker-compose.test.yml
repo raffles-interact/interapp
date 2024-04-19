@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   postgres:
     container_name: interapp-postgres-test
@@ -84,6 +82,8 @@ services:
       dockerfile: tests/config/test.Dockerfile
     env_file:
       - ./interapp-backend/tests/config/.env.docker
+    environment:
+      - APP_VERSION=${APP_VERSION}
     ports:
       - 1234:1234
     networks:

@@ -7,13 +7,14 @@ import {
   ChangeEmailFields,
   TokenFields,
   PermissionsFields,
-  ServiceIdFields,
+  ServiceIdFieldsNumeric,
   ServiceHoursFields,
   UpdateUserServicesFields,
   ProfilePictureFields,
+  ServiceHoursBulkFields,
 } from './validation';
 import { z } from 'zod';
-import { UserModel } from '@models/user';
+import { UserModel } from '@models/.';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
 
@@ -174,9 +175,9 @@ userRouter.post(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFieldsV2(ServiceIdFields),
+  validateRequiredFieldsV2(ServiceIdFieldsNumeric),
   async (req, res) => {
-    const body: z.infer<typeof ServiceIdFields> = req.body;
+    const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
     await UserModel.addServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
@@ -186,9 +187,9 @@ userRouter.delete(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFieldsV2(ServiceIdFields),
+  validateRequiredFieldsV2(ServiceIdFieldsNumeric),
   async (req, res) => {
-    const body: z.infer<typeof ServiceIdFields> = req.body;
+    const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
     await UserModel.removeServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
@@ -230,6 +231,18 @@ userRouter.patch(
       await UserModel.updateServiceHours(req.headers.username as string, body.hours);
       res.status(204).send();
     }
+  },
+);
+
+userRouter.patch(
+  '/service_hours_bulk',
+  validateRequiredFieldsV2(ServiceHoursBulkFields),
+  verifyJWT,
+  verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
+  async (req, res) => {
+    const body: z.infer<typeof ServiceHoursBulkFields> = req.body;
+    await UserModel.updateServiceHoursBulk(body);
+    res.status(204).send();
   },
 );
 

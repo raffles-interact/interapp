@@ -13,6 +13,7 @@ import {
   IconHeart,
   type TablerIconsProps,
   IconCheck,
+  IconFileExport,
 } from '@tabler/icons-react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { User } from '@providers/AuthProvider/types';
@@ -149,6 +150,13 @@ const generateNavbarTabs: (user: User | null, actions: NavbarActions) => NavbarT
       !!user &&
       (user.permissions.includes(Permissions.SERVICE_IC) ||
         user.permissions.includes(Permissions.MENTORSHIP_IC)),
+    category: 'Administration',
+  },
+  {
+    name: 'Exports',
+    callback: () => goTo('/exports'),
+    icon: IconFileExport,
+    show: !!user && user.permissions.includes(Permissions.ATTENDANCE_MANAGER),
     category: 'Administration',
   },
 ];

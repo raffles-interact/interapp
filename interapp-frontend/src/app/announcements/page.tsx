@@ -5,7 +5,7 @@ import PageController from '@components/PageController/PageController';
 import { AnnouncementWithMeta } from './types';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { Title, Text, Group, ActionIcon } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
@@ -83,7 +83,11 @@ export default function AnnouncementsPage() {
       </div>
       <PageController
         activePage={page}
-        totalPages={data ? Math.ceil(data?.total_entries / data?.length_of_page) : 1}
+        totalPages={
+          data?.data && data.total_entries != 0
+            ? Math.ceil(data?.total_entries / data?.length_of_page)
+            : 1
+        }
         handlePageChange={(page) => setPage(page)}
         className='announcement-page-controller'
       />

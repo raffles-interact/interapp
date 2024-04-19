@@ -44,6 +44,7 @@ import {
   userRouter,
   serviceRouter,
   announcementRouter,
+  exportsRouter,
 } from './endpoints';
 
 import 'express-async-errors';
@@ -58,7 +59,7 @@ const PORT = Number(process.env.API_PORT);
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '50mb' }));
-app.use(cors({ credentials: true, origin: true }));
+app.use(cors({ credentials: true, origin: process.env.FRONTEND_URL ?? true }));
 app.use(cookieParser());
 
 if (['development', 'test'].includes(process.env.NODE_ENV ?? '')) {
@@ -67,14 +68,21 @@ if (['development', 'test'].includes(process.env.NODE_ENV ?? '')) {
 
 if (process.env.NODE_ENV === 'production') {
   app.set('trust proxy', 1);
-  app.use(generateRateLimit(1000 * 60, 500)); // 500 requests per 1 minute
+  app.use(generateRateLimit(1000 * 60, 10000)); // 10000 requests per 1 minute
 }
 
-app.use('/api/hello', helloRouter);
-app.use('/api/auth', authRouter);
-app.use('/api/user', userRouter);
-app.use('/api/service', serviceRouter);
-app.use('/api/announcement', announcementRouter);
+const routes = {
+  '/api/hello': helloRouter,
+  '/api/auth': authRouter,
+  '/api/user': userRouter,
+  '/api/service': serviceRouter,
+  '/api/announcement': announcementRouter,
+  '/api/exports': exportsRouter,
+};
+
+for (const [route, router] of Object.entries(routes)) {
+  app.use(route, router);
+}
 
 app.use(handleError);
 

@@ -1,5 +1,5 @@
 'use client';
-import { Accordion, Select, Checkbox, Group, Stack, Center, MultiSelect } from '@mantine/core';
+import { Accordion, Select, Checkbox, Group, Stack, Center, TagsInput } from '@mantine/core';
 import { ServiceSessionUser, AttendanceStatus } from '../../types';
 import { useState, useEffect } from 'react';
 import './styles.css';
@@ -131,7 +131,7 @@ const ServiceSessionUserInput = ({
   };
   return (
     <div className='service-session-user-input'>
-      <MultiSelect
+      <TagsInput
         data={all_users_names}
         defaultValue={serviceSessionUsers.map((serviceUser) => serviceUser.username)}
         placeholder='Add Attendees'

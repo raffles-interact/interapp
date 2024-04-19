@@ -36,7 +36,6 @@ const handleGetUsers = async (service_id: number) => {
 interface ServiceBoxUsersProps {
   service_id: number;
   service_ic: string;
-  alreadyServiceICUsernames: string[];
   handleChangeServiceIc: (service_ic: string) => void;
   handleChangeServiceUsers: (old_service_users: string[], service_users: string[]) => void;
 }
@@ -44,7 +43,6 @@ interface ServiceBoxUsersProps {
 const ServiceBoxUsers = ({
   service_id,
   service_ic,
-  alreadyServiceICUsernames,
   handleChangeServiceIc,
   handleChangeServiceUsers,
 }: ServiceBoxUsersProps) => {
@@ -78,10 +76,7 @@ const ServiceBoxUsers = ({
         service_users: serviceUsers,
       });
       setAllUsernames(allUsernames);
-      setAllValidServiceICUsernames([
-        ...allUsernames.filter((username) => !alreadyServiceICUsernames.includes(username)),
-        service_ic,
-      ]);
+      setAllValidServiceICUsernames(allUsernames);
     });
   }, [opened]);
 

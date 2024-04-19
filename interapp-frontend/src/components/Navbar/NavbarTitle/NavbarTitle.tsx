@@ -17,9 +17,10 @@ import {
   IconQuestionMark,
   type TablerIconsProps,
   IconPencil,
+  IconFileExport,
 } from '@tabler/icons-react';
 import { Group, Text } from '@mantine/core';
-import { wildcardMatcher } from '@api/utils';
+import { wildcardMatcher } from '@utils/.';
 
 interface RouteTitle {
   route: string;
@@ -154,6 +155,11 @@ export const getNavbarTitle = (pathname: string) => {
       route: '/profile',
       title: 'Profile',
       Icon: IconUserSquare,
+    },
+    {
+      route: '/exports',
+      title: 'Exports',
+      Icon: IconFileExport,
     },
   ];
   const match = routeTitles.find((routeTitle) => wildcardMatcher(pathname, routeTitle.route));

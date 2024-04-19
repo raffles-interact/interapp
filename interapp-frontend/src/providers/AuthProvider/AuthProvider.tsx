@@ -9,10 +9,10 @@ import {
   validateUserType,
 } from './types';
 import APIClient from '@api/api_client';
-import { useRouter, usePathname } from 'next/navigation';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { routePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
-import { wildcardMatcher } from '@api/utils';
+import { wildcardMatcher } from '@utils/.';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -29,6 +29,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
+  const params = useSearchParams();
   const apiClient = useMemo(() => new APIClient().instance, []);
 
   const memoWildcardMatcher = useCallback(wildcardMatcher, []);
@@ -66,7 +67,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         message: 'You must be logged in to access this page',
         color: 'red',
       });
-      router.replace('/auth/login');
+      // convert search params to an object and then to a query string
+      const constructedSearchParams = Object.entries(Object.fromEntries(params))
+        .map(([key, value]) => `${key}=${value}`)
+        .join('&');
+      const fullPath = `${pathname}${constructedSearchParams ? `?${constructedSearchParams}` : ''}`;
+      router.push(`/auth/login?redirectTo=${encodeURIComponent(fullPath)}`);
+
       return;
     }
     if (user && (pathname === '/auth/login' || pathname === '/auth/signup')) {

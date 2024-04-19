@@ -1,13 +1,14 @@
-import { testSuites } from '../constants.test';
-import { AuthModel, UserModel, ServiceModel, AnnouncementModel } from '../../api/models';
-import { describe, test, expect } from 'bun:test';
+import { runSuite, testSuites } from '../constants.test';
+import { AuthModel, UserModel, ServiceModel, AnnouncementModel } from '@models/.';
+import { expect } from 'bun:test';
 import { recreateDB, recreateRedis } from '../utils';
 import redisClient from '@utils/init_redis';
 import { Permissions } from '@utils/permissions';
 import { AttendanceStatus } from '@db/entities';
 import { readFileSync } from 'fs';
 
-const suite = testSuites.UserModel;
+const SUITE_NAME = 'UserModel';
+const suite = testSuites[SUITE_NAME];
 
 const signUp = async (id: number, username: string) =>
   await AuthModel.signUp(id, username, 'test@email.com', 'pass');
@@ -914,24 +915,4 @@ suite.getNotifications = [
   },
 ];
 
-describe('UserModel', () => {
-  for (const [method, tests] of Object.entries(suite)) {
-    describe(method, async () => {
-      for (const { name, cb, cleanup } of tests) {
-        test(name, async () => {
-          try {
-            await cb();
-          } finally {
-            if (cleanup) await cleanup();
-          }
-        });
-      }
-    });
-  }
-  test('make sure suite is exhaustive', () => {
-    Object.values(suite).forEach((tests) => {
-      expect(tests).toBeArray();
-      expect(tests).not.toBeEmpty();
-    });
-  });
-});
+runSuite(SUITE_NAME, suite);

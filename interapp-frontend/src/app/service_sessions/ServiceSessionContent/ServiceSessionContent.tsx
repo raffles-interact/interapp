@@ -59,6 +59,7 @@ const ServiceSessionContent = ({
             const index = serviceOptions.findIndex((option) => option.name === selected);
             setServiceId(serviceOptions[index]?.service_id ?? null);
           }}
+          clearable
         />
         <AddAction refreshData={refresh} />
       </Group>

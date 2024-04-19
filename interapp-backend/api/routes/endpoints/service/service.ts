@@ -16,11 +16,11 @@ import {
   VerifyAttendanceFields,
   ServiceSessionIdFields,
 } from './validation';
-import { ServiceModel } from '@models/service';
 import { HTTPError, HTTPErrorCode } from '@utils/errors';
 import { Permissions } from '@utils/permissions';
-import { UserModel } from '@models/user';
+import { UserModel, ServiceModel } from '@models/.';
 import { z } from 'zod';
+import { AttendanceStatus } from '@db/entities';
 
 const serviceRouter = Router();
 
@@ -233,11 +233,30 @@ serviceRouter.patch(
     const body: z.infer<typeof UpdateServiceSessionUserFields> = req.body;
 
     const session_user = await ServiceModel.getServiceSessionUser(
-      Number(req.body.service_session_id),
-      String(req.body.username),
+      Number(body.service_session_id),
+      String(body.username),
     );
     const updated = await ServiceModel.updateServiceSessionUser({ ...session_user, ...body });
     res.status(200).send(updated);
+  },
+);
+
+serviceRouter.patch(
+  '/absence',
+  validateRequiredFieldsV2(ServiceSessionUserIdFields),
+  verifyJWT,
+  verifyRequiredPermission(Permissions.CLUB_MEMBER),
+  async (req, res) => {
+    const body: z.infer<typeof ServiceSessionUserIdFields> = req.body;
+    const session_user = await ServiceModel.getServiceSessionUser(
+      Number(body.service_session_id),
+      String(body.username),
+    );
+    await ServiceModel.updateServiceSessionUser({
+      ...session_user,
+      attended: AttendanceStatus.ValidReason,
+    });
+    res.status(204).send();
   },
 );
 

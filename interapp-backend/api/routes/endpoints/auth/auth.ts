@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { validateRequiredFieldsV2, verifyJWT } from '../../middleware';
 import { SignupFields, SigninFields } from './validation';
-import { AuthModel } from '@models/auth';
+import { AuthModel } from '@models/.';
 import { z } from 'zod';
 
 const authRouter = Router();

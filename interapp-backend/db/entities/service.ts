@@ -3,7 +3,7 @@ import {
   PrimaryGeneratedColumn,
   Column,
   OneToMany,
-  OneToOne,
+  ManyToOne,
   JoinColumn,
   type Relation,
 } from 'typeorm';
@@ -68,7 +68,7 @@ export class Service {
   @OneToMany(() => ServiceSession, (service_session) => service_session.service, { cascade: true })
   service_sessions: Relation<ServiceSession[]>;
 
-  @OneToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @ManyToOne(() => User, { onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   @JoinColumn()
   service_ic: Relation<User>;
 }

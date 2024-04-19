@@ -177,3 +177,6 @@ dist
 pgdata/
 minio_data/
 dump/
+
+*.csv
+*.sql

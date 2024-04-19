@@ -1,7 +1,7 @@
 'use client';
 import { Table, Pill, TextInput } from '@mantine/core';
 import APIClient from '@api/api_client';
-import { memo, useEffect, useState } from 'react';
+import { memo, useEffect, useState, useMemo } from 'react';
 import { User } from '@providers/AuthProvider/types';
 import { Permissions } from '@/app/route_permissions';
 import { permissionsMap } from './PermissionsInput/PermissionsInput';
@@ -48,6 +48,13 @@ const AdminTable = () => {
 
   useEffect(refreshData, []);
 
+  const filteredUsers = useMemo(() => computeSearchItems(search, userData), [search, userData]);
+
+  const paginatedUsers = useMemo(
+    () => paginateItems(filteredUsers, page, usersPerPage),
+    [filteredUsers, page],
+  );
+
   return (
     <div>
       {loading ? (
@@ -74,43 +81,41 @@ const AdminTable = () => {
                 </Table.Tr>
               </Table.Thead>
               <Table.Tbody>
-                {paginateItems(computeSearchItems(search, userData), page, usersPerPage).map(
-                  (user) => (
-                    <Table.Tr key={user.username}>
-                      <Table.Td>{user.user_id}</Table.Td>
-                      <Table.Td>{user.username}</Table.Td>
-                      <Table.Td>{user.email}</Table.Td>
-                      <Table.Td>
-                        {user.verified ? (
-                          <span className='admin-table-verified'>Verified</span>
-                        ) : (
-                          <span className='admin-table-unverified'>Unverified</span>
-                        )}
-                      </Table.Td>
-                      <Table.Td>
-                        <div className='admin-table-permissions'>
-                          {user.permissions &&
-                            user.permissions.map((perm) => (
-                              <Pill key={perm} className='admin-table-permission'>
-                                {permissionsMap[perm]}
-                              </Pill>
-                            ))}
-                        </div>
-                      </Table.Td>
-                      <Table.Td>{user.service_hours}</Table.Td>
-                      <Table.Td className='admin-table-actions'>
-                        <EditAction user={user} refreshData={refreshData} />
-                        <DeleteAction username={user.username} refreshData={refreshData} />
-                      </Table.Td>
-                    </Table.Tr>
-                  ),
-                )}
+                {paginatedUsers.map((user) => (
+                  <Table.Tr key={user.username}>
+                    <Table.Td>{user.user_id}</Table.Td>
+                    <Table.Td>{user.username}</Table.Td>
+                    <Table.Td>{user.email}</Table.Td>
+                    <Table.Td>
+                      {user.verified ? (
+                        <span className='admin-table-verified'>Verified</span>
+                      ) : (
+                        <span className='admin-table-unverified'>Unverified</span>
+                      )}
+                    </Table.Td>
+                    <Table.Td>
+                      <div className='admin-table-permissions'>
+                        {user.permissions &&
+                          user.permissions.map((perm) => (
+                            <Pill key={perm} className='admin-table-permission'>
+                              {permissionsMap[perm]}
+                            </Pill>
+                          ))}
+                      </div>
+                    </Table.Td>
+                    <Table.Td>{user.service_hours}</Table.Td>
+                    <Table.Td className='admin-table-actions'>
+                      <EditAction user={user} refreshData={refreshData} />
+                      <DeleteAction username={user.username} refreshData={refreshData} />
+                    </Table.Td>
+                  </Table.Tr>
+                ))}
               </Table.Tbody>
             </Table>
           </Table.ScrollContainer>
           <PageController
             activePage={page}
-            totalPages={Math.ceil(userData.length / usersPerPage)}
+            totalPages={Math.ceil(filteredUsers.length / usersPerPage)}
             handlePageChange={(e) => setPage(e)}
             className='admin-table-pagination'
           />

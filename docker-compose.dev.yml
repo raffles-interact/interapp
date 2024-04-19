@@ -1,5 +1,3 @@
-version: "3"
-
 services:
   postgres:
     container_name: interapp-postgres
@@ -110,6 +108,8 @@ services:
           target: /app/db
     env_file:
       - ./interapp-backend/.env.development
+    environment:
+      - APP_VERSION=${APP_VERSION}
     ports:
       - 8000:8000
     networks:
@@ -131,6 +131,8 @@ services:
       - ./interapp-frontend/src:/app/src
     env_file:
       - ./interapp-frontend/.env.development
+    environment:
+      - NEXT_PUBLIC_APP_VERSION=${APP_VERSION}
     ports:
       - 3000:3000
     networks:

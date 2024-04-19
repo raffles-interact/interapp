@@ -5,7 +5,7 @@ import APIClient from '@api/api_client';
 const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
 import { Title, Skeleton, Text } from '@mantine/core';
-import { remapAssetUrl } from '@api/utils';
+import { remapAssetUrl } from '@utils/.';
 import { Service } from './types';
 import './styles.css';
 
@@ -38,15 +38,20 @@ const fetchAllServices = async () => {
 export default async function ServicesPage() {
   const allServices: Service[] = await fetchAllServices();
 
+  // sort by name, then day of week
+  allServices.sort((a, b) => {
+    if (a.name < b.name) return -1;
+    if (a.name > b.name) return 1;
+    return a.day_of_week - b.day_of_week;
+  });
+
   return (
     <div className='service-page'>
       <div className='service-headers-container'>
         <div className='service-headers'>
           <Title order={1}>Services</Title>
 
-          <AddService
-            alreadyServiceICUsernames={allServices.map((service) => service.service_ic_username)}
-          />
+          <AddService />
         </div>
         <Text>View the list of Interact Club's services here!</Text>
       </div>
@@ -69,7 +74,6 @@ export default async function ServicesPage() {
               service_id={service.service_id}
               service_hours={service.service_hours}
               enable_scheduled={service.enable_scheduled}
-              alreadyServiceICUsernames={allServices.map((service) => service.service_ic_username)}
             />
           ))}
         </Suspense>

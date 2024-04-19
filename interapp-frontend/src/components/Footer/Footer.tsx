@@ -1,15 +1,23 @@
 import { memo } from 'react';
-import { Group, Text } from '@mantine/core';
+import { Stack, Text } from '@mantine/core';
 import './styles.css';
 
 const year = new Date().getFullYear();
 
-const footer = () => {
+const footer = async () => {
+  const getVersion = async () => {
+    'use server';
+    return process.env.NEXT_PUBLIC_APP_VERSION;
+  };
+
+  const version = await getVersion();
+
   return (
     <footer>
-      <Group className='footer' justify='center'>
+      <Stack className='footer' align='center' gap={2}>
         <Text>© 2023-{year} Raffles Interact</Text>
-      </Group>
+        {version && <Text>Version: {version}</Text>}
+      </Stack>
     </footer>
   );
 };

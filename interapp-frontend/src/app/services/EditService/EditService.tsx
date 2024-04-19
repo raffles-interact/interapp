@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form';
 import { TextInput, Textarea, NumberInput, Button, Group, Checkbox } from '@mantine/core';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
-import { parseErrorMessage } from '@api/utils';
+import { parseErrorMessage } from '@utils/.';
 import { TimeInput } from '@mantine/dates';
 import { useState, useContext, memo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -157,7 +157,7 @@ const EditService = ({
           <NumberInput label='Contact Number' {...form.getInputProps('contact_number')} />
           <TextInput label='Website' {...form.getInputProps('website')} />
           <SearchableSelect
-            defaultValue={'Sun'}
+            defaultValue={daysOfWeek[day_of_week]}
             allValues={daysOfWeek}
             onChange={(day_of_week) =>
               form.setFieldValue(

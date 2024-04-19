@@ -10,7 +10,7 @@ import { memo, useContext, useEffect, useState } from 'react';
 import APIClient from '@api/api_client';
 import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
-import { getAllUsernames, parseErrorMessage } from '@api/utils';
+import { getAllUsernames, parseErrorMessage } from '@utils/.';
 import { ServiceSessionUser } from '../../types';
 import { IconPlus } from '@tabler/icons-react';
 import { Service } from '@/app/services/types';
@@ -94,28 +94,27 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
     }
     const id: number = res.data.service_session_id;
 
-    if (values.attendees.length > 0) {
-      const body = {
-        service_session_id: id,
-        users: values.attendees.map((user) => ({
-          username: user.username,
-          attended: user.attended,
-          is_ic: user.is_ic,
-          ad_hoc: user.ad_hoc,
-        })),
-      };
-      const res = await apiClient.post('/service/session_user_bulk', body);
-      if (res.status !== 201) {
-        notifications.show({
-          title: 'Error',
-          message: 'Could not add service session users',
-          color: 'red',
-        });
-        refreshData();
-        setLoading(false);
+    if (values.attendees.length === 0) return;
+    const body2 = {
+      service_session_id: id,
+      users: values.attendees.map((user) => ({
+        username: user.username,
+        attended: user.attended,
+        is_ic: user.is_ic,
+        ad_hoc: user.ad_hoc,
+      })),
+    };
+    const res2 = await apiClient.post('/service/session_user_bulk', body2);
+    if (res2.status !== 201) {
+      notifications.show({
+        title: 'Error',
+        message: 'Could not add service session users',
+        color: 'red',
+      });
+      refreshData();
+      setLoading(false);
 
-        return;
-      }
+      return;
     }
 
     notifications.show({
