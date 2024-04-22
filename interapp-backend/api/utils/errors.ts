@@ -126,12 +126,12 @@ export const HTTPErrors = {
   ),
   NO_SERVICES_FOUND: new HTTPError(
     'NoServicesFound',
-    'This user is not part of unknown service',
+    'This user is not part of any service',
     HTTPErrorCode.NOT_FOUND_ERROR,
   ),
   NO_SERVICE_SESSION_FOUND: new HTTPError(
     'NoServiceSessionFound',
-    'This user is not part of unknown service session',
+    'This user is not part of any service session',
     HTTPErrorCode.NOT_FOUND_ERROR,
   ),
   SERVICE_NO_USER_FOUND: new HTTPError(
