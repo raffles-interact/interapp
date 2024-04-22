@@ -1,13 +1,13 @@
 export interface AppError extends Error {
   name: string;
   message: string;
-  data?: Record<string, any> | Array<unknown>;
+  data?: Record<string, unknown> | Array<unknown>;
 }
 
 export class HTTPError extends Error implements AppError {
   public readonly name: string;
   public readonly message: string;
-  public readonly data?: Record<string, any> | Array<unknown>;
+  public readonly data?: Record<string, unknown> | Array<unknown>;
   public readonly status: HTTPErrorCode;
   public readonly headers?: Record<string, string>;
 
@@ -15,7 +15,7 @@ export class HTTPError extends Error implements AppError {
     name: string,
     message: string,
     status: HTTPErrorCode,
-    data?: Record<string, any> | Array<unknown>,
+    data?: Record<string, unknown> | Array<unknown>,
     headers?: Record<string, string>,
   ) {
     super(message);
@@ -30,9 +30,9 @@ export class HTTPError extends Error implements AppError {
 export class TestError extends Error implements AppError {
   public readonly name: string;
   public readonly message: string;
-  public readonly data?: Record<string, any> | Array<unknown>;
+  public readonly data?: Record<string, unknown> | Array<unknown>;
 
-  constructor(name: string, message: string, data?: Record<string, any> | Array<unknown>) {
+  constructor(name: string, message: string, data?: Record<string, unknown> | Array<unknown>) {
     super(message);
     this.name = name;
     this.message = message;
@@ -126,12 +126,12 @@ export const HTTPErrors = {
   ),
   NO_SERVICES_FOUND: new HTTPError(
     'NoServicesFound',
-    'This user is not part of any service',
+    'This user is not part of unknown service',
     HTTPErrorCode.NOT_FOUND_ERROR,
   ),
   NO_SERVICE_SESSION_FOUND: new HTTPError(
     'NoServiceSessionFound',
-    'This user is not part of any service session',
+    'This user is not part of unknown service session',
     HTTPErrorCode.NOT_FOUND_ERROR,
   ),
   SERVICE_NO_USER_FOUND: new HTTPError(
