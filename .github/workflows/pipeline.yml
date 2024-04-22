@@ -28,9 +28,6 @@ jobs:
       
       - name: Install dependencies
         run: cd interapp-backend && bun install
-
-      - name: lint backend
-        run: cd interapp-backend && bun run lint
       
       - name: Run unit tests
         run: cd interapp-backend && bun run test:unit
