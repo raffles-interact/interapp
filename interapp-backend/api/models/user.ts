@@ -364,7 +364,7 @@ export class UserModel {
         session.service_session.service.promotional_image = url;
       }
     }
-    let parsed: {
+    const parsed: {
       service_id: number;
       start_time: string;
       end_time: string;
@@ -375,7 +375,7 @@ export class UserModel {
       ad_hoc: boolean;
       attended: string;
       is_ic: boolean;
-      service_session?: any;
+      service_session?: unknown;
     }[] = serviceSessions.map((session) => ({
       ...session,
       service_id: session.service_session.service_id,
@@ -468,10 +468,10 @@ export class UserModel {
     };
 
     const toAdd = data
-      .filter(({ action, username }) => action === 'add')
+      .filter(({ action }) => action === 'add')
       .map((data) => data.username);
     const toRemove = data
-      .filter(({ action, username }) => action === 'remove')
+      .filter(({ action }) => action === 'remove')
       .map((data) => data.username);
 
     if (toAdd.length !== 0)

@@ -213,10 +213,10 @@ serviceRouter.get(
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof ServiceSessionUserBulkFields>;
 
-    if (query.hasOwnProperty('username')) {
+    if (Object.prototype.hasOwnProperty.call(query, 'username')) {
       const session_users = await UserModel.getAllServiceSessionsByUser(String(req.query.username));
       res.status(200).send(session_users);
-    } else if (query.hasOwnProperty('service_session_id')) {
+    } else if (Object.prototype.hasOwnProperty.call(query, 'service_session_id')) {
       const session_users = await ServiceModel.getServiceSessionUsers(
         Number(req.query.service_session_id),
       );
