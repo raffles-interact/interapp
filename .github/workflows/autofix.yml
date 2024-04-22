@@ -1,0 +1,34 @@
+name: autofix.ci  # needed to securely identify the workflow
+
+on:
+  pull_request:
+  push:
+    branches: 
+      - '**'
+permissions:
+  contents: read
+
+jobs:
+  autofix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: 1.1.3
+
+      - name: Install dependencies (backend)
+        run: cd interapp-backend && bun install
+
+      - name: Format code (backend)
+        run: cd interapp-backend && bun run prettier
+
+      - name: Install dependencies (frontend)
+        run: cd interapp-frontend && bun install
+
+      - name: Format code (frontend)
+        run: cd interapp-frontend && bun run prettier
+
+      - uses: autofix-ci/action@d3e591514b99d0fca6779455ff8338516663f7cc
