@@ -8,6 +8,7 @@ on:
 
 jobs:
   test-backend:
+    name: Test backend
     runs-on: ubuntu-latest
 
     steps:
@@ -27,13 +28,21 @@ jobs:
       
       - name: Install dependencies
         run: cd interapp-backend && bun install
-      - name: Test with bun
-        run: cd interapp-backend && bun run test
+
+      - name: lint backend
+        run: cd interapp-backend && bun run lint
+      
+      - name: Run unit tests
+        run: cd interapp-backend && bun run test:unit
+
+      - name: Run API tests
+        run: cd interapp-backend && bun run test:api
 
       - name: Tear down test environment
         run: docker compose -f docker-compose.test.yml down
   
   build-application:
+    name: Build application
     runs-on: ubuntu-latest
 
     steps:
