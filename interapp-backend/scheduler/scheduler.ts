@@ -138,7 +138,7 @@ schedule('0 */1 * * * *', async () => {
   // filter out all values that are not found in service_sessions
   const serviceSessionIds = new Set(service_sessions.map((s) => s.service_session_id));
   const ghost = Object.entries(hashes).filter(([, v]) => !serviceSessionIds.has(Number(v)));
-  toDelete.push(...ghost.map(([k, ]) => k));
+  toDelete.push(...ghost.map(([k]) => k));
   // remove them all
   if (toDelete.length > 0) {
     const operations = toDelete.map((k) => redisClient.hDel('service_session', k));

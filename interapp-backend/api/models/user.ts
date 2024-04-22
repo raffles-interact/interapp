@@ -467,12 +467,8 @@ export class UserModel {
         .getMany();
     };
 
-    const toAdd = data
-      .filter(({ action }) => action === 'add')
-      .map((data) => data.username);
-    const toRemove = data
-      .filter(({ action }) => action === 'remove')
-      .map((data) => data.username);
+    const toAdd = data.filter(({ action }) => action === 'add').map((data) => data.username);
+    const toRemove = data.filter(({ action }) => action === 'remove').map((data) => data.username);
 
     if (toAdd.length !== 0)
       await appDataSource.manager.insert(
