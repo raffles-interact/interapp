@@ -7,14 +7,33 @@ export const recreateMinio = async () => {
       undefined,
       true,
     );
-    stream.on('data', async (obj) => {
-      if (obj.name)
-        await minioClient.removeObject(process.env.MINIO_BUCKETNAME as string, obj.name);
-    });
-    stream.on('error', (e) => console.error(e));
-    stream.on('end', async () => {
-      await minioClient.removeBucket(process.env.MINIO_BUCKETNAME as string);
-      await createBucket();
+
+    await new Promise<void>((resolve, reject) => {
+      const deletePromises: Promise<void>[] = [];
+
+      stream.on('data', (obj) => {
+        if (obj.name) {
+          const deletePromise = minioClient.removeObject(
+            process.env.MINIO_BUCKETNAME as string,
+            obj.name,
+          );
+          deletePromises.push(deletePromise);
+        }
+      });
+      stream.on('error', (e) => {
+        console.error(e);
+        reject(e);
+      });
+      stream.on('end', async () => {
+        try {
+          await Promise.all(deletePromises);
+          await minioClient.removeBucket(process.env.MINIO_BUCKETNAME as string);
+          await createBucket();
+          resolve();
+        } catch (e) {
+          reject(e);
+        }
+      });
     });
   } catch (e) {
     console.error(e);
