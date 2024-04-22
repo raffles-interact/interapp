@@ -1,10 +1,13 @@
-import { AttendanceExportsResult, AttendanceExportsXLSX, AttendanceQueryExportsConditions } from "./types";
-import { BaseExportsModel } from "./exports_base";
-import { ServiceSession, type AttendanceStatus } from "@db/entities";
-import { HTTPErrors } from "@utils/errors";
-import { WorkSheet } from "node-xlsx";
-import appDataSource from "@utils/init_datasource";
-
+import {
+  AttendanceExportsResult,
+  AttendanceExportsXLSX,
+  AttendanceQueryExportsConditions,
+} from './types';
+import { BaseExportsModel } from './exports_base';
+import { ServiceSession, type AttendanceStatus } from '@db/entities';
+import { HTTPErrors } from '@utils/errors';
+import { WorkSheet } from 'node-xlsx';
+import appDataSource from '@utils/init_datasource';
 
 export class AttendanceExportsModel extends BaseExportsModel {
   public static async queryExports({ id, start_date, end_date }: AttendanceQueryExportsConditions) {
@@ -84,10 +87,9 @@ export class AttendanceExportsModel extends BaseExportsModel {
       });
     });
 
-    const body: AttendanceExportsXLSX[1][] = Object.entries(usernameMap).map(([username, attendance]) => [
-      username,
-      ...attendance,
-    ]);
+    const body: AttendanceExportsXLSX[1][] = Object.entries(usernameMap).map(
+      ([username, attendance]) => [username, ...attendance],
+    );
 
     const out: AttendanceExportsXLSX = [headers, ...body];
 

@@ -1,4 +1,11 @@
-import { ServiceModel, AuthModel, AnnouncementModel, UserModel, AttendanceExportsModel, ServiceHoursExportsModel } from '../api/models';
+import {
+  ServiceModel,
+  AuthModel,
+  AnnouncementModel,
+  UserModel,
+  AttendanceExportsModel,
+  ServiceHoursExportsModel,
+} from '../api/models';
 import { expect, test, describe } from 'bun:test';
 import { recreateDB, recreateMinio, recreateRedis } from './utils';
 
@@ -13,7 +20,14 @@ type TestSuite = {
 };
 
 // get all models in an array
-const objs = [ServiceModel, AuthModel, AnnouncementModel, UserModel, AttendanceExportsModel, ServiceHoursExportsModel] as const;
+const objs = [
+  ServiceModel,
+  AuthModel,
+  AnnouncementModel,
+  UserModel,
+  AttendanceExportsModel,
+  ServiceHoursExportsModel,
+] as const;
 
 // map all models to an object with the name as key
 const models = objs.reduce(
