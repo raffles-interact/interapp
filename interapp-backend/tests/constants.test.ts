@@ -1,5 +1,6 @@
 import { ServiceModel, AuthModel, AnnouncementModel, UserModel, ExportsModel } from '../api/models';
 import { expect, test, describe } from 'bun:test';
+import { recreateDB, recreateMinio, recreateRedis } from './utils';
 
 interface Test {
   name: string;
@@ -55,6 +56,13 @@ export const testSuites = Object.entries(testableMethods).reduce(
     };
   },
 );
+
+process.on('SIGINT', async (s) => {
+  console.warn('SIGINT received, aborting...');
+  await Promise.all([recreateDB(), recreateMinio(), recreateRedis()]);
+
+  process.exit(0);
+});
 
 test('test suites are of correct shape', () => {
   for (const obj of objs) {
