@@ -1,5 +1,3 @@
-// @ts-check
-
 import 'eslint-plugin-only-warn';
 import * as eslint from '@eslint/js';
 import tseslint from 'typescript-eslint';
