@@ -17,7 +17,11 @@ exportsRouter.get(
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof ExportsFields>;
 
-    const exports = await AttendanceExportsModel.packXLSX(query.id, query.start_date, query.end_date);
+    const exports = await AttendanceExportsModel.packXLSX(
+      query.id,
+      query.start_date,
+      query.end_date,
+    );
 
     res.setHeader('Content-Type', xlsxMime);
     res.setHeader('Content-Disposition', 'attachment; filename=output.xlsx');

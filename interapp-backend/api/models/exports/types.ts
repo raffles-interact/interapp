@@ -17,7 +17,10 @@ export type AttendanceExportsResult = {
   }[];
 };
 
-export type AttendanceExportsXLSX = [['username', ...string[]], ...[string, ...(AttendanceStatus | null)[]][]];
+export type AttendanceExportsXLSX = [
+  ['username', ...string[]],
+  ...[string, ...(AttendanceStatus | null)[]][],
+];
 
 export type AttendanceQueryExportsConditions = {
   id: number;
