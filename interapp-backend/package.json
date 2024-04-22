@@ -5,7 +5,10 @@
   "type": "module",
   "scripts": {
     "prettier": "prettier --write . '!./pgdata'",
-    "test": "NODE_ENV=test bun test --env-file tests/config/.env.test --coverage --timeout 10000",
+    "lint": "eslint .",
+    "test": "bun run test:unit && bun run test:api",
+    "test:api": "NODE_ENV=test bun test tests/api/* --env-file tests/config/.env.test --timeout 10000",
+    "test:unit": "NODE_ENV=test bun test tests/constants.test.ts tests/unit/* --env-file tests/config/.env.test --coverage --timeout 5000",
     "typeorm": "typeorm-ts-node-esm",
     "typeorm:generate": "sh ./scripts/typeorm_generate.sh",
     "typeorm:run": "typeorm-ts-node-esm migration:run -d db/data_source.ts",
@@ -15,6 +18,7 @@
     "typeorm:sync": "typeorm-ts-node-esm schema:sync -d db/data_source.ts"
   },
   "devDependencies": {
+    "@eslint/js": "^9.1.1",
     "@types/bun": "^1.0.8",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.16",
@@ -25,8 +29,10 @@
     "@types/nodemailer": "^6.4.14",
     "@types/nodemailer-express-handlebars": "^4.0.5",
     "@types/swagger-ui-express": "^4.1.6",
+    "eslint": "^9.1.0",
     "prettier": "^3.0.3",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "typescript-eslint": "^7.7.0"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
