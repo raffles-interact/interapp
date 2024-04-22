@@ -26,13 +26,14 @@ const models = objs.reduce(
 
 // get all methods of a default class
 const defaultClassMethods = Object.getOwnPropertyNames(class {});
+const filterObjectProperties = (model: (typeof objs)[number]) =>
+  Object.getOwnPropertyNames(model)
+    .filter((method) => typeof (model as any)[method] === 'function')
+    .filter((method) => !defaultClassMethods.includes(method));
 
 // get all testable methods of a model, excluding the default class methods
 const testableMethods = Object.fromEntries(
-  Object.entries(models).map(([name, model]) => [
-    name,
-    Object.getOwnPropertyNames(model).filter((method) => !defaultClassMethods.includes(method)),
-  ]),
+  Object.entries(models).map(([name, model]) => [name, filterObjectProperties(model)]),
 ) as Record<string, string[]>;
 
 // map all testable methods to a test suite
@@ -57,7 +58,7 @@ export const testSuites = Object.entries(testableMethods).reduce(
   },
 );
 
-process.on('SIGINT', async (s) => {
+process.on('SIGINT', async () => {
   console.warn('SIGINT received, aborting...');
   await Promise.all([recreateDB(), recreateMinio(), recreateRedis()]);
 
@@ -68,11 +69,9 @@ test('test suites are of correct shape', () => {
   for (const obj of objs) {
     expect(testSuites).toHaveProperty(obj.name);
     expect(testSuites[obj.name]).toBeObject();
-    for (const method of Object.getOwnPropertyNames(obj)) {
-      if (!defaultClassMethods.includes(method)) {
-        expect(testSuites[obj.name]).toHaveProperty(method);
-        expect(testSuites[obj.name][method]).toBeArray();
-      }
+    for (const method of filterObjectProperties(obj)) {
+      expect(testSuites[obj.name]).toHaveProperty(method);
+      expect(testSuites[obj.name][method]).toBeArray();
     }
   }
 });
@@ -94,8 +93,21 @@ export const runSuite = async (name: string, suite: TestSuite) => {
     }
     test('make sure suite is exhaustive', () => {
       Object.values(suite).forEach((tests) => {
-        expect(tests).toBeArray();
-        expect(tests).not.toBeEmpty();
+        try {
+          expect(tests).toBeArray();
+          expect(tests).not.toBeEmpty();
+        } catch (e) {
+          const failed = Object.entries(suite)
+            .filter(([, tests]) => tests.length === 0)
+            .reduce((acc, [name]) => {
+              acc.push(name);
+              return acc;
+            }, [] as string[]);
+
+          console.error(`The following methods have no test coverage: ${failed.join(', ')}`);
+
+          throw e;
+        }
       });
     });
   });
