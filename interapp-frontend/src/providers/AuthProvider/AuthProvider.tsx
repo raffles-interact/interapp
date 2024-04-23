@@ -12,7 +12,7 @@ import APIClient from '@api/api_client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import { routePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
-import { wildcardMatcher } from '@utils/.';
+import { remapAssetUrl, wildcardMatcher } from '@utils/.';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -130,7 +130,10 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (status === 200) {
       localStorage.setItem('access_token_expire', expire.toString());
       localStorage.setItem('access_token', access_token);
-      localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('user', JSON.stringify({
+        ...user,
+        profile_picture: user.profile_picture ? remapAssetUrl(user.profile_picture) : null,
+      }));
       setUser(user);
       setJustLoggedIn(true);
       router.refresh(); // invalidate browser cache

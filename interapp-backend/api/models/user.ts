@@ -405,19 +405,19 @@ export class UserModel {
     if (usernames.length === 0) {
       throw HTTPErrors.SERVICE_NO_USER_FOUND;
     }
-    const users: Pick<User, 'username' | 'user_id' | 'email' | 'verified' | 'service_hours'>[] =
-      await appDataSource.manager
-        .createQueryBuilder()
-        .select([
-          'user.username',
-          'user.user_id',
-          'user.email',
-          'user.verified',
-          'user.service_hours',
-        ])
-        .from(User, 'user')
-        .where('user.username IN (:...usernames)', { usernames })
-        .getMany();
+    const users: UserWithoutSensitiveFields[] = await appDataSource.manager
+      .createQueryBuilder()
+      .select([
+        'user.username',
+        'user.user_id',
+        'user.email',
+        'user.verified',
+        'user.service_hours',
+        'user.profile_picture',
+      ])
+      .from(User, 'user')
+      .where('user.username IN (:...usernames)', { usernames })
+      .getMany();
 
     return users;
   }
@@ -553,6 +553,10 @@ export class UserModel {
     user.profile_picture = `profile_pictures/${username}`;
 
     await appDataSource.manager.update(User, { username }, user);
+    // sign and return url
+    return {
+      url: await minioClient.presignedGetObject(MINIO_BUCKETNAME, `profile_pictures/${username}`),
+    };
   }
   public static async deleteProfilePicture(username: string) {
     const user = await appDataSource.manager

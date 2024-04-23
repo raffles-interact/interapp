@@ -297,7 +297,10 @@ describe('API (account)', async () => {
       }),
       headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    expect(res.status).toBe(204);
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({
+      url: expect.any(String),
+    });
 
     // check if profile picture is updated
     const res2 = await fetch(`${API_URL}/user?username=testuser`, {
