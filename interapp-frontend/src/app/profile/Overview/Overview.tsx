@@ -1,7 +1,7 @@
 'use client';
 import APIClient from '@api/api_client';
 import { useState, useEffect } from 'react';
-import { User, UserWithProfilePicture, validateUserType } from '@providers/AuthProvider/types';
+import { User, validateUserType } from '@providers/AuthProvider/types';
 import { Permissions } from '../../route_permissions';
 import { remapAssetUrl } from '@utils/.';
 import { Text, Title, Group, Stack, Badge, ActionIcon, Paper, Button } from '@mantine/core';
@@ -18,7 +18,7 @@ const fetchUserDetails = async (username: string) => {
 
   if (response.status !== 200) throw new Error('Failed to fetch user info');
 
-  const data: UserWithProfilePicture = response.data;
+  const data: User = response.data;
 
   if (data.profile_picture) data.profile_picture = remapAssetUrl(data.profile_picture);
 
@@ -38,7 +38,7 @@ interface OverviewProps {
 
 const Overview = ({ username, updateUser }: OverviewProps) => {
   const router = useRouter();
-  const [user, setUser] = useState<UserWithProfilePicture | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     fetchUserDetails(username).then((data) => {
@@ -50,8 +50,7 @@ const Overview = ({ username, updateUser }: OverviewProps) => {
     if (!user) return;
     fetchUserDetails(username).then((data) => {
       setUser(data);
-      const { profile_picture, ...rest } = data;
-      updateUser(rest);
+      updateUser(data);
       notifications.show({
         title: 'Profile updated',
         message: 'Your profile has been updated successfully.',

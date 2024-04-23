@@ -694,7 +694,14 @@ describe('API (service session)', async () => {
       }),
       headers: { 'Content-type': 'application/json', Authorization: `Bearer ${accessToken}` },
     });
-    expect(res2.status).toBe(204);
+    expect(res2.status).toBe(200);
+    expect(await res2.json()).toMatchObject({
+      start_time: expect.any(String),
+      end_time: expect.any(String),
+      service_hours: expect.any(Number),
+      name: expect.any(String),
+      ad_hoc: expect.any(Boolean),
+    });
   });
 
   test('get ad hoc service sessions', async () => {

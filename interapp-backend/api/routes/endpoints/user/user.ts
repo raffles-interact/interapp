@@ -252,8 +252,11 @@ userRouter.patch(
   validateRequiredFields(ProfilePictureFields),
   async (req, res) => {
     const body: z.infer<typeof ProfilePictureFields> = req.body;
-    await UserModel.updateProfilePicture(req.headers.username as string, body.profile_picture);
-    res.status(204).send();
+    const presigned = await UserModel.updateProfilePicture(
+      req.headers.username as string,
+      body.profile_picture,
+    );
+    res.status(200).send(presigned);
   },
 );
 
