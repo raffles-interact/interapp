@@ -57,6 +57,8 @@ const ChangeProfilePicture = () => {
       convertToBase64(file)
         .then((base64) => {
           apiClient.patch('/user/profile_picture', { profile_picture: base64 }).then((response) => {
+            const url = (response.data as { url: string }).url;
+            const mappedURL = url ? remapAssetUrl(url) : null;
             
             if (response.status !== 200) {
               notifications.show({
@@ -65,7 +67,7 @@ const ChangeProfilePicture = () => {
                 color: 'red',
               });
             } else {
-              updateUser({ ...user, profile_picture: (response.data as { url: string }).url});
+              updateUser({ ...user, profile_picture: mappedURL });
               notifications.show({
                 title: 'Profile picture updated',
                 message: 'Your profile picture has been updated.',
