@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateRequiredFieldsV2, verifyJWT, verifyRequiredPermission } from '../../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../../middleware';
 import {
   ServiceIdFields,
   UpdateServiceFields,
@@ -27,7 +27,7 @@ const serviceRouter = Router();
 
 serviceRouter.post(
   '/',
-  validateRequiredFieldsV2(CreateServiceFields),
+  validateRequiredFields(CreateServiceFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
@@ -40,7 +40,7 @@ serviceRouter.post(
   },
 );
 
-serviceRouter.get('/', validateRequiredFieldsV2(ServiceIdFields), async (req, res) => {
+serviceRouter.get('/', validateRequiredFields(ServiceIdFields), async (req, res) => {
   const query = req.query as unknown as z.infer<typeof ServiceIdFields>;
 
   const service = await ServiceModel.getService(Number(query.service_id));
@@ -49,7 +49,7 @@ serviceRouter.get('/', validateRequiredFieldsV2(ServiceIdFields), async (req, re
 
 serviceRouter.patch(
   '/',
-  validateRequiredFieldsV2(UpdateServiceFields),
+  validateRequiredFields(UpdateServiceFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
@@ -63,7 +63,7 @@ serviceRouter.patch(
 
 serviceRouter.delete(
   '/',
-  validateRequiredFieldsV2(ServiceIdFields),
+  validateRequiredFields(ServiceIdFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
@@ -81,7 +81,7 @@ serviceRouter.get('/all', async (req, res) => {
 
 serviceRouter.get(
   '/get_users_by_service',
-  validateRequiredFieldsV2(ServiceIdFields),
+  validateRequiredFields(ServiceIdFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
@@ -94,7 +94,7 @@ serviceRouter.get(
 
 serviceRouter.post(
   '/session',
-  validateRequiredFieldsV2(CreateServiceSessionFields),
+  validateRequiredFields(CreateServiceSessionFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -108,7 +108,7 @@ serviceRouter.post(
 
 serviceRouter.get(
   '/session',
-  validateRequiredFieldsV2(ServiceSessionIdFields),
+  validateRequiredFields(ServiceSessionIdFields),
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof ServiceSessionIdFields>;
     const session = await ServiceModel.getServiceSession(Number(query.service_session_id));
@@ -118,7 +118,7 @@ serviceRouter.get(
 
 serviceRouter.patch(
   '/session',
-  validateRequiredFieldsV2(UpdateServiceSessionFields),
+  validateRequiredFields(UpdateServiceSessionFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -131,7 +131,7 @@ serviceRouter.patch(
 
 serviceRouter.delete(
   '/session',
-  validateRequiredFieldsV2(ServiceSessionIdFields),
+  validateRequiredFields(ServiceSessionIdFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -143,7 +143,7 @@ serviceRouter.delete(
 
 serviceRouter.get(
   '/session/all',
-  validateRequiredFieldsV2(AllServiceSessionsFields),
+  validateRequiredFields(AllServiceSessionsFields),
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof AllServiceSessionsFields>;
     let sessions;
@@ -165,7 +165,7 @@ serviceRouter.get(
 
 serviceRouter.post(
   '/session_user',
-  validateRequiredFieldsV2(CreateServiceSessionUserFields),
+  validateRequiredFields(CreateServiceSessionUserFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -178,7 +178,7 @@ serviceRouter.post(
 
 serviceRouter.post(
   '/session_user_bulk',
-  validateRequiredFieldsV2(CreateBulkServiceSessionUserFields),
+  validateRequiredFields(CreateBulkServiceSessionUserFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -194,7 +194,7 @@ serviceRouter.post(
 
 serviceRouter.get(
   '/session_user',
-  validateRequiredFieldsV2(FindServiceSessionUserFields),
+  validateRequiredFields(FindServiceSessionUserFields),
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof FindServiceSessionUserFields>;
 
@@ -209,7 +209,7 @@ serviceRouter.get(
 // gets service session user by service_session_id or by username
 serviceRouter.get(
   '/session_user_bulk',
-  validateRequiredFieldsV2(ServiceSessionUserBulkFields),
+  validateRequiredFields(ServiceSessionUserBulkFields),
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof ServiceSessionUserBulkFields>;
 
@@ -228,7 +228,7 @@ serviceRouter.get(
 
 serviceRouter.patch(
   '/session_user',
-  validateRequiredFieldsV2(UpdateServiceSessionUserFields),
+  validateRequiredFields(UpdateServiceSessionUserFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -245,7 +245,7 @@ serviceRouter.patch(
 
 serviceRouter.patch(
   '/absence',
-  validateRequiredFieldsV2(ServiceSessionUserIdFields),
+  validateRequiredFields(ServiceSessionUserIdFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.CLUB_MEMBER),
   async (req, res) => {
@@ -264,7 +264,7 @@ serviceRouter.patch(
 
 serviceRouter.delete(
   '/session_user',
-  validateRequiredFieldsV2(ServiceSessionUserIdFields),
+  validateRequiredFields(ServiceSessionUserIdFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -279,7 +279,7 @@ serviceRouter.delete(
 
 serviceRouter.delete(
   '/session_user_bulk',
-  validateRequiredFieldsV2(DeleteBulkServiceSessionUserFields),
+  validateRequiredFields(DeleteBulkServiceSessionUserFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -306,7 +306,7 @@ serviceRouter.get('/ad_hoc_sessions', verifyJWT, async (req, res) => {
 
 serviceRouter.post(
   '/verify_attendance',
-  validateRequiredFieldsV2(VerifyAttendanceFields),
+  validateRequiredFields(VerifyAttendanceFields),
   verifyJWT,
   async (req, res) => {
     const body: z.infer<typeof VerifyAttendanceFields> = req.body;
