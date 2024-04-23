@@ -145,7 +145,7 @@ const VerifyAttendance = ({ hash }: VerifyAttendanceProps) => {
   return (
     <div className='verify-attendance'>
       <Title>Verify Attendance</Title>
-      
+
       <Text>{message}</Text>
       {status === 'Success' ? (
         <GoHomeButton />
