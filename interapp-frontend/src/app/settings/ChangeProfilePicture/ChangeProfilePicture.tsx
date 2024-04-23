@@ -37,7 +37,6 @@ const ChangeProfilePicture = () => {
   const handleUpdate = (imageURL: string, file: File | null) => {
     if (file === null) {
       apiClient.delete('/user/profile_picture').then((response) => {
-        
         if (response.status !== 204) {
           notifications.show({
             title: 'Failed to delete profile picture',
