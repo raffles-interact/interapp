@@ -347,21 +347,54 @@ export class ServiceModel {
     }));
   }
   public static async verifyAttendance(hash: string, username: string) {
-    const service_session_id = await redisClient.hGet('service_session', hash);
-    if (!service_session_id) {
+    const id = await redisClient.hGet('service_session', hash);
+    if (!id) {
       throw HTTPErrors.INVALID_HASH;
     }
-    const service_session_user = await this.getServiceSessionUser(
-      parseInt(service_session_id),
-      username,
-    );
+    const service_session_id = parseInt(id);
+
+    const service_session_user = await this.getServiceSessionUser(service_session_id, username);
 
     if (service_session_user.attended === AttendanceStatus.Attended) {
       throw HTTPErrors.ALREADY_ATTENDED;
     }
     service_session_user.attended = AttendanceStatus.Attended;
     await this.updateServiceSessionUser(service_session_user);
-    return service_session_user;
+
+    // get some metadata and return it to the user
+
+    type _Return = {
+      start_time: string;
+      end_time: string;
+      service_hours: number;
+      name: string;
+      ad_hoc: boolean;
+    };
+    const res = await appDataSource.manager
+      .createQueryBuilder()
+      .select([
+        'service_session.start_time',
+        'service_session.end_time',
+        'service_session.service_hours',
+        'service.name',
+      ])
+      .from(ServiceSession, 'service_session')
+      .leftJoin('service_session.service', 'service')
+      .where('service_session_id = :id', { id: service_session_id })
+      .getOne();
+
+    // literally impossible for this to be null
+    if (!res) {
+      throw HTTPErrors.RESOURCE_NOT_FOUND;
+    }
+
+    return {
+      start_time: res.start_time,
+      end_time: res.end_time,
+      service_hours: res.service_hours,
+      name: res.service.name,
+      ad_hoc: service_session_user.ad_hoc,
+    } as _Return;
   }
   public static async getAdHocServiceSessions() {
     const res = await appDataSource.manager
