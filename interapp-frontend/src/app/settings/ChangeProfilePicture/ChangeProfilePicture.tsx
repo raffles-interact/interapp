@@ -5,7 +5,7 @@ import APIClient from '@api/api_client';
 import { remapAssetUrl } from '@utils/.';
 import { useContext, useState, useEffect, memo } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { UserWithProfilePicture } from '@providers/AuthProvider/types';
+import { User } from '@providers/AuthProvider/types';
 import { notifications } from '@mantine/notifications';
 import { Group, Title, Text } from '@mantine/core';
 
@@ -14,14 +14,14 @@ const fetchUserProfilePicture = async (username: string) => {
   const response = await apiClient.get('/user?username=' + username);
   if (response.status !== 200) throw new Error('Failed to fetch profile picture');
 
-  const data: UserWithProfilePicture = response.data;
+  const data: User = response.data;
   if (data.profile_picture) data.profile_picture = remapAssetUrl(data.profile_picture);
   return data.profile_picture;
 };
 
 const ChangeProfilePicture = () => {
   const apiClient = new APIClient().instance;
-  const { user, loading } = useContext(AuthContext);
+  const { user, loading, updateUser } = useContext(AuthContext);
   const username = user?.username ?? '';
   const [imageURL, setImageURL] = useState<string | null>(null);
 
@@ -32,9 +32,12 @@ const ChangeProfilePicture = () => {
     });
   }, [loading]);
 
+  if (loading || !user) return null;
+
   const handleUpdate = (imageURL: string, file: File | null) => {
     if (file === null) {
       apiClient.delete('/user/profile_picture').then((response) => {
+        updateUser({ ...user, profile_picture: null });
         if (response.status !== 204) {
           notifications.show({
             title: 'Failed to delete profile picture',
@@ -54,13 +57,15 @@ const ChangeProfilePicture = () => {
       convertToBase64(file)
         .then((base64) => {
           apiClient.patch('/user/profile_picture', { profile_picture: base64 }).then((response) => {
-            if (response.status !== 204) {
+            
+            if (response.status !== 200) {
               notifications.show({
                 title: 'Failed to update profile picture',
                 message: 'Please try again later.',
                 color: 'red',
               });
             } else {
+              updateUser({ ...user, profile_picture: (response.data as { url: string }).url});
               notifications.show({
                 title: 'Profile picture updated',
                 message: 'Your profile picture has been updated.',
@@ -79,6 +84,8 @@ const ChangeProfilePicture = () => {
         });
     }
   };
+
+  
 
   return (
     <Group gap={20}>

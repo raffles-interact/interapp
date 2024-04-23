@@ -27,9 +27,6 @@ export interface User {
   permissions: Permissions[];
   verified: boolean;
   service_hours: number;
-}
-
-export interface UserWithProfilePicture extends User {
   profile_picture: string | null;
 }
 
@@ -56,6 +53,7 @@ export function validateUserType(user: User | null): boolean {
       user.permissions.every((permission) => Object.values(Permissions).includes(permission)),
     user.verified !== undefined && typeof user.verified === 'boolean',
     user.service_hours !== undefined && typeof user.service_hours === 'number',
+    user.profile_picture !== undefined && (user.profile_picture === null || typeof user.profile_picture === 'string'),
   ];
 
   if (conditions.every((condition) => condition)) return true;

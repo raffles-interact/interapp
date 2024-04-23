@@ -4,6 +4,7 @@ import { HTTPErrors } from '@utils/errors';
 import { SignJWT, jwtVerify, JWTPayload, JWTVerifyResult } from 'jose';
 
 import redisClient from '@utils/init_redis';
+import minioClient from '@utils/init_minio';
 
 export interface UserJWT {
   user_id: number;
@@ -11,6 +12,8 @@ export interface UserJWT {
 }
 
 type JWTtype = 'access' | 'refresh';
+
+const MINIO_BUCKETNAME = process.env.MINIO_BUCKETNAME as string;
 
 export class AuthModel {
   private static readonly accessSecret = new TextEncoder().encode(
@@ -79,6 +82,7 @@ export class AuthModel {
         'user.email',
         'user.verified',
         'user.service_hours',
+        'user.profile_picture',
       ])
       .from(User, 'user')
       .leftJoinAndSelect('user.user_permissions', 'user_permissions')
@@ -109,6 +113,9 @@ export class AuthModel {
       email: user.email,
       verified: user.verified,
       service_hours: user.service_hours,
+      profile_picture: user.profile_picture
+        ? await minioClient.presignedGetObject(MINIO_BUCKETNAME, user.profile_picture)
+        : null,
       permissions: user.user_permissions.map((perm) => perm.permission_id),
     };
 
