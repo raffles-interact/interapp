@@ -106,15 +106,11 @@ serviceRouter.post(
   },
 );
 
-serviceRouter.get(
-  '/session',
-  validateRequiredFields(ServiceSessionIdFields),
-  async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof ServiceSessionIdFields>;
-    const session = await ServiceModel.getServiceSession(Number(query.service_session_id));
-    res.status(200).send(session);
-  },
-);
+serviceRouter.get('/session', validateRequiredFields(ServiceSessionIdFields), async (req, res) => {
+  const query = req.query as unknown as z.infer<typeof ServiceSessionIdFields>;
+  const session = await ServiceModel.getServiceSession(Number(query.service_session_id));
+  res.status(200).send(session);
+});
 
 serviceRouter.patch(
   '/session',
