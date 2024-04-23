@@ -9,7 +9,7 @@ type ReqBody = Partial<{ [key: string]: ReqBody }> | ReqBody[] | string | number
 
 type ReqQuery = { [key: string]: string | string[] | undefined };
 
-export function validateRequiredFieldsV2<T extends z.ZodType<ReqBody | ReqQuery>>(schema: T) {
+export function validateRequiredFields<T extends z.ZodType<ReqBody | ReqQuery>>(schema: T) {
   return (req: Request, res: Response, next: NextFunction) => {
     const content: unknown = req.method === 'GET' ? req.query : req.body;
     const validationResult = schema.safeParse(content);
