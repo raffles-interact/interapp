@@ -130,10 +130,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     if (status === 200) {
       localStorage.setItem('access_token_expire', expire.toString());
       localStorage.setItem('access_token', access_token);
-      localStorage.setItem('user', JSON.stringify({
-        ...user,
-        profile_picture: user.profile_picture ? remapAssetUrl(user.profile_picture) : null,
-      }));
+      localStorage.setItem(
+        'user',
+        JSON.stringify({
+          ...user,
+          profile_picture: user.profile_picture ? remapAssetUrl(user.profile_picture) : null,
+        }),
+      );
       setUser(user);
       setJustLoggedIn(true);
       router.refresh(); // invalidate browser cache
