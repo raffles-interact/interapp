@@ -306,8 +306,8 @@ serviceRouter.post(
   verifyJWT,
   async (req, res) => {
     const body: z.infer<typeof VerifyAttendanceFields> = req.body;
-    await ServiceModel.verifyAttendance(body.hash, req.headers.username as string);
-    res.status(204).send();
+    const meta = await ServiceModel.verifyAttendance(body.hash, req.headers.username as string);
+    res.status(200).send(meta);
   },
 );
 
