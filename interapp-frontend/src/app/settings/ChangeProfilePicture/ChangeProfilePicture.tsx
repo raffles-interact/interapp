@@ -59,7 +59,7 @@ const ChangeProfilePicture = () => {
           apiClient.patch('/user/profile_picture', { profile_picture: base64 }).then((response) => {
             const url = (response.data as { url: string }).url;
             const mappedURL = url ? remapAssetUrl(url) : null;
-            
+
             if (response.status !== 200) {
               notifications.show({
                 title: 'Failed to update profile picture',
@@ -86,8 +86,6 @@ const ChangeProfilePicture = () => {
         });
     }
   };
-
-  
 
   return (
     <Group gap={20}>
