@@ -12,5 +12,4 @@ import { WorkSheet } from 'node-xlsx';
 import appDataSource from '@utils/init_datasource';
 
 // @staticImplements<ExportsModelImpl>()
-export class ServiceHoursExportsModel extends BaseExportsModel {
-}
+export class ServiceHoursExportsModel extends BaseExportsModel {}

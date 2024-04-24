@@ -9,10 +9,10 @@ export interface ExportsModelImpl {
 // class decorator that asserts that a class implements an interface statically
 // https://stackoverflow.com/a/43674389
 export function staticImplements<T>() {
-  return <U extends T>(constructor: U) => {constructor};
-} 
-
-
+  return <U extends T>(constructor: U) => {
+    constructor;
+  };
+}
 
 export type AttendanceExportsResult = {
   service_session_id: number;
