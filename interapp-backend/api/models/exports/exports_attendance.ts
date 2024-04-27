@@ -97,7 +97,6 @@ export class AttendanceExportsModel extends BaseExportsModel {
     const out: AttendanceExportsXLSX = [headers, ...body];
 
     const sheetOptions = this.getSheetOptions(out);
-    console.log(sheetOptions);
 
     return { name: ret[0].service.name, data: out, options: sheetOptions };
   }
