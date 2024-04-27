@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { notifications } from '@mantine/notifications';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
+import { ClientError } from '@/utils';
 
 const NavbarNotifications = () => {
   const apiClient = new APIClient().instance;
@@ -28,7 +29,7 @@ const NavbarNotifications = () => {
   const getNotifications = useCallback(async () => {
     if (!user) return;
     const res = await apiClient.get('/user/notifications');
-    if (res.status !== 200) throw new Error('Error getting notifications');
+    if (res.status !== 200) throw new ClientError({ message: 'Could not get notifications', responseStatus: res.status, responseBody: res.data });
 
     const data: {
       unread_announcements: {

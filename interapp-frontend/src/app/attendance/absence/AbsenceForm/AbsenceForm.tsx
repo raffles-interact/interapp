@@ -6,6 +6,7 @@ import { Text, Button } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import Link from 'next/link';
 import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
+import { ClientError } from '@/utils';
 
 const handleSetValidReason = async (id: number, username: string) => {
   const apiClient = new APIClient().instance;
@@ -14,7 +15,7 @@ const handleSetValidReason = async (id: number, username: string) => {
     username: username,
   });
 
-  if (res.status !== 204) throw new Error(res.data.message);
+  if (res.status !== 204) throw new ClientError({ message: 'Failed to set valid reason', responseStatus: res.status, responseBody: res.data });
 };
 
 interface AbsenceFormProps {

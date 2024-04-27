@@ -10,7 +10,7 @@ import { memo, useContext, useEffect, useState } from 'react';
 import APIClient from '@api/api_client';
 import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
-import { getAllUsernames, parseServerError } from '@utils/.';
+import { ClientError, getAllUsernames, parseServerError } from '@utils/.';
 import { ServiceSessionUser } from '../../types';
 import { IconPlus } from '@tabler/icons-react';
 import { Service } from '@/app/services/types';
@@ -23,7 +23,7 @@ export interface AddActionProps {
 const getAllServices = async () => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/all');
-  if (response.status !== 200) throw new Error('Could not fetch services');
+  if (response.status !== 200) throw new ClientError({ message: 'Failed to fetch services', responseStatus: response.status, responseBody: response.data });
   const services: Service[] = response.data;
   return services.map((service) => ({ service_id: service.service_id, name: service.name }));
 };
