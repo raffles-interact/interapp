@@ -10,7 +10,7 @@ import { useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { type AnnouncementWithMeta, type AnnouncementForm } from '../../types';
 import { useParams, useRouter } from 'next/navigation';
-import { parseErrorMessage, remapAssetUrl } from '@utils/.';
+import { parseServerError, remapAssetUrl } from '@utils/.';
 import { notifications } from '@mantine/notifications';
 import { Button, Group, TextInput, Title, Text, Stack } from '@mantine/core';
 import { IconClock, IconUser } from '@tabler/icons-react';
@@ -86,7 +86,7 @@ function EditForm() {
         default:
           notifications.show({
             title: 'Error',
-            message: parseErrorMessage(data),
+            message: parseServerError(data),
             color: 'red',
           });
       }

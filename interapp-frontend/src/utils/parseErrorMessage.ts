@@ -3,7 +3,7 @@ interface ZodFieldErrors {
     [key: string]: Array<string>;
   };
 }
-export function parseErrorMessage(resBody: unknown) {
+export function parseServerError(resBody: unknown) {
   // check if 'data' exists in the response body
   if (!resBody || typeof resBody !== 'object' || !('data' in resBody)) {
     return 'An unknown error occurred';
