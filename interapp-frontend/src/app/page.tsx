@@ -10,7 +10,7 @@ import AttendanceList, {
 import NextAttendance from '@/app/_homepage/NextAttendance/NextAttendance';
 
 import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import Link from 'next/link';
 import { Stack, Title, Text, SimpleGrid, Image, Group } from '@mantine/core';
 import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
@@ -19,7 +19,7 @@ import './styles.css';
 const fetchAttendance = async (username: string, sessionCount: number) => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/session_user_bulk?username=' + username);
-  if (response.status !== 200) throw new Error('Failed to fetch service sessions');
+  if (response.status !== 200) throw new ClientError({ message: 'Failed to fetch attendance', responseStatus: response.status, responseBody: response.data });
 
   const now = new Date();
 

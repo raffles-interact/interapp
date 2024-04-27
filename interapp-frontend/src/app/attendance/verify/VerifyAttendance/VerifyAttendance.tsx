@@ -6,6 +6,7 @@ import APIClient from '@/api/api_client';
 import { Title, Text, Button, Loader } from '@mantine/core';
 import GoHomeButton from '@/components/GoHomeButton/GoHomeButton';
 import { User } from '@/providers/AuthProvider/types';
+import { ClientError } from '@utils/.';
 import './styles.css';
 
 interface VerifyAttendanceProps {
@@ -81,7 +82,7 @@ const updateServiceHours = async (newHours: number) => {
   const res = await apiClient.patch('/user/service_hours', {
     hours: newHours,
   });
-  if (res.status !== 204) throw new Error('Failed to update CCA hours');
+  if (res.status !== 204) throw new ClientError({ message: 'Failed to update service hours', responseStatus: res.status, responseBody: res.data });
 };
 
 const VerifyAttendance = ({ hash }: VerifyAttendanceProps) => {

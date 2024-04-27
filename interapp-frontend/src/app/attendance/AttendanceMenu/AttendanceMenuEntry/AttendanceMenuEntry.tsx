@@ -4,7 +4,7 @@ import APIClient from '@/api/api_client';
 import { useState, useEffect, memo } from 'react';
 import { Text, Skeleton, Paper, Title, Badge } from '@mantine/core';
 import { AxiosResponse } from 'axios';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import { IconFlag } from '@tabler/icons-react';
 import { useRouter } from 'next/navigation';
 import './styles.css';
@@ -20,12 +20,12 @@ export const fetchAttendanceDetails = async (service_session_id: number) => {
   });
   // if the session does not exist, return null
   if (res.status === 404) return null;
-  if (res.status !== 200) throw new Error('Failed to fetch attendance details');
+  if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch service session', responseStatus: res.status, responseBody: res.data });
 
   const res2 = await apiClient.get('/service/session_user_bulk', {
     params: { service_session_id: service_session_id },
   });
-  if (res2.status !== 200) throw new Error('Failed to fetch user attendance details');
+  if (res2.status !== 200) throw new ClientError({ message: 'Failed to fetch service session users', responseStatus: res2.status, responseBody: res2.data });
 
   let res3: AxiosResponse<any, any> | null = (await apiClient.get('/service', {
     params: { service_id: res.data.service_id },

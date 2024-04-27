@@ -2,7 +2,7 @@
 import APIClient from '@api/api_client';
 import { Service } from '@/app/services/types';
 import { ServiceSession } from '@/app/service_sessions/types';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import ServiceCard from './ServiceCard/ServiceCard';
 import { useState, useEffect } from 'react';
 import { Title } from '@mantine/core';
@@ -15,15 +15,15 @@ const fetchServices = async (username: string) => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.get('/service/all');
 
-  if (res.status !== 200) throw new Error('Could not fetch services');
+  if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch services', responseStatus: res.status, responseBody: res.data });
 
   const res2 = await apiClient.get('/service/ad_hoc_sessions');
 
-  if (res2.status !== 200) throw new Error('Could not fetch ad hoc sessions');
+  if (res2.status !== 200) throw new ClientError({ message: 'Failed to fetch ad hoc sessions', responseStatus: res2.status, responseBody: res2.data });
 
   const res3 = await apiClient.get('/user/userservices?username=' + username);
 
-  if (res3.status !== 200) throw new Error('Could not fetch user services');
+  if (res3.status !== 200) throw new ClientError({ message: 'Failed to fetch user services', responseStatus: res3.status, responseBody: res3.data });
 
   const services: Service[] = res.data;
   const adHocSessions: Omit<ServiceSession, 'service_session_users' | 'service_name'>[] = res2.data;
@@ -78,7 +78,7 @@ const handleJoinAdHocSession = async (serviceSessionId: number, username: string
   });
 
   // if the user has already joined the session, throw an error (404 means they haven't joined)
-  if (check.status !== 404) throw new Error('You have already joined this session');
+  if (check.status !== 404) throw new ClientError({ message: 'User has already joined session', responseStatus: check.status, responseBody: check.data });
 
   const res = await apiClient.post('/service/session_user', {
     service_session_id: serviceSessionId,
@@ -88,7 +88,7 @@ const handleJoinAdHocSession = async (serviceSessionId: number, username: string
     is_ic: false,
   });
 
-  if (res.status !== 201) throw new Error('Could not join ad hoc session');
+  if (res.status !== 201) throw new ClientError({ message: 'Failed to join session', responseStatus: res.status, responseBody: res.data });
 };
 
 const generateSessionsInFuture = (service: FetchServicesResponse[number]) => {

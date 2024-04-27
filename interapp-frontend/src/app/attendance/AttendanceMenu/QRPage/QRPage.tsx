@@ -12,6 +12,7 @@ import { IconFlag, IconExternalLink } from '@tabler/icons-react';
 import './styles.css';
 import Link from 'next/link';
 import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
+import { ClientError } from '@utils/.';
 
 interface QRPageProps {
   id: number;
@@ -22,7 +23,7 @@ const refreshAttendance = async (id: number) => {
   const res = await apiClient.get('/service/session_user_bulk', {
     params: { service_session_id: id },
   });
-  if (res.status !== 200) throw new Error('Failed to fetch user attendance details');
+  if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch service session users', responseStatus: res.status, responseBody: res.data });
 
   const sessionUserDetails: {
     service_session_id: number;

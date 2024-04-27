@@ -4,7 +4,7 @@ import { AnnouncementWithMeta } from './../types';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import GoBackButton from '@components/GoBackButton/GoBackButton';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import { Title, Text, Group, Stack, ActionIcon, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { IconClock, IconUser, IconPencil, IconTrash } from '@tabler/icons-react';
@@ -30,7 +30,11 @@ const handleFetch = async (id: number) => {
   } else if (res.status === 404) {
     return null;
   } else {
-    throw new Error('Failed to fetch announcements');
+    throw new ClientError({
+      message: 'Failed to fetch announcement',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
   }
 };
 
@@ -41,7 +45,7 @@ const handleRead = async (id: number) => {
     completed: true,
   });
 
-  if (res.status !== 204) throw new Error('Failed to update announcement completion status');
+  if (res.status !== 204) throw new ClientError({ message: 'Failed to mark announcement as read', responseStatus: res.status, responseBody: res.data });
 };
 
 const handleDelete = async (id: number, handleEnd: () => void) => {
@@ -54,7 +58,7 @@ const handleDelete = async (id: number, handleEnd: () => void) => {
       message: 'Announcement could not be deleted',
       color: 'red',
     });
-    throw new Error('Failed to delete announcement');
+    throw new ClientError({ message: 'Failed to delete announcement', responseStatus: res.status, responseBody: res.data });
   } else
     notifications.show({
       title: 'Success',
