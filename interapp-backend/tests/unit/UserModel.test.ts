@@ -915,4 +915,57 @@ suite.getNotifications = [
   },
 ];
 
+suite.updateServiceHoursBulk = [
+  {
+    name: 'should update service user bulk',
+    cb: async () => {
+      for (let i = 0; i < 50; i++) {
+        await signUp(i, `user${i}`);
+      }
+      const id = await createService('test service', 'user0');
+      expect(id).toBe(1);
+      const data = Array.from({ length: 50 }, (_, i) => ({
+        username: `user${i}`,
+        hours: i,
+      }));
+
+      await UserModel.updateServiceHoursBulk(data);
+      for (let i = 0; i < 50; i++) {
+        const result = await UserModel.getUserDetails(`user${i}`);
+        expect(result.service_hours).toBe(i);
+      }
+    },
+    cleanup: async () => await recreateDB(),
+  },
+  {
+    name: 'should throw when user does not exist',
+    cb: async () => {
+      const data = [{ username: 'user', hours: 1 }];
+      expect(UserModel.updateServiceHoursBulk(data)).rejects.toThrow();
+    },
+  },
+  {
+    name: 'should use delta hours',
+    cb: async () => {
+      await signUp(1, 'user');
+      const id = await createService('test service', 'user');
+      expect(id).toBe(1);
+      await UserModel.updateServiceHours('user', 10);
+
+      // add 1 hour
+      const data = [{ username: 'user', hours: 1 }];
+      await UserModel.updateServiceHoursBulk(data);
+      const result = await UserModel.getUserDetails('user');
+      expect(result.service_hours).toBe(11);
+
+      // remove 999 hours
+      const data2 = [{ username: 'user', hours: -999 }];
+      await UserModel.updateServiceHoursBulk(data2);
+      const result2 = await UserModel.getUserDetails('user');
+      expect(result2.service_hours).toBe(-988);
+    },
+    cleanup: async () => await recreateDB(),
+  },
+];
+
 runSuite(SUITE_NAME, suite);
