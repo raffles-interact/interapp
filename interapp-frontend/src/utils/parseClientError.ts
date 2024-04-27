@@ -7,7 +7,7 @@ interface ClientErrorParams {
 export class ClientError extends Error {
   constructor({ message, responseBody, responseStatus }: ClientErrorParams) {
     const cause = ClientError.formatCause({ responseBody, responseStatus });
-    super(message, { cause });
+    super(message + '\n' + cause, { cause });
   }
 
   static formatCause({
@@ -15,10 +15,11 @@ export class ClientError extends Error {
     responseStatus,
   }: Pick<ClientErrorParams, 'responseBody' | 'responseStatus'>): string {
     if (!responseStatus && !responseBody) return '';
-    return `
-    \n
-      Response status: ${responseStatus}\n
-      Response body: ${String(responseBody)}
-    `;
+    console.log(responseBody);
+    return `Response status: ${responseStatus}\nResponse body: \n${JSON.stringify(
+      responseBody,
+      null,
+      2,
+    )}`;
   }
 }
