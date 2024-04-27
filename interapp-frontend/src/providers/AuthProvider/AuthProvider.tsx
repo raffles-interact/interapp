@@ -55,7 +55,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const validUser = validateUserType(user);
     if (!validUser) {
       logout();
-      throw new ClientError({ message: 'Invalid user type in local storage' + JSON.stringify(user) });
+      throw new ClientError({
+        message: 'Invalid user type in local storage' + JSON.stringify(user),
+      });
     }
 
     if (allowedRoutes.some((route) => memoWildcardMatcher(pathname, route))) {

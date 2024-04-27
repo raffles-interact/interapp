@@ -24,10 +24,20 @@ const handleGetUsers = async (service_id: number) => {
     serviceUsers = [];
   } else if (get_users_by_service.status === 200) {
     serviceUsers = users.map((user) => user.username);
-  } else throw new ClientError({ message: 'Could not get users by service', responseStatus: get_users_by_service.status, responseBody: get_users_by_service.data })
+  } else
+    throw new ClientError({
+      message: 'Could not get users by service',
+      responseStatus: get_users_by_service.status,
+      responseBody: get_users_by_service.data,
+    });
 
   const get_all_users = await apiClient.get('/user');
-  if (get_all_users.status !== 200) throw new ClientError({ message: 'Could not get all users', responseStatus: get_all_users.status, responseBody: get_all_users.data })
+  if (get_all_users.status !== 200)
+    throw new ClientError({
+      message: 'Could not get all users',
+      responseStatus: get_all_users.status,
+      responseBody: get_all_users.data,
+    });
   const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
   const allUsernames = all_users !== undefined ? all_users.map((user) => user.username) : [];
 

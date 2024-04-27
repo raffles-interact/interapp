@@ -19,7 +19,12 @@ import './styles.css';
 const fetchAttendance = async (username: string, sessionCount: number) => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/session_user_bulk?username=' + username);
-  if (response.status !== 200) throw new ClientError({ message: 'Failed to fetch attendance', responseStatus: response.status, responseBody: response.data });
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch attendance',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
   const now = new Date();
 

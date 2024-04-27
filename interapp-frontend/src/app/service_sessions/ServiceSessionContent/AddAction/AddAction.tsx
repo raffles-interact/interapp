@@ -23,7 +23,12 @@ export interface AddActionProps {
 const getAllServices = async () => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/all');
-  if (response.status !== 200) throw new ClientError({ message: 'Failed to fetch services', responseStatus: response.status, responseBody: response.data });
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch services',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
   const services: Service[] = response.data;
   return services.map((service) => ({ service_id: service.service_id, name: service.name }));
 };

@@ -14,7 +14,12 @@ const fetchAllServices = async () => {
   try {
     const res = await apiClient.get('/service/all');
 
-    if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch services', responseStatus: res.status, responseBody: res.data });
+    if (res.status !== 200)
+      throw new ClientError({
+        message: 'Failed to fetch services',
+        responseStatus: res.status,
+        responseBody: res.data,
+      });
 
     const allServices: Service[] = res.data;
 

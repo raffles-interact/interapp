@@ -12,7 +12,12 @@ import { Group, Title, Text } from '@mantine/core';
 const fetchUserProfilePicture = async (username: string) => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/user?username=' + username);
-  if (response.status !== 200) throw new ClientError({ message: 'Could not get user', responseStatus: response.status, responseBody: response.data });
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Could not get user',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
   const data: User = response.data;
   if (data.profile_picture) data.profile_picture = remapAssetUrl(data.profile_picture);

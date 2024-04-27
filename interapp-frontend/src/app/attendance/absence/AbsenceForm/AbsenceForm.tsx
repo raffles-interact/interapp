@@ -15,7 +15,12 @@ const handleSetValidReason = async (id: number, username: string) => {
     username: username,
   });
 
-  if (res.status !== 204) throw new ClientError({ message: 'Failed to set valid reason', responseStatus: res.status, responseBody: res.data });
+  if (res.status !== 204)
+    throw new ClientError({
+      message: 'Failed to set valid reason',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 };
 
 interface AbsenceFormProps {

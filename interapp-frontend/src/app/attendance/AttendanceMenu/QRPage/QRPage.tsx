@@ -23,7 +23,12 @@ const refreshAttendance = async (id: number) => {
   const res = await apiClient.get('/service/session_user_bulk', {
     params: { service_session_id: id },
   });
-  if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch service session users', responseStatus: res.status, responseBody: res.data });
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch service session users',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 
   const sessionUserDetails: {
     service_session_id: number;

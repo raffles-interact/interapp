@@ -82,7 +82,12 @@ const updateServiceHours = async (newHours: number) => {
   const res = await apiClient.patch('/user/service_hours', {
     hours: newHours,
   });
-  if (res.status !== 204) throw new ClientError({ message: 'Failed to update service hours', responseStatus: res.status, responseBody: res.data });
+  if (res.status !== 204)
+    throw new ClientError({
+      message: 'Failed to update service hours',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 };
 
 const VerifyAttendance = ({ hash }: VerifyAttendanceProps) => {

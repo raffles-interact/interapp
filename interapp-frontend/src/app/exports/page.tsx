@@ -18,7 +18,12 @@ const fetchServices = async (apiClient: AxiosInstance) => {
     service_id: service.service_id,
   })) as Pick<Service, 'name' | 'service_id'>[];
 
-  if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch services', responseStatus: res.status, responseBody: res.data });
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch services',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
   return data;
 };
 
