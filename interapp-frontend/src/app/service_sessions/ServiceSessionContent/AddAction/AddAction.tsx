@@ -10,7 +10,7 @@ import { memo, useContext, useEffect, useState } from 'react';
 import APIClient from '@api/api_client';
 import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
-import { getAllUsernames, parseErrorMessage } from '@utils/.';
+import { getAllUsernames, parseServerError } from '@utils/.';
 import { ServiceSessionUser } from '../../types';
 import { IconPlus } from '@tabler/icons-react';
 import { Service } from '@/app/services/types';
@@ -85,7 +85,7 @@ function AddAction({ refreshData }: Readonly<AddActionProps>) {
     if (res.status !== 200) {
       notifications.show({
         title: 'Error',
-        message: parseErrorMessage(res.data),
+        message: parseServerError(res.data),
         color: 'red',
       });
       setLoading(false);

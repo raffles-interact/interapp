@@ -13,7 +13,7 @@ import { Permissions } from '@/app/route_permissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
 import './styles.css';
 import { ServiceSessionUser } from '../../types';
-import { getAllUsernames, parseErrorMessage } from '@utils/.';
+import { getAllUsernames, parseServerError } from '@utils/.';
 import { type AxiosInstance } from 'axios';
 
 const calculateInterval = (start: Date, end: Date) => {
@@ -187,7 +187,7 @@ function EditAction({
     if (updatedServiceSessionResponse.status !== 200) {
       notifications.show({
         title: 'Error',
-        message: parseErrorMessage(updatedServiceSessionResponse.data),
+        message: parseServerError(updatedServiceSessionResponse.data),
         color: 'red',
       });
 
@@ -207,9 +207,9 @@ function EditAction({
         title: 'Error',
         message:
           'Failed to update attendees. Changes may have been partially applied.\n' +
-          parseErrorMessage(deletedServiceSessionUsersResponse) +
+          parseServerError(deletedServiceSessionUsersResponse) +
           '\n' +
-          parseErrorMessage(addedServiceSessionUsersResponse),
+          parseServerError(addedServiceSessionUsersResponse),
         color: 'red',
       });
 
@@ -230,7 +230,7 @@ function EditAction({
         title: 'Error',
         message:
           'Failed to update service hours. Changes may have been partially applied.\n' +
-          parseErrorMessage(updateHoursResponse),
+          parseServerError(updateHoursResponse),
         color: 'red',
       });
 

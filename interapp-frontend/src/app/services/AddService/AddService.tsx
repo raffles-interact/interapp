@@ -22,7 +22,7 @@ import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import UploadImage, { convertToBase64, allowedFormats } from '@components/UploadImage/UploadImage';
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
-import { getAllUsernames, parseErrorMessage } from '@utils/.';
+import { getAllUsernames, parseServerError } from '@utils/.';
 import { useRouter } from 'next/navigation';
 import { CreateServiceWithUsers } from '../types';
 
@@ -125,7 +125,7 @@ const AddService = () => {
       case 400:
         notifications.show({
           title: 'Error',
-          message: parseErrorMessage(res.data),
+          message: parseServerError(res.data),
           color: 'red',
         });
         setLoading(false);
