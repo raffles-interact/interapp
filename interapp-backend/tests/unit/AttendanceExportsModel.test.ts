@@ -49,10 +49,8 @@ const populateDb = async () => {
     await signUp(i, `user${i}`);
   }
 
-  
   // create service with id 1
   const id = await createService('a', 'user0');
-  
 
   // create sessions with id 1-10
   for (let i = 0; i < 10; i++) {
@@ -65,7 +63,6 @@ const populateDb = async () => {
 
     await createSessions(id, now, end);
   }
-  
 
   // add all users to all sessions
   const users = [];
@@ -149,7 +146,7 @@ suite.queryExports = [
       expect(AttendanceExportsModel.queryExports({ id: 2 })).resolves.toBeArrayOfSize(0);
     },
     cleanup: async () => await recreateDB(),
-  }
+  },
 ];
 
 suite.formatXLSX = [
@@ -174,7 +171,7 @@ suite.formatXLSX = [
         name: 'a',
         data: expect.any(Array),
         options: expect.any(Object),
-      })
+      });
     },
     cleanup: async () => await recreateDB(),
   },
@@ -186,15 +183,22 @@ suite.formatXLSX = [
       expect(AttendanceExportsModel.formatXLSX({ id: 2 })).rejects.toThrow();
     },
     cleanup: async () => await recreateDB(),
-  },{
+  },
+  {
     name: 'should throw if no exports found',
     cb: async () => {
       await populateDb();
-      expect(AttendanceExportsModel.formatXLSX({ id: 1, start_date: new Date().toISOString(), end_date: new Date().toISOString() })).rejects.toThrow();
+      expect(
+        AttendanceExportsModel.formatXLSX({
+          id: 1,
+          start_date: new Date().toISOString(),
+          end_date: new Date().toISOString(),
+        }),
+      ).rejects.toThrow();
     },
     cleanup: async () => await recreateDB(),
-  }
-]
+  },
+];
 
 suite.packXLSX = [
   {
@@ -208,7 +212,11 @@ suite.packXLSX = [
       const end_date = new Date(start_date);
       end_date.setDate(end_date.getDate() + 5);
 
-      const ret = await AttendanceExportsModel.packXLSX([1], start_date.toISOString(), end_date.toISOString());
+      const ret = await AttendanceExportsModel.packXLSX(
+        [1],
+        start_date.toISOString(),
+        end_date.toISOString(),
+      );
 
       expect(ret).toBeInstanceOf(Buffer);
     },
@@ -227,10 +235,12 @@ suite.packXLSX = [
     name: 'should throw if no exports found',
     cb: async () => {
       await populateDb();
-      expect(AttendanceExportsModel.packXLSX([1], new Date().toISOString(), new Date().toISOString())).rejects.toThrow();
+      expect(
+        AttendanceExportsModel.packXLSX([1], new Date().toISOString(), new Date().toISOString()),
+      ).rejects.toThrow();
     },
     cleanup: async () => await recreateDB(),
-  }
+  },
 ];
 
 console.log(suite);
