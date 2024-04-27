@@ -10,7 +10,12 @@ import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
 const fetchUserServiceSessions = async (username: string) => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/session_user_bulk?username=' + username);
-  if (response.status !== 200) throw new ClientError({ message: 'Failed to fetch service sessions', responseStatus: response.status, responseBody: response.data });
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch service sessions',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
   const data: {
     service_id: number;

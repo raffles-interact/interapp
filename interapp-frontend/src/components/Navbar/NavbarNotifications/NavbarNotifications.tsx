@@ -29,7 +29,12 @@ const NavbarNotifications = () => {
   const getNotifications = useCallback(async () => {
     if (!user) return;
     const res = await apiClient.get('/user/notifications');
-    if (res.status !== 200) throw new ClientError({ message: 'Could not get notifications', responseStatus: res.status, responseBody: res.data });
+    if (res.status !== 200)
+      throw new ClientError({
+        message: 'Could not get notifications',
+        responseStatus: res.status,
+        responseBody: res.data,
+      });
 
     const data: {
       unread_announcements: {

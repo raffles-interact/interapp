@@ -45,7 +45,12 @@ const handleRead = async (id: number) => {
     completed: true,
   });
 
-  if (res.status !== 204) throw new ClientError({ message: 'Failed to mark announcement as read', responseStatus: res.status, responseBody: res.data });
+  if (res.status !== 204)
+    throw new ClientError({
+      message: 'Failed to mark announcement as read',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 };
 
 const handleDelete = async (id: number, handleEnd: () => void) => {
@@ -58,7 +63,11 @@ const handleDelete = async (id: number, handleEnd: () => void) => {
       message: 'Announcement could not be deleted',
       color: 'red',
     });
-    throw new ClientError({ message: 'Failed to delete announcement', responseStatus: res.status, responseBody: res.data });
+    throw new ClientError({
+      message: 'Failed to delete announcement',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
   } else
     notifications.show({
       title: 'Success',

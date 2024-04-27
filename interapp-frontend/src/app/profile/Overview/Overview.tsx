@@ -16,18 +16,33 @@ const fetchUserDetails = async (username: string) => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/user?username=' + username);
 
-  if (response.status !== 200) throw new ClientError({ message: 'Failed to fetch user details', responseStatus: response.status, responseBody: response.data });
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch user details',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
   const data: User = response.data;
 
   if (data.profile_picture) data.profile_picture = remapAssetUrl(data.profile_picture);
 
   const response2 = await apiClient.get('/user/permissions?username=' + username);
-  if (response2.status !== 200) throw new ClientError({ message: 'Failed to fetch user permissions', responseStatus: response2.status, responseBody: response2.data });
+  if (response2.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch user permissions',
+      responseStatus: response2.status,
+      responseBody: response2.data,
+    });
 
   data.permissions = response2.data[username] satisfies Permissions[];
 
-  if (!validateUserType(data)) throw new ClientError({ message: 'Invalid user data', responseStatus: response.status, responseBody: response.data });
+  if (!validateUserType(data))
+    throw new ClientError({
+      message: 'Invalid user data',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
   return data;
 };
 

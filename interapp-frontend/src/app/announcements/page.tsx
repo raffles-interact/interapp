@@ -16,7 +16,12 @@ import { Permissions } from '../route_permissions';
 const handleFetch = async (page: number) => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.get('/announcement/all', { params: { page: page, page_size: 8 } });
-  if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch announcements', responseStatus: res.status, responseBody: res.data });
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch announcements',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 
   const resData: {
     data: AnnouncementWithMeta[];

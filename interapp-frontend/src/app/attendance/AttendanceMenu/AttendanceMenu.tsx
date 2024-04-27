@@ -14,7 +14,12 @@ interface AttendanceMenuProps {
 export const fetchActiveServiceSessions = async () => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/active_sessions');
-  if (response.status !== 200) throw new ClientError({ message: 'Failed to fetch active service sessions', responseStatus: response.status, responseBody: response.data });
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch active service sessions',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
   const data: {
     [hash: string]: {

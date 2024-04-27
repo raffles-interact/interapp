@@ -12,7 +12,12 @@ const handleFetch = async () => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.get('/announcement/all', { params: { page: 1, page_size: 1 } }); // get the very latest announcement
 
-  if (res.status !== 200) throw new ClientError({ message: 'Failed to fetch announcement', responseStatus: res.status, responseBody: res.data });
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch announcement',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 
   // size is 1 because we only want the latest announcement
   const resData: {
