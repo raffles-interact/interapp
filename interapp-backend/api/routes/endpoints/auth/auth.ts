@@ -1,19 +1,19 @@
 import { Router } from 'express';
-import { validateRequiredFieldsV2, verifyJWT } from '../../middleware';
+import { validateRequiredFields, verifyJWT } from '../../middleware';
 import { SignupFields, SigninFields } from './validation';
 import { AuthModel } from '@models/.';
 import { z } from 'zod';
 
 const authRouter = Router();
 
-authRouter.post('/signup', validateRequiredFieldsV2(SignupFields), async (req, res) => {
+authRouter.post('/signup', validateRequiredFields(SignupFields), async (req, res) => {
   const body: z.infer<typeof SignupFields> = req.body;
 
   await AuthModel.signUp(body.user_id, body.username, body.email, body.password);
   res.status(201).send();
 });
 
-authRouter.post('/signin', validateRequiredFieldsV2(SigninFields), async (req, res) => {
+authRouter.post('/signin', validateRequiredFields(SigninFields), async (req, res) => {
   const body: z.infer<typeof SigninFields> = req.body;
   const { token, refresh, user, expire } = await AuthModel.signIn(body.username, body.password);
   res.cookie('refresh', refresh, {

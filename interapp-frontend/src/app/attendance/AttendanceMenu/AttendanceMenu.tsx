@@ -5,6 +5,7 @@ import { Stack, Text, Title } from '@mantine/core';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import AttendanceMenuEntry from './AttendanceMenuEntry/AttendanceMenuEntry';
 import QRPage from './QRPage/QRPage';
+import { ClientError } from '@/utils';
 
 interface AttendanceMenuProps {
   id?: number;
@@ -13,7 +14,12 @@ interface AttendanceMenuProps {
 export const fetchActiveServiceSessions = async () => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/active_sessions');
-  if (response.status !== 200) throw new Error('Failed to fetch active service sessions');
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch active service sessions',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
   const data: {
     [hash: string]: {

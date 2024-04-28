@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
 import APIClient from '@api/api_client';
 import { Service } from '../services/types';
 import ServiceSessionContent from './ServiceSessionContent/ServiceSessionContent';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import { ServiceSessionsWithMeta, ServiceMeta } from './types';
 import { Title, Text } from '@mantine/core';
 import './styles.css';
@@ -23,10 +23,20 @@ const handleFetchServiceSessionsData = async (
   const res = await apiClient.get('/service/session/all', {
     params: params,
   });
-  if (res.status !== 200) return null;
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch service sessions',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
   // then we get the services for searching
   const res2 = await apiClient.get('/service/all');
-  if (res2.status !== 200) return null;
+  if (res2.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch services',
+      responseStatus: res2.status,
+      responseBody: res2.data,
+    });
   // we return the data and map the services to the format that the select component expects
   const parsed = [
     res.data as ServiceSessionsWithMeta,
@@ -47,7 +57,7 @@ export default async function ServiceSessionPage() {
   const refreshServiceSessions = async (page: number, service_id?: number) => {
     'use server';
     const result = await handleFetchServiceSessionsData(page, perPage, service_id);
-    if (result === null) throw new Error('Error fetching service sessions');
+
     return result;
   };
 

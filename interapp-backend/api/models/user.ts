@@ -364,7 +364,7 @@ export class UserModel {
         session.service_session.service.promotional_image = url;
       }
     }
-    let parsed: {
+    const parsed: {
       service_id: number;
       start_time: string;
       end_time: string;
@@ -375,7 +375,7 @@ export class UserModel {
       ad_hoc: boolean;
       attended: string;
       is_ic: boolean;
-      service_session?: any;
+      service_session?: unknown;
     }[] = serviceSessions.map((session) => ({
       ...session,
       service_id: session.service_session.service_id,
@@ -405,19 +405,19 @@ export class UserModel {
     if (usernames.length === 0) {
       throw HTTPErrors.SERVICE_NO_USER_FOUND;
     }
-    const users: Pick<User, 'username' | 'user_id' | 'email' | 'verified' | 'service_hours'>[] =
-      await appDataSource.manager
-        .createQueryBuilder()
-        .select([
-          'user.username',
-          'user.user_id',
-          'user.email',
-          'user.verified',
-          'user.service_hours',
-        ])
-        .from(User, 'user')
-        .where('user.username IN (:...usernames)', { usernames })
-        .getMany();
+    const users: UserWithoutSensitiveFields[] = await appDataSource.manager
+      .createQueryBuilder()
+      .select([
+        'user.username',
+        'user.user_id',
+        'user.email',
+        'user.verified',
+        'user.service_hours',
+        'user.profile_picture',
+      ])
+      .from(User, 'user')
+      .where('user.username IN (:...usernames)', { usernames })
+      .getMany();
 
     return users;
   }
@@ -467,12 +467,8 @@ export class UserModel {
         .getMany();
     };
 
-    const toAdd = data
-      .filter(({ action, username }) => action === 'add')
-      .map((data) => data.username);
-    const toRemove = data
-      .filter(({ action, username }) => action === 'remove')
-      .map((data) => data.username);
+    const toAdd = data.filter(({ action }) => action === 'add').map((data) => data.username);
+    const toRemove = data.filter(({ action }) => action === 'remove').map((data) => data.username);
 
     if (toAdd.length !== 0)
       await appDataSource.manager.insert(
@@ -505,10 +501,10 @@ export class UserModel {
   // it ADDS a certain number of hours to the user's service hours, and does not set it to a specific value like the previous one
   public static async updateServiceHoursBulk(data: { username: string; hours: number }[]) {
     const queryRunner = appDataSource.createQueryRunner();
-  
+
     // start a new transaction
     await queryRunner.startTransaction();
-  
+
     try {
       await Promise.all(
         data.map(async ({ username, hours }) => {
@@ -518,14 +514,14 @@ export class UserModel {
             .from(User, 'user')
             .where('user.username = :username', { username })
             .getOne();
-  
+
           if (!user) throw HTTPErrors.RESOURCE_NOT_FOUND;
-  
+
           user.service_hours += hours;
           await queryRunner.manager.update(User, { username }, user);
         }),
       );
-  
+
       // commit the transaction if no errors were thrown
       await queryRunner.commitTransaction();
     } catch (error) {
@@ -557,6 +553,10 @@ export class UserModel {
     user.profile_picture = `profile_pictures/${username}`;
 
     await appDataSource.manager.update(User, { username }, user);
+    // sign and return url
+    return {
+      url: await minioClient.presignedGetObject(MINIO_BUCKETNAME, `profile_pictures/${username}`),
+    };
   }
   public static async deleteProfilePicture(username: string) {
     const user = await appDataSource.manager

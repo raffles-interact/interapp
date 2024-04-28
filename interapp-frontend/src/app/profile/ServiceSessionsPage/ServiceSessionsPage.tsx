@@ -1,6 +1,6 @@
 'use client';
 import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@utils/.';
+import { remapAssetUrl, ClientError } from '@utils/.';
 import { useEffect, useState } from 'react';
 import ServiceSessionCard from './ServiceSessionCard/ServiceSessionCard';
 import { Text } from '@mantine/core';
@@ -10,7 +10,12 @@ import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
 const fetchUserServiceSessions = async (username: string) => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/service/session_user_bulk?username=' + username);
-  if (response.status !== 200) throw new Error('Failed to fetch service sessions');
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch service sessions',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
   const data: {
     service_id: number;

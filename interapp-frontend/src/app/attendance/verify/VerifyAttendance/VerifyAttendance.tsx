@@ -3,54 +3,56 @@
 import { AuthContext } from '@/providers/AuthProvider/AuthProvider';
 import { useContext, useEffect, useState } from 'react';
 import APIClient from '@/api/api_client';
-import { Title, Text, Button } from '@mantine/core';
+import { Title, Text, Button, Loader } from '@mantine/core';
 import GoHomeButton from '@/components/GoHomeButton/GoHomeButton';
 import { User } from '@/providers/AuthProvider/types';
+import { ClientError } from '@utils/.';
 import './styles.css';
 
 interface VerifyAttendanceProps {
-  id: number;
   hash: string;
 }
 
-const fetchDuration = async (id: number) => {
-  const apiClient = new APIClient().instance;
-  const res = await apiClient.get('/service/session', {
-    params: { service_session_id: id },
-  });
-  if (res.status !== 200) throw new Error('Failed to fetch session details');
+interface ErrorResponse {
+  status: 'Error';
+  message: string;
+}
 
-  const sessionDetails: {
-    service_id: number;
+interface SuccessResponse {
+  status: 'Success';
+  data: {
     start_time: string;
     end_time: string;
-    ad_hoc_enabled: boolean;
-    service_session_id: number;
     service_hours: number;
-  } = res.data;
+    name: string;
+    ad_hoc: boolean;
+  };
+}
 
-  const rounded = parseFloat(sessionDetails.service_hours.toFixed(1));
+type VerifyResponse = ErrorResponse | SuccessResponse;
 
-  return rounded;
-};
-
-const verifyAttendanceUser = async (
-  hash: string,
-): Promise<{ status: 'Success' | 'Error'; message: string }> => {
+const verifyAttendanceUser = async (hash: string): Promise<VerifyResponse> => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.post('/service/verify_attendance', {
     hash,
   });
+
   switch (res.status) {
-    case 204:
+    case 200:
       return {
         status: 'Success',
-        message: '',
+        data: res.data satisfies {
+          start_time: string;
+          end_time: string;
+          service_hours: number;
+          name: string;
+          ad_hoc: boolean;
+        },
       };
     case 400:
       return {
         status: 'Error',
-        message: 'Invalid attendance hash.',
+        message: 'Invalid attendance hash. QR code likely has expired.',
       };
     case 409:
       return {
@@ -61,6 +63,11 @@ const verifyAttendanceUser = async (
       return {
         status: 'Error',
         message: 'You must be logged in to verify attendance.',
+      };
+    case 404:
+      return {
+        status: 'Error',
+        message: 'Hash does not match any service session that you are in.',
       };
     default:
       return {
@@ -75,30 +82,46 @@ const updateServiceHours = async (newHours: number) => {
   const res = await apiClient.patch('/user/service_hours', {
     hours: newHours,
   });
-  if (res.status !== 204) throw new Error('Failed to update CCA hours');
+  if (res.status !== 204)
+    throw new ClientError({
+      message: 'Failed to update service hours',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 };
 
-const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
+const VerifyAttendance = ({ hash }: VerifyAttendanceProps) => {
   const { user, updateUser, loading } = useContext(AuthContext);
 
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'Success' | 'Error'>();
-  const [gainedHours, setGainedHours] = useState(0);
+  const [fetching, setFetching] = useState(true);
 
   const handleVerify = (user: User) => {
-    verifyAttendanceUser(hash).then(({ status, message }) => {
-      setMessage(message);
-      setStatus(status);
+    verifyAttendanceUser(hash).then((res) => {
+      // error
+      setStatus(res.status);
 
-      if (status === 'Success') {
-        fetchDuration(id).then((data) => {
-          updateUser({ ...user, service_hours: user.service_hours + data });
-          updateServiceHours(user.service_hours + data);
-
-          setGainedHours(data);
-        });
+      if (res.status === 'Error') {
+        setMessage(res.message);
+        return;
       }
+
+      // success
+      const { data } = res;
+      const message =
+        `Checked in for ${data.name} from ${new Date(data.start_time).toLocaleString(
+          'en-GB',
+        )} to ${new Date(data.end_time).toLocaleString('en-GB')}. Gained ${
+          data.service_hours
+        } CCA hours.` + (data.ad_hoc ? ' (Ad-hoc)' : '');
+
+      updateServiceHours(user.service_hours + data.service_hours);
+      updateUser({ ...user, service_hours: user.service_hours + data.service_hours });
+
+      setMessage(message);
     });
+    setFetching(false);
   };
 
   useEffect(() => {
@@ -116,13 +139,20 @@ const VerifyAttendance = ({ id, hash }: VerifyAttendanceProps) => {
     );
   }
 
+  if (fetching) {
+    return (
+      <div className='verify-attendance'>
+        <Title>Verify Attendance</Title>
+        <Loader />
+      </div>
+    );
+  }
+
   return (
     <div className='verify-attendance'>
       <Title>Verify Attendance</Title>
+
       <Text>{message}</Text>
-      {status === 'Success' && (
-        <Text>Checked in successfully. Added {gainedHours} CCA hours to your account.</Text>
-      )}
       {status === 'Success' ? (
         <GoHomeButton />
       ) : (

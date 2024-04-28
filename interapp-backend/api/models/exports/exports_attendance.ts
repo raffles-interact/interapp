@@ -1,48 +1,20 @@
-import appDataSource from '@utils/init_datasource';
-import { ServiceSession, AttendanceStatus } from '@db/entities';
-import xlsx, { WorkSheet } from 'node-xlsx';
+import {
+  AttendanceExportsResult,
+  AttendanceExportsXLSX,
+  AttendanceQueryExportsConditions,
+  ExportsModelImpl,
+  staticImplements,
+} from './types';
+import { BaseExportsModel } from './exports_base';
+import { ServiceSession, type AttendanceStatus } from '@db/entities';
 import { HTTPErrors } from '@utils/errors';
+import { WorkSheet } from 'node-xlsx';
+import appDataSource from '@utils/init_datasource';
 
-type ExportsResult = {
-  service_session_id: number;
-  start_time: string;
-  end_time: string;
-  service: {
-    name: string;
-    service_id: number;
-  };
-  service_session_users: {
-    service_session_id: number;
-    username: string;
-    ad_hoc: boolean;
-    attended: AttendanceStatus;
-    is_ic: boolean;
-  }[];
-};
-
-type ExportsXLSX = [['username', ...string[]], ...[string, ...(AttendanceStatus | null)[]][]];
-
-type QueryExportsConditions = {
-  id: number;
-} & (
-  | {
-      start_date: string; // ISO strings, we have already validated this
-      end_date: string;
-    }
-  | {
-      start_date?: never;
-      end_date?: never;
-    }
-);
-
-export class ExportsModel {
-  private static getSheetOptions = (ret: ExportsXLSX) => ({
-    '!cols': [{ wch: 24 }, ...Array(ret.length).fill({ wch: 16 })],
-  });
-  private static constructXLSX = (...data: Parameters<typeof xlsx.build>[0]) => xlsx.build(data);
-
-  public static async queryExports({ id, start_date, end_date }: QueryExportsConditions) {
-    let res: ExportsResult[];
+@staticImplements<ExportsModelImpl>()
+export class AttendanceExportsModel extends BaseExportsModel {
+  public static async queryExports({ id, start_date, end_date }: AttendanceQueryExportsConditions) {
+    let res: AttendanceExportsResult[];
     if (start_date === undefined || end_date === undefined) {
       res = await appDataSource.manager
         .createQueryBuilder()
@@ -82,16 +54,16 @@ export class ExportsModel {
     return res;
   }
 
-  public static async formatXLSX(conds: QueryExportsConditions) {
+  public static async formatXLSX(conds: AttendanceQueryExportsConditions) {
     const ret = await this.queryExports(conds);
 
     if (ret.length === 0) throw HTTPErrors.RESOURCE_NOT_FOUND;
 
     // create headers
     // start_time is in ascending order
-    const headers: ExportsXLSX[0] = (['username'] as ExportsXLSX[0]).concat(
+    const headers = (['username'] as AttendanceExportsXLSX[0]).concat(
       ret.map(({ start_time }) => start_time),
-    ) as ExportsXLSX[0];
+    ) as AttendanceExportsXLSX[0];
 
     // output needs to be in the form:
     // [username, [attendance status]]
@@ -118,15 +90,13 @@ export class ExportsModel {
       });
     });
 
-    const body: ExportsXLSX[1][] = Object.entries(usernameMap).map(([username, attendance]) => [
-      username,
-      ...attendance,
-    ]);
+    const body: AttendanceExportsXLSX[1][] = Object.entries(usernameMap).map(
+      ([username, attendance]) => [username, ...attendance],
+    );
 
-    const out: ExportsXLSX = [headers, ...body];
+    const out: AttendanceExportsXLSX = [headers, ...body];
 
     const sheetOptions = this.getSheetOptions(out);
-    console.log(sheetOptions);
 
     return { name: ret[0].service.name, data: out, options: sheetOptions };
   }

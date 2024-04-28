@@ -8,11 +8,12 @@ on:
 
 jobs:
   test-backend:
+    name: Test backend
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Build test environment
         run: docker compose -f docker-compose.test.yml build --no-cache
@@ -27,18 +28,23 @@ jobs:
       
       - name: Install dependencies
         run: cd interapp-backend && bun install
-      - name: Test with bun
+
+      - name: Lint code
+        run: cd interapp-backend && bun run lint
+      
+      - name: Run unit and api tests
         run: cd interapp-backend && bun run test
 
       - name: Tear down test environment
         run: docker compose -f docker-compose.test.yml down
   
   build-application:
+    name: Build application
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup prod environment
         run: docker compose -f docker-compose.prod.yml up -d --build

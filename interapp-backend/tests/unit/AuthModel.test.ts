@@ -12,8 +12,6 @@ const signUpUser = async (id: number, name: string) =>
 
 // these are private internal methods
 delete suite.signJWT;
-delete suite.accessSecret;
-delete suite.refreshSecret;
 
 suite.signUp = [
   {

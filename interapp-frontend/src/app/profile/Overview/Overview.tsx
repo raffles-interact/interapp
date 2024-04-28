@@ -1,9 +1,9 @@
 'use client';
 import APIClient from '@api/api_client';
 import { useState, useEffect } from 'react';
-import { User, UserWithProfilePicture, validateUserType } from '@providers/AuthProvider/types';
+import { User, validateUserType } from '@providers/AuthProvider/types';
 import { Permissions } from '../../route_permissions';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import { Text, Title, Group, Stack, Badge, ActionIcon, Paper, Button } from '@mantine/core';
 import './styles.css';
 import { permissionsMap } from '@/app/admin/AdminTable/PermissionsInput/PermissionsInput';
@@ -16,18 +16,33 @@ const fetchUserDetails = async (username: string) => {
   const apiClient = new APIClient().instance;
   const response = await apiClient.get('/user?username=' + username);
 
-  if (response.status !== 200) throw new Error('Failed to fetch user info');
+  if (response.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch user details',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
 
-  const data: UserWithProfilePicture = response.data;
+  const data: User = response.data;
 
   if (data.profile_picture) data.profile_picture = remapAssetUrl(data.profile_picture);
 
   const response2 = await apiClient.get('/user/permissions?username=' + username);
-  if (response2.status !== 200) throw new Error('Failed to fetch user permissions');
+  if (response2.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch user permissions',
+      responseStatus: response2.status,
+      responseBody: response2.data,
+    });
 
   data.permissions = response2.data[username] satisfies Permissions[];
 
-  if (!validateUserType(data)) throw new Error('Invalid user data');
+  if (!validateUserType(data))
+    throw new ClientError({
+      message: 'Invalid user data',
+      responseStatus: response.status,
+      responseBody: response.data,
+    });
   return data;
 };
 
@@ -38,7 +53,7 @@ interface OverviewProps {
 
 const Overview = ({ username, updateUser }: OverviewProps) => {
   const router = useRouter();
-  const [user, setUser] = useState<UserWithProfilePicture | null>(null);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
     fetchUserDetails(username).then((data) => {
@@ -50,8 +65,7 @@ const Overview = ({ username, updateUser }: OverviewProps) => {
     if (!user) return;
     fetchUserDetails(username).then((data) => {
       setUser(data);
-      const { profile_picture, ...rest } = data;
-      updateUser(rest);
+      updateUser(data);
       notifications.show({
         title: 'Profile updated',
         message: 'Your profile has been updated successfully.',

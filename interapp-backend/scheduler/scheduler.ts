@@ -42,13 +42,13 @@ async function scheduleSessions() {
   if (to_be_scheduled.length === 0) return;
 
   // schedule services for the week
-  let created_services: { [id: number]: Record<string, string | number | boolean | string[]> }[] =
+  const created_services: { [id: number]: Record<string, string | number | boolean | string[]> }[] =
     [];
   for (const service of to_be_scheduled) {
     // create service session
     // add service session id to created_ids
 
-    let detail = {
+    const detail = {
       service_id: service.service_id,
       start_time: constructDate(service.day_of_week, service.start_time).toISOString(),
       end_time: constructDate(service.day_of_week, service.end_time).toISOString(),
@@ -127,7 +127,7 @@ schedule('0 */1 * * * *', async () => {
     // if yes, remove it from redis
     else {
       const hash = Object.entries(hashes).find(
-        ([k, v]) => v === String(session.service_session_id),
+        ([, v]) => v === String(session.service_session_id),
       )?.[0];
 
       if (hash) toDelete.push(hash);
@@ -137,8 +137,8 @@ schedule('0 */1 * * * *', async () => {
   // this is to prevent memory leak
   // filter out all values that are not found in service_sessions
   const serviceSessionIds = new Set(service_sessions.map((s) => s.service_session_id));
-  const ghost = Object.entries(hashes).filter(([_, v]) => !serviceSessionIds.has(Number(v)));
-  toDelete.push(...ghost.map(([k, _]) => k));
+  const ghost = Object.entries(hashes).filter(([, v]) => !serviceSessionIds.has(Number(v)));
+  toDelete.push(...ghost.map(([k]) => k));
   // remove them all
   if (toDelete.length > 0) {
     const operations = toDelete.map((k) => redisClient.hDel('service_session', k));

@@ -6,7 +6,7 @@ import { notifications } from '@mantine/notifications';
 import { APIClient } from '@api/api_client';
 import { Service } from '@/app/services/types';
 import { use, useMemo, useState } from 'react';
-import { parseErrorMessage } from '@utils/.';
+import { parseServerError } from '@utils/.';
 import './styles.css';
 
 type ExportsProps = {
@@ -91,7 +91,7 @@ export function ExportsForm({ allServices }: ExportsFormProps) {
       case 400:
         notifications.show({
           title: 'Error',
-          message: parseErrorMessage(response.data),
+          message: parseServerError(response.data),
           color: 'red',
         });
         return;

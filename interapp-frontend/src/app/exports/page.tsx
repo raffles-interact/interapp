@@ -8,6 +8,7 @@ import { type Service } from '@/app/services/types';
 import { AxiosInstance } from 'axios';
 import './styles.css';
 import { ExportsForm } from './ExportsForm/ExportsForm';
+import { ClientError } from '@utils/.';
 
 const fetchServices = async (apiClient: AxiosInstance) => {
   const res = await apiClient.get('/service/all');
@@ -17,8 +18,12 @@ const fetchServices = async (apiClient: AxiosInstance) => {
     service_id: service.service_id,
   })) as Pick<Service, 'name' | 'service_id'>[];
 
-  if (res.status !== 200) throw new Error('Could not fetch services');
-
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch services',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
   return data;
 };
 

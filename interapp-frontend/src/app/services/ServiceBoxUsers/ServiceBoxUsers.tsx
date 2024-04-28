@@ -1,7 +1,7 @@
 'use client';
 import APIClient from '@api/api_client';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
-import { UserWithProfilePicture } from '@providers/AuthProvider/types';
+import { User } from '@providers/AuthProvider/types';
 import { useDisclosure } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { useState, useEffect, useContext } from 'react';
@@ -10,6 +10,7 @@ import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 
 import './styles.css';
 import { Permissions } from '@/app/route_permissions';
+import { ClientError } from '@/utils';
 
 const handleGetUsers = async (service_id: number) => {
   const apiClient = new APIClient().instance;
@@ -17,17 +18,27 @@ const handleGetUsers = async (service_id: number) => {
   const get_users_by_service = await apiClient.get(
     `/service/get_users_by_service?service_id=${service_id}`,
   );
-  const users: Omit<UserWithProfilePicture, 'permissions'>[] = get_users_by_service.data;
+  const users: Omit<User, 'permissions'>[] = get_users_by_service.data;
   let serviceUsers: string[] = [];
   if (get_users_by_service.status === 404) {
     serviceUsers = [];
   } else if (get_users_by_service.status === 200) {
     serviceUsers = users.map((user) => user.username);
-  } else throw new Error('Could not get users by service');
+  } else
+    throw new ClientError({
+      message: 'Could not get users by service',
+      responseStatus: get_users_by_service.status,
+      responseBody: get_users_by_service.data,
+    });
 
   const get_all_users = await apiClient.get('/user');
-  if (get_all_users.status !== 200) throw new Error('Could not get all users');
-  const all_users: Omit<UserWithProfilePicture, 'permissions'>[] = get_all_users.data;
+  if (get_all_users.status !== 200)
+    throw new ClientError({
+      message: 'Could not get all users',
+      responseStatus: get_all_users.status,
+      responseBody: get_all_users.data,
+    });
+  const all_users: Omit<User, 'permissions'>[] = get_all_users.data;
   const allUsernames = all_users !== undefined ? all_users.map((user) => user.username) : [];
 
   return [serviceUsers, allUsernames] as const;

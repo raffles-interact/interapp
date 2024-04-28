@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateRequiredFieldsV2, verifyJWT, verifyRequiredPermission } from '../../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../../middleware';
 import {
   AnnouncementIdFields,
   CreateAnnouncementFields,
@@ -19,7 +19,7 @@ const announcementRouter = Router();
 announcementRouter.post(
   '/',
   upload.array('attachments', 10),
-  validateRequiredFieldsV2(CreateAnnouncementFields),
+  validateRequiredFields(CreateAnnouncementFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
@@ -38,7 +38,7 @@ announcementRouter.post(
 
 announcementRouter.get(
   '/',
-  validateRequiredFieldsV2(AnnouncementIdFields),
+  validateRequiredFields(AnnouncementIdFields),
   verifyJWT,
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof AnnouncementIdFields>;
@@ -49,7 +49,7 @@ announcementRouter.get(
 
 announcementRouter.get(
   '/all',
-  validateRequiredFieldsV2(PaginationFields),
+  validateRequiredFields(PaginationFields),
   verifyJWT,
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof PaginationFields>;
@@ -64,7 +64,7 @@ announcementRouter.get(
 announcementRouter.patch(
   '/',
   upload.array('attachments', 10),
-  validateRequiredFieldsV2(UpdateAnnouncementFields),
+  validateRequiredFields(UpdateAnnouncementFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
@@ -78,7 +78,7 @@ announcementRouter.patch(
 
 announcementRouter.delete(
   '/',
-  validateRequiredFieldsV2(AnnouncementIdFields),
+  validateRequiredFields(AnnouncementIdFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
@@ -90,7 +90,7 @@ announcementRouter.delete(
 
 announcementRouter.get(
   '/completion',
-  validateRequiredFieldsV2(AnnouncementIdFields),
+  validateRequiredFields(AnnouncementIdFields),
   verifyJWT,
   async (req, res) => {
     const completions = await AnnouncementModel.getAnnouncementCompletions(
@@ -103,7 +103,7 @@ announcementRouter.get(
 
 announcementRouter.patch(
   '/completion',
-  validateRequiredFieldsV2(AnnouncementCompletionFields),
+  validateRequiredFields(AnnouncementCompletionFields),
   verifyJWT,
   async (req, res) => {
     const body: z.infer<typeof AnnouncementCompletionFields> = req.body;

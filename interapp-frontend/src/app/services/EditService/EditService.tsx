@@ -8,7 +8,7 @@ import { useForm } from '@mantine/form';
 import { TextInput, Textarea, NumberInput, Button, Group, Checkbox } from '@mantine/core';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import { daysOfWeek } from '../ServiceBox/ServiceBox';
-import { parseErrorMessage } from '@utils/.';
+import { parseServerError } from '@utils/.';
 import { TimeInput } from '@mantine/dates';
 import { useState, useContext, memo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -114,7 +114,7 @@ const EditService = ({
     if (res.status !== 200) {
       notifications.show({
         title: 'Error',
-        message: parseErrorMessage(res.data),
+        message: parseServerError(res.data),
         color: 'red',
       });
       setLoading(false);

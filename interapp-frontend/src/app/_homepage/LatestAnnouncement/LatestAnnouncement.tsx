@@ -1,7 +1,7 @@
 'use client';
 import './styles.css';
 import APIClient from '@api/api_client';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import { AnnouncementWithMeta } from '@/app/announcements/types';
 import { Card, ActionIcon, Text, Title, Image, Skeleton, Stack } from '@mantine/core';
 import { IconExternalLink, IconClock, IconUser } from '@tabler/icons-react';
@@ -12,7 +12,12 @@ const handleFetch = async () => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.get('/announcement/all', { params: { page: 1, page_size: 1 } }); // get the very latest announcement
 
-  if (res.status !== 200) throw new Error('Failed to fetch announcements');
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch announcement',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 
   // size is 1 because we only want the latest announcement
   const resData: {

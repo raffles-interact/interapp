@@ -5,7 +5,7 @@ import APIClient from '@api/api_client';
 const ServiceBox = lazy(() => import('./ServiceBox/ServiceBox'));
 import AddService from './AddService/AddService';
 import { Title, Skeleton, Text } from '@mantine/core';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import { Service } from './types';
 import './styles.css';
 
@@ -14,13 +14,14 @@ const fetchAllServices = async () => {
   try {
     const res = await apiClient.get('/service/all');
 
-    if (res.status !== 200) throw new Error(res.data);
+    if (res.status !== 200)
+      throw new ClientError({
+        message: 'Failed to fetch services',
+        responseStatus: res.status,
+        responseBody: res.data,
+      });
 
     const allServices: Service[] = res.data;
-    // promotional image url will look like this:
-    // http://interapp-minio:9000/interapp-minio/service/yes677?X-Amz-Algorithm=...
-    // we need to remove the bit before the 'service' part
-    // and remap it to localhost:3000/assets/service/yes677?....
 
     allServices.forEach((service) => {
       if (service.promotional_image) {

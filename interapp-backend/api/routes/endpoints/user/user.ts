@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { validateRequiredFieldsV2, verifyJWT, verifyRequiredPermission } from '../../middleware';
+import { validateRequiredFields, verifyJWT, verifyRequiredPermission } from '../../middleware';
 import {
   OptionalUsername,
   RequiredUsername,
@@ -20,7 +20,7 @@ import { Permissions } from '@utils/permissions';
 
 const userRouter = Router();
 
-userRouter.get('/', validateRequiredFieldsV2(OptionalUsername), verifyJWT, async (req, res) => {
+userRouter.get('/', validateRequiredFields(OptionalUsername), verifyJWT, async (req, res) => {
   const query: z.infer<typeof OptionalUsername> = req.query;
   const username = query.username;
 
@@ -55,7 +55,7 @@ userRouter.get('/', validateRequiredFieldsV2(OptionalUsername), verifyJWT, async
 
 userRouter.delete(
   '/',
-  validateRequiredFieldsV2(RequiredUsername),
+  validateRequiredFields(RequiredUsername),
   verifyJWT,
   verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
@@ -67,7 +67,7 @@ userRouter.delete(
 
 userRouter.patch(
   '/password/change',
-  validateRequiredFieldsV2(ChangePasswordFields),
+  validateRequiredFields(ChangePasswordFields),
   verifyJWT,
   async (req, res) => {
     const body: z.infer<typeof ChangePasswordFields> = req.body;
@@ -82,7 +82,7 @@ userRouter.patch(
 
 userRouter.post(
   '/password/reset_email',
-  validateRequiredFieldsV2(RequiredUsername),
+  validateRequiredFields(RequiredUsername),
   async (req, res) => {
     const body: z.infer<typeof RequiredUsername> = req.body;
     await UserModel.sendResetPasswordEmail(body.username);
@@ -90,7 +90,7 @@ userRouter.post(
   },
 );
 
-userRouter.patch('/password/reset', validateRequiredFieldsV2(TokenFields), async (req, res) => {
+userRouter.patch('/password/reset', validateRequiredFields(TokenFields), async (req, res) => {
   const body: z.infer<typeof TokenFields> = req.body;
   const newPw = await UserModel.resetPassword(body.token);
   res.clearCookie('refresh', { path: '/api/auth/refresh' });
@@ -101,7 +101,7 @@ userRouter.patch('/password/reset', validateRequiredFieldsV2(TokenFields), async
 
 userRouter.patch(
   '/change_email',
-  validateRequiredFieldsV2(ChangeEmailFields),
+  validateRequiredFields(ChangeEmailFields),
   verifyJWT,
   async (req, res) => {
     const body: z.infer<typeof ChangeEmailFields> = req.body;
@@ -129,7 +129,7 @@ userRouter.post('/verify_email', verifyJWT, async (req, res) => {
   res.status(204).send();
 });
 
-userRouter.patch('/verify', validateRequiredFieldsV2(TokenFields), verifyJWT, async (req, res) => {
+userRouter.patch('/verify', validateRequiredFields(TokenFields), verifyJWT, async (req, res) => {
   const body: z.infer<typeof TokenFields> = req.body;
   await UserModel.verifyEmail(body.token);
   res.status(204).send();
@@ -137,7 +137,7 @@ userRouter.patch('/verify', validateRequiredFieldsV2(TokenFields), verifyJWT, as
 
 userRouter.patch(
   '/permissions',
-  validateRequiredFieldsV2(PermissionsFields),
+  validateRequiredFields(PermissionsFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
@@ -150,7 +150,7 @@ userRouter.patch(
 
 userRouter.get(
   '/permissions',
-  validateRequiredFieldsV2(OptionalUsername),
+  validateRequiredFields(OptionalUsername),
   verifyJWT,
   async (req, res) => {
     const query: z.infer<typeof OptionalUsername> = req.query;
@@ -163,7 +163,7 @@ userRouter.get(
 userRouter.get(
   '/userservices',
   verifyJWT,
-  validateRequiredFieldsV2(RequiredUsername),
+  validateRequiredFields(RequiredUsername),
   async (req, res) => {
     const query = req.query as unknown as z.infer<typeof RequiredUsername>;
     const services = await UserModel.getAllServicesByUser(query.username as string);
@@ -175,7 +175,7 @@ userRouter.post(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFieldsV2(ServiceIdFieldsNumeric),
+  validateRequiredFields(ServiceIdFieldsNumeric),
   async (req, res) => {
     const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
     await UserModel.addServiceUser(body.service_id, body.username);
@@ -187,7 +187,7 @@ userRouter.delete(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFieldsV2(ServiceIdFieldsNumeric),
+  validateRequiredFields(ServiceIdFieldsNumeric),
   async (req, res) => {
     const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
     await UserModel.removeServiceUser(body.service_id, body.username);
@@ -199,7 +199,7 @@ userRouter.patch(
   '/userservices',
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
-  validateRequiredFieldsV2(UpdateUserServicesFields),
+  validateRequiredFields(UpdateUserServicesFields),
   async (req, res) => {
     const body: z.infer<typeof UpdateUserServicesFields> = req.body;
 
@@ -211,7 +211,7 @@ userRouter.patch(
 userRouter.patch(
   '/service_hours',
   verifyJWT,
-  validateRequiredFieldsV2(ServiceHoursFields),
+  validateRequiredFields(ServiceHoursFields),
   async (req, res) => {
     const body: z.infer<typeof ServiceHoursFields> = req.body;
     if (body.username) {
@@ -236,7 +236,7 @@ userRouter.patch(
 
 userRouter.patch(
   '/service_hours_bulk',
-  validateRequiredFieldsV2(ServiceHoursBulkFields),
+  validateRequiredFields(ServiceHoursBulkFields),
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
@@ -249,11 +249,14 @@ userRouter.patch(
 userRouter.patch(
   '/profile_picture',
   verifyJWT,
-  validateRequiredFieldsV2(ProfilePictureFields),
+  validateRequiredFields(ProfilePictureFields),
   async (req, res) => {
     const body: z.infer<typeof ProfilePictureFields> = req.body;
-    await UserModel.updateProfilePicture(req.headers.username as string, body.profile_picture);
-    res.status(204).send();
+    const presigned = await UserModel.updateProfilePicture(
+      req.headers.username as string,
+      body.profile_picture,
+    );
+    res.status(200).send(presigned);
   },
 );
 

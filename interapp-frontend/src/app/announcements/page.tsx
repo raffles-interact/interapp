@@ -5,7 +5,7 @@ import PageController from '@components/PageController/PageController';
 import { AnnouncementWithMeta } from './types';
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { remapAssetUrl } from '@utils/.';
+import { ClientError, remapAssetUrl } from '@utils/.';
 import { Title, Text, Group, ActionIcon } from '@mantine/core';
 import { useDebouncedState } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,12 @@ import { Permissions } from '../route_permissions';
 const handleFetch = async (page: number) => {
   const apiClient = new APIClient().instance;
   const res = await apiClient.get('/announcement/all', { params: { page: page, page_size: 8 } });
-  if (res.status !== 200) throw new Error('Failed to fetch announcements');
+  if (res.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch announcements',
+      responseStatus: res.status,
+      responseBody: res.data,
+    });
 
   const resData: {
     data: AnnouncementWithMeta[];
