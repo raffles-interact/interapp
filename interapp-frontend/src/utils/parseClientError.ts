@@ -15,7 +15,7 @@ export class ClientError extends Error {
     responseStatus,
   }: Pick<ClientErrorParams, 'responseBody' | 'responseStatus'>): string {
     if (!responseStatus && !responseBody) return '';
-    
+
     return `Response status: ${responseStatus}\nResponse body: \n${JSON.stringify(
       responseBody,
       null,
