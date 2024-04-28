@@ -2,10 +2,13 @@ import { Transporter, createTransport } from 'nodemailer';
 import aws, { SES } from '@aws-sdk/client-ses';
 import hbs from 'nodemailer-express-handlebars';
 
-
 // verify env integrity
 if (process.env.NODE_ENV === 'production') {
-  if (!process.env.SES_ACCESS_KEY_ID || !process.env.SES_SECRET_ACCESS_KEY || !process.env.EMAIL_USER) {
+  if (
+    !process.env.SES_ACCESS_KEY_ID ||
+    !process.env.SES_SECRET_ACCESS_KEY ||
+    !process.env.EMAIL_USER
+  ) {
     console.error('Missing SES_ACCESS_KEY_ID or SES_SECRET_ACCESS_KEY');
     process.exit(1);
   }
