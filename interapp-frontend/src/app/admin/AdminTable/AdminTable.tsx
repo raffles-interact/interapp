@@ -10,14 +10,32 @@ import DeleteAction from './DeleteAction/DeleteAction';
 import PageController, { paginateItems } from '@components/PageController/PageController';
 import { IconSearch } from '@tabler/icons-react';
 import './styles.css';
-import PageSkeleton from '@/components/PageSkeleton/PageSkeleton';
+import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
+import { ClientError } from '@utils/.';
 
 const fetchUserData = async () => {
   const apiClient = new APIClient().instance;
 
-  const users: Omit<User, 'permissions'>[] = (await apiClient.get('/user')).data;
-  const perms: { [username: string]: Permissions[] } = (await apiClient.get('/user/permissions'))
-    .data;
+  const usersResponse = await apiClient.get('/user');
+  if (usersResponse.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch users',
+      responseStatus: usersResponse.status,
+      responseBody: usersResponse.data,
+    });
+
+  const users: Omit<User, 'permissions'>[] = usersResponse.data;
+
+  const permsResponse = await apiClient.get('/user/permissions');
+  if (permsResponse.status !== 200)
+    throw new ClientError({
+      message: 'Failed to fetch permissions',
+      responseStatus: permsResponse.status,
+      responseBody: permsResponse.data,
+    });
+
+  const perms: { [username: string]: Permissions[] } = permsResponse.data;
+
   const usersWithPerms = users.map((user) => ({ ...user, permissions: perms[user.username] }));
   return usersWithPerms;
 };
