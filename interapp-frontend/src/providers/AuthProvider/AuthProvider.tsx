@@ -118,9 +118,14 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             logout();
             return;
           }
+          const data = res.data as Omit<UserWithJWT, 'user'>;
           localStorage.setItem(
             'access_token',
-            (res.data as Omit<UserWithJWT, 'user'>).access_token,
+            data.access_token,
+          );
+          localStorage.setItem(
+            'access_token_expire',
+            data.expire.toString(),
           );
         })
         .catch(logout);
