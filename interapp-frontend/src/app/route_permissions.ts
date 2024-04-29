@@ -33,3 +33,7 @@ export const routePermissions = {
   [Permissions.ATTENDANCE_MANAGER]: ['/exports'],
   [Permissions.ADMIN]: ['/admin'],
 } as const;
+
+export const allRoutes = new Set<string>(
+  (Object.values(routePermissions).flat() as string[]).concat(noLoginRequiredRoutes),
+);
