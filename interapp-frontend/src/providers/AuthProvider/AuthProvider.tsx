@@ -10,9 +10,9 @@ import {
 } from './types';
 import APIClient from '@api/api_client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { routePermissions, noLoginRequiredRoutes } from '@/app/route_permissions';
+import { routePermissions, noLoginRequiredRoutes, allRoutes } from '@/app/route_permissions';
 import { notifications } from '@mantine/notifications';
-import { ClientError, remapAssetUrl, wildcardMatcher } from '@utils/.';
+import { remapAssetUrl, wildcardMatcher } from '@utils/.';
 
 export const AuthContext = createContext<AuthContextType>({
   user: null,
@@ -22,6 +22,22 @@ export const AuthContext = createContext<AuthContextType>({
   updateUser: () => {},
   registerUserAccount: async () => 0,
 });
+
+const authCheckErrors = {
+  INVALID_USER_TYPE: 'Invalid user type in local storage',
+  NOT_AUTHORISED: 'You must be logged in to access this page',
+  NO_PERMISSION: 'You do not have permission to access this page',
+  ALREADY_LOGGED_IN: 'You are already logged in. Redirecting to home page.',
+} as const;
+
+const showNotification = (title: keyof typeof authCheckErrors) => {
+  notifications.show({
+    // CAPS_CASE to Title Case
+    title: title.toLowerCase().replace(/_/g, ' ').replace(/(^\w|\s\w)/g, m => m.toUpperCase()),
+    message: authCheckErrors[title],
+    color: 'red',
+  });
+};
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
@@ -55,27 +71,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     const validUser = validateUserType(user);
     if (!validUser) {
       logout();
-      notifications.show({
-        title: 'Error',
-        message: 'Invalid user type in local storage',
-        color: 'red',
-      });
-      /*
-      throw new ClientError({
-        message: 'Invalid user type in local storage' + JSON.stringify(user),
-      });
-      */
+      showNotification('INVALID_USER_TYPE');
     }
 
+    const disallowedRoutes = Array.from(allRoutes).filter((route) => !allowedRoutes.includes(route));
+
+    // check if the current route is allowed
     if (allowedRoutes.some((route) => memoWildcardMatcher(pathname, route))) {
       return;
     }
+    // if the current route is not allowed, check if the user is logged in
     if (!user) {
-      notifications.show({
-        title: 'Error',
-        message: 'You must be logged in to access this page',
-        color: 'red',
-      });
+      showNotification('NOT_AUTHORISED');
       // convert search params to an object and then to a query string
       const constructedSearchParams = Object.entries(Object.fromEntries(params))
         .map(([key, value]) => `${key}=${value}`)
@@ -85,21 +92,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       return;
     }
+    // if the user is logged in and tries to access the login or signup page
     if (user && (pathname === '/auth/login' || pathname === '/auth/signup')) {
-      notifications.show({
-        title: 'Info',
-        message: 'You are already logged in. Redirecting to home page.',
-        color: 'red',
-      });
+      showNotification('ALREADY_LOGGED_IN');
       router.replace('/');
       return;
     }
-    notifications.show({
-      title: 'Error',
-      message: 'You do not have permission to access this page',
-      color: 'red',
-    });
-    router.replace('/');
+    // if the user is logged in but does not have permission to access the current route
+    if (disallowedRoutes.some((route) => memoWildcardMatcher(pathname, route))) {
+      showNotification('NO_PERMISSION');
+      router.replace('/');
+    }
+
   }, [user, loading]);
 
   useEffect(() => {
