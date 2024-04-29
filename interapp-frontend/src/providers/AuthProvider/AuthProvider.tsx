@@ -33,7 +33,10 @@ const authCheckErrors = {
 const showNotification = (title: keyof typeof authCheckErrors) => {
   notifications.show({
     // CAPS_CASE to Title Case
-    title: title.toLowerCase().replace(/_/g, ' ').replace(/(^\w|\s\w)/g, m => m.toUpperCase()),
+    title: title
+      .toLowerCase()
+      .replace(/_/g, ' ')
+      .replace(/(^\w|\s\w)/g, (m) => m.toUpperCase()),
     message: authCheckErrors[title],
     color: 'red',
   });
@@ -74,7 +77,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       showNotification('INVALID_USER_TYPE');
     }
 
-    const disallowedRoutes = Array.from(allRoutes).filter((route) => !allowedRoutes.includes(route));
+    const disallowedRoutes = Array.from(allRoutes).filter(
+      (route) => !allowedRoutes.includes(route),
+    );
 
     // check if the current route is allowed
     if (allowedRoutes.some((route) => memoWildcardMatcher(pathname, route))) {
@@ -103,7 +108,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       showNotification('NO_PERMISSION');
       router.replace('/');
     }
-
   }, [user, loading]);
 
   useEffect(() => {
@@ -123,14 +127,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
             return;
           }
           const data = res.data as Omit<UserWithJWT, 'user'>;
-          localStorage.setItem(
-            'access_token',
-            data.access_token,
-          );
-          localStorage.setItem(
-            'access_token_expire',
-            data.expire.toString(),
-          );
+          localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('access_token_expire', data.expire.toString());
         })
         .catch(logout);
     }
