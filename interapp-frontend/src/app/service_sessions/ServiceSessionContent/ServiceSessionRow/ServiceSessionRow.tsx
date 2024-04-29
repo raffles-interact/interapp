@@ -38,14 +38,8 @@ const ServiceSessionRow = ({
       <Table.Td>{service_name}</Table.Td>
 
       <Table.Td>
-        <Text size='sm'>
-          Start: {new Date(start_time).toLocaleString('en-GB')} 
-          
-        </Text>
-        <Text size='sm'>
-          End: {new Date(end_time).toLocaleString('en-GB')}
-        </Text>
-        
+        <Text size='sm'>Start: {new Date(start_time).toLocaleString('en-GB')}</Text>
+        <Text size='sm'>End: {new Date(end_time).toLocaleString('en-GB')}</Text>
       </Table.Td>
 
       <Table.Td>{ad_hoc_enabled ? <Text c='green'>Yes</Text> : <Text c='red'>No</Text>}</Table.Td>
