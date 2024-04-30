@@ -172,25 +172,32 @@ const envVars = {
   MINIO_ROOT_PASSWORD: process.env.MINIO_ROOT_PASSWORD,
   MINIO_BUCKETNAME: process.env.MINIO_BUCKETNAME,
 };
-const missingEnv = Object.entries(envVars).filter(([, value]) => !value).map(([key]) => key);
+const missingEnv = Object.entries(envVars)
+  .filter(([, value]) => !value)
+  .map(([key]) => key);
 if (missingEnv.length > 0) {
   throw new Error(`Missing required environment variables: ${missingEnv.join(', ')}`);
 }
-const { MINIO_ENDPOINT, MINIO_ADDRESS, MINIO_ROOT_USER, MINIO_ROOT_PASSWORD, MINIO_BUCKETNAME } = envVars;
+const { MINIO_ENDPOINT, MINIO_ADDRESS, MINIO_ROOT_USER, MINIO_ROOT_PASSWORD, MINIO_BUCKETNAME } =
+  envVars;
 const minioURL = `http://${MINIO_ENDPOINT}${MINIO_ADDRESS}`;
 const minioAccessKey = MINIO_ROOT_USER;
 const minioSecretKey = MINIO_ROOT_PASSWORD;
 const minioBucketName = MINIO_BUCKETNAME;
 const minioAliasName = 'minio';
-const minioBackupTask = schedule('0 0 0 */1 * *', async () => {
-  const path = '/tmp/minio-dump';
-  if (!existsSync(path)) mkdirSync(path);
-  const d = new Date();
-  const fmted = `interapp_minio_${d.toLocaleDateString('en-GB').replace(/\//g, '_')}`;
-  const newFile = `${path}/${fmted}.tar.gz`;
-  await $`mc mirror ${minioAliasName}/${minioBucketName} /tmp/minio-dump/temp`;
-  await $`cd /tmp && tar -cvf ${newFile} minio-dump/temp`;
-  await $`rm -rf /tmp/minio-dump/temp`;
-}, { scheduled: false });
+const minioBackupTask = schedule(
+  '0 0 0 */1 * *',
+  async () => {
+    const path = '/tmp/minio-dump';
+    if (!existsSync(path)) mkdirSync(path);
+    const d = new Date();
+    const fmted = `interapp_minio_${d.toLocaleDateString('en-GB').replace(/\//g, '_')}`;
+    const newFile = `${path}/${fmted}.tar.gz`;
+    await $`mc mirror ${minioAliasName}/${minioBucketName} /tmp/minio-dump/temp`;
+    await $`cd /tmp && tar -cvf ${newFile} minio-dump/temp`;
+    await $`rm -rf /tmp/minio-dump/temp`;
+  },
+  { scheduled: false },
+);
 await $`mc alias set ${minioAliasName} ${minioURL} ${minioAccessKey} ${minioSecretKey}`;
 minioBackupTask.start();
