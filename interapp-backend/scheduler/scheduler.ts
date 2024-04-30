@@ -200,8 +200,6 @@ const minioBackupTask = schedule(
     await $`mc mirror ${minioAliasName}/${minioBucketName} /tmp/minio-dump/temp`;
     await $`cd /tmp && tar -cvf ${newFile} minio-dump/temp`;
     await $`rm -rf /tmp/minio-dump/temp`;
-
-    
   },
   { scheduled: false },
 );
