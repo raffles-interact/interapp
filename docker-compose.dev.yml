@@ -64,6 +64,9 @@ services:
       - type: bind
         source: ./dump
         target: /tmp/dump
+      - type: bind
+        source: ./minio-dump
+        target: /tmp/minio-dump
 
   minio:
     container_name: interapp-minio
