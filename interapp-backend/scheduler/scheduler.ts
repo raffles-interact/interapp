@@ -155,7 +155,7 @@ schedule('0 0 0 */1 * *', async () => {
   await $`find ${path} -type f -mtime +7 -exec rm {} +`;
 
   const d = new Date();
-  const fmted = `interapp_${d.toLocaleDateString('en-GB').replace(/\//g, '_')}`;
+  const fmted = `interapp_db_${d.toLocaleDateString('en-GB').replace(/\//g, '_')}`;
 
   const newFile = `${path}/${fmted}.sql`;
   await $`touch ${newFile}`;
@@ -163,3 +163,47 @@ schedule('0 0 0 */1 * *', async () => {
 
   console.info('db snapshot taken at location: ', newFile);
 });
+
+// Minio backup task
+const requiredEnv = [
+  'MINIO_ENDPOINT',
+  'MINIO_ADDRESS',
+  'MINIO_ROOT_USER',
+  'MINIO_ROOT_PASSWORD',
+  'MINIO_BUCKETNAME',
+];
+const missingEnv = requiredEnv.filter((env) => !process.env[env]);
+if (missingEnv.length > 0) {
+  console.error('Missing required environment variables: ', missingEnv);
+  process.exit(1);
+}
+
+// define minio variables
+const minioURL = `http://${process.env.MINIO_ENDPOINT}${process.env.MINIO_ADDRESS}`;
+const minioAccessKey = process.env.MINIO_ROOT_USER as string;
+const minioSecretKey = process.env.MINIO_ROOT_PASSWORD as string;
+const minioBucketName = process.env.MINIO_BUCKETNAME as string;
+const minioAliasName = 'minio';
+
+const minioBackupTask = schedule(
+  '0 0 0 */1 * *',
+  async () => {
+    const path = '/tmp/minio-dump';
+    if (!existsSync(path)) mkdirSync(path);
+    // remove all files older than 7 days
+    await $`find ${path} -type f -mtime +7 -exec rm {} +`;
+
+    const d = new Date();
+    const fmted = `interapp_minio_${d.toLocaleDateString('en-GB').replace(/\//g, '_')}`;
+    const newFile = `${path}/${fmted}.tar.gz`;
+
+    await $`mc mirror ${minioAliasName}/${minioBucketName} /tmp/minio-dump/temp`;
+    await $`cd /tmp && tar -cvf ${newFile} minio-dump/temp`;
+    await $`rm -rf /tmp/minio-dump/temp`;
+  },
+  { scheduled: false },
+);
+
+// set minio alias to allow mc to access minio server
+await $`mc alias set ${minioAliasName} ${minioURL} ${minioAccessKey} ${minioSecretKey}`;
+minioBackupTask.start();

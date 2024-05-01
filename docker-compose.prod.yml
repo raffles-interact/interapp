@@ -42,7 +42,7 @@ services:
       context: ./interapp-backend
       dockerfile: scheduler/prod.Dockerfile
     env_file:
-      - ./interapp-backend/.env.development
+      - ./interapp-backend/.env.production
     networks:
       - interapp-network
     depends_on:
@@ -52,6 +52,7 @@ services:
         condition: service_healthy
     volumes:
         - ./dump:/tmp/dump
+        - ./minio-dump:/tmp/minio-dump
 
   minio:
     container_name: interapp-minio
