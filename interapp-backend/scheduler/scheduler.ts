@@ -185,7 +185,6 @@ const minioSecretKey = process.env.MINIO_ROOT_PASSWORD as string;
 const minioBucketName = process.env.MINIO_BUCKETNAME as string;
 const minioAliasName = 'minio';
 
-
 const minioBackupTask = schedule(
   '0 0 0 */1 * *',
   async () => {
@@ -197,7 +196,7 @@ const minioBackupTask = schedule(
     const d = new Date();
     const fmted = `interapp_minio_${d.toLocaleDateString('en-GB').replace(/\//g, '_')}`;
     const newFile = `${path}/${fmted}.tar.gz`;
-    
+
     await $`mc mirror ${minioAliasName}/${minioBucketName} /tmp/minio-dump/temp`;
     await $`cd /tmp && tar -cvf ${newFile} minio-dump/temp`;
     await $`rm -rf /tmp/minio-dump/temp`;
