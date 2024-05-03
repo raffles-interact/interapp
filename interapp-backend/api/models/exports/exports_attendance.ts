@@ -8,7 +8,7 @@ import {
 import { BaseExportsModel } from './exports_base';
 import { ServiceSession, type AttendanceStatus } from '@db/entities';
 import { HTTPErrors } from '@utils/errors';
-import { WorkSheet } from 'node-xlsx';
+import { type WorkSheet } from 'node-xlsx';
 import appDataSource from '@utils/init_datasource';
 
 @staticImplements<ExportsModelImpl>()
