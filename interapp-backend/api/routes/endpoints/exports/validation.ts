@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const ExportsFields = z
+export const AttendanceExportsFields = z
   .object({
     id: z.array(z.coerce.number()).or(z.coerce.number()),
     start_date: z.string().optional(),
@@ -52,3 +52,10 @@ export const ExportsFields = z
     ...data,
     id: Array.isArray(data.id) ? data.id : [data.id],
   }));
+
+export const ServiceHoursExportsFields = z
+  .object({
+    type: z.enum(['user_id', 'username', 'service_hours']),
+    order: z.enum(['ASC', 'DESC']),
+  })
+  .transform((data) => data);
