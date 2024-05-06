@@ -146,9 +146,11 @@ export function ServiceHoursExportsForm() {
   };
 
   return (
-    <ExportsCard title='Export Service Hours' description='Export a list of service hours of each user, sorted by the filters below.'>
+    <ExportsCard
+      title='Export Service Hours'
+      description='Export a list of service hours of each user, sorted by the filters below.'
+    >
       <form onSubmit={form.onSubmit(handleSubmit)} className='exports-form'>
-        
         <Group justify='center' grow>
           <Select
             label='Type'
