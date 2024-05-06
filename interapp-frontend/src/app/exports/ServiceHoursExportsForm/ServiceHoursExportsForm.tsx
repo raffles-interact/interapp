@@ -1,8 +1,7 @@
 'use client';
-import { ExportsCard, downloadFile, type DownloadFileHeaders } from '../ExportsCard/ExportsCard';
+import { ExportsCard, downloadFile, generateErrorFromResponse, type DownloadFileHeaders } from '../ExportsCard/ExportsCard';
 import { Select, Button, Group } from '@mantine/core';
 import { APIClient } from '@api/api_client';
-import { parseServerError } from '@utils/parseServerError';
 import { useForm } from '@mantine/form';
 import { AxiosInstance } from 'axios';
 import { notifications } from '@mantine/notifications';
@@ -96,44 +95,10 @@ export function ServiceHoursExportsForm() {
     });
     setLoading(false);
 
-    switch (response.status) {
-      case 200:
-        break;
-      case 400:
-        notifications.show({
-          title: 'Error',
-          message: parseServerError(response.data),
-          color: 'red',
-        });
-        return;
-      case 401:
-        notifications.show({
-          title: 'Error',
-          message: 'Unauthorized',
-          color: 'red',
-        });
-        return;
-      case 403:
-        notifications.show({
-          title: 'Error',
-          message: 'Forbidden',
-          color: 'red',
-        });
-        return;
-      case 404:
-        notifications.show({
-          title: 'Error',
-          message: 'Sessions between the selected dates are not found',
-          color: 'red',
-        });
-        return;
-      default:
-        notifications.show({
-          title: 'Error',
-          message: 'Unknown error',
-          color: 'red',
-        });
-        return;
+    const error = generateErrorFromResponse(response);
+    if (error) {
+      notifications.show(error);
+      return;
     }
 
     downloadFile(response.data as ArrayBuffer, response.headers as DownloadFileHeaders);
