@@ -6,7 +6,12 @@ import { notifications } from '@mantine/notifications';
 import { APIClient } from '@api/api_client';
 import { Service } from '@/app/services/types';
 import { use, useMemo, useState } from 'react';
-import { ExportsCard, downloadFile, generateErrorFromResponse, type DownloadFileHeaders } from '../ExportsCard/ExportsCard';
+import {
+  ExportsCard,
+  downloadFile,
+  generateErrorFromResponse,
+  type DownloadFileHeaders,
+} from '../ExportsCard/ExportsCard';
 
 type AttendanceExportsProps = {
   names: string[];
