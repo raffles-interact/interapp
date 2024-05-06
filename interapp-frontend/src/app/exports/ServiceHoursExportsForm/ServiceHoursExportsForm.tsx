@@ -25,29 +25,6 @@ interface UserFriendlyServiceExportsProps {
 const types = ['User ID', 'Username', 'CCA Hours'] as const;
 const orders = ['Ascending', 'Descending'] as const;
 
-const test = async (apiClient: AxiosInstance) => {
-  const response = await apiClient.get('/exports/service_hours', {
-    params: {
-      type: 'username',
-      order: 'ASC',
-    },
-    responseType: 'arraybuffer',
-  });
-  console.log(response.data);
-  const responseData = response.data as ArrayBuffer;
-  const blob = new Blob([responseData], { type: response.headers['content-type'] });
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = response.headers['content-disposition'].split('=')[1];
-  a.click();
-  a.remove();
-
-  URL.revokeObjectURL(url);
-  console.log(a.href);
-};
-
 const normaliseServiceExportsProps = (
   props: UserFriendlyServiceExportsProps,
 ): ServiceExportsProps => {
