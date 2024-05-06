@@ -1,6 +1,7 @@
-import { Card, Stack } from '@mantine/core';
+import { Card, Stack, Title, Text } from '@mantine/core';
 import { AxiosResponseHeaders } from 'axios';
 import { type ReactNode } from 'react';
+import './styles.css';
 
 export interface DownloadFileHeaders extends AxiosResponseHeaders {
   'content-type': string;
@@ -20,10 +21,21 @@ export function downloadFile(data: ArrayBuffer, headers: DownloadFileHeaders) {
   URL.revokeObjectURL(url);
 }
 
-export function ExportsCard({ children }: { children: ReactNode }) {
+interface ExportsCardProps {
+  children: ReactNode;
+  title: string;
+  description: string;
+}
+
+export function ExportsCard({ children, title, description }: ExportsCardProps) {
   return (
-    <Card shadow='sm' padding='lg' radius='md' withBorder>
-      <Stack gap='sm'>{children}</Stack>
+    <Card shadow='sm' padding='lg' radius='md' withBorder className='exports-card'>
+      <Stack gap='sm'>
+        <Title order={4}>{title}</Title>
+        <Text size='sm'>{description}</Text>
+
+        {children}
+      </Stack>
     </Card>
   );
 }

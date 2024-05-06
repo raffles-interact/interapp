@@ -1,9 +1,12 @@
 'use client';
 import { ExportsCard, downloadFile, type DownloadFileHeaders } from '../ExportsCard/ExportsCard';
-import { Select, Button, Group, Text } from '@mantine/core';
+import { Select, Button, Group } from '@mantine/core';
+import { APIClient } from '@api/api_client';
+import { parseServerError } from '@utils/parseServerError';
 import { useForm } from '@mantine/form';
 import { AxiosInstance } from 'axios';
 import { notifications } from '@mantine/notifications';
+import { useState } from 'react';
 
 interface ServiceExportsProps {
   type: 'user_id' | 'username' | 'service_hours';
@@ -75,6 +78,7 @@ const initialType = types[0];
 const initialOrder = orders[0];
 
 export function ServiceHoursExportsForm() {
+  const [loading, setLoading] = useState(false);
   const form = useForm<UserFriendlyServiceExportsProps>({
     initialValues: {
       type: initialType,
@@ -83,14 +87,69 @@ export function ServiceHoursExportsForm() {
   });
 
   const handleSubmit = async (values: UserFriendlyServiceExportsProps) => {
-    console.log(values);
+    const transformed = normaliseServiceExportsProps(values);
+    const apiClient = new APIClient().instance;
+    setLoading(true);
+    const response = await apiClient.get('/exports/service_hours', {
+      params: transformed,
+      responseType: 'arraybuffer',
+    });
+    setLoading(false);
+
+    switch (response.status) {
+      case 200:
+        break;
+      case 400:
+        notifications.show({
+          title: 'Error',
+          message: parseServerError(response.data),
+          color: 'red',
+        });
+        return;
+      case 401:
+        notifications.show({
+          title: 'Error',
+          message: 'Unauthorized',
+          color: 'red',
+        });
+        return;
+      case 403:
+        notifications.show({
+          title: 'Error',
+          message: 'Forbidden',
+          color: 'red',
+        });
+        return;
+      case 404:
+        notifications.show({
+          title: 'Error',
+          message: 'Sessions between the selected dates are not found',
+          color: 'red',
+        });
+        return;
+      default:
+        notifications.show({
+          title: 'Error',
+          message: 'Unknown error',
+          color: 'red',
+        });
+        return;
+    }
+
+    downloadFile(response.data as ArrayBuffer, response.headers as DownloadFileHeaders);
+
+    notifications.show({
+      title: 'Success',
+      message: 'Export has been created',
+      color: 'green',
+    });
   };
 
   return (
-    <ExportsCard>
-      <form onSubmit={form.onSubmit(handleSubmit)}>
-        <Group justify='center'>
-          <Text>Sort users by...</Text>
+    <ExportsCard title='Export Service Hours' description='Export a list of service hours of each user, sorted by the filters below.'>
+      <form onSubmit={form.onSubmit(handleSubmit)} className='exports-form'>
+        
+        <Group justify='center' grow>
           <Select
             label='Type'
             defaultValue={initialType}
@@ -108,7 +167,9 @@ export function ServiceHoursExportsForm() {
             {...form.getInputProps('order')}
           />
         </Group>
-        <Button type='submit'>Export</Button>
+        <Button type='submit' variant='outline' color='green' loading={loading}>
+          Export
+        </Button>
       </form>
     </ExportsCard>
   );
