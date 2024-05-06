@@ -1,3 +1,13 @@
 .exports-page {
   margin: 1rem;
 }
+
+.exports-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.exports-cards {
+  padding: 1rem;
+}

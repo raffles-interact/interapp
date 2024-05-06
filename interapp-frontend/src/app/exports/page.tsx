@@ -36,7 +36,7 @@ export default function Exports() {
     <div className='exports-page'>
       <Title order={1}>Exports</Title>
       <Text>Export data as an Excel sheet here.</Text>
-      <Group justify='center'>
+      <Group justify='center' className='exports-cards'>
         <AttendanceExportsForm allServices={services} />
         <ServiceHoursExportsForm />
       </Group>

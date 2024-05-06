@@ -135,7 +135,10 @@ export function AttendanceExportsForm({ allServices }: AttendanceExportsFormProp
   };
 
   return (
-    <ExportsCard>
+    <ExportsCard
+      title='Export Attendance'
+      description='Export attendance of users by service. Output will include which session each user has attended for each service.'
+    >
       <form onSubmit={form.onSubmit(handleSubmit)} className='exports-form'>
         <TagsInput
           label='Services'
@@ -161,7 +164,7 @@ export function AttendanceExportsForm({ allServices }: AttendanceExportsFormProp
         )}
 
         <Button type='submit' variant='outline' color='green' loading={loading}>
-          Export Data
+          Export
         </Button>
       </form>
     </ExportsCard>
