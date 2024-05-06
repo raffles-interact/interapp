@@ -7,18 +7,18 @@ import { APIClient } from '@api/api_client';
 import { Service } from '@/app/services/types';
 import { use, useMemo, useState } from 'react';
 import { parseServerError } from '@utils/.';
-import './styles.css';
+import { ExportsCard, downloadFile, type DownloadFileHeaders } from '../ExportsCard/ExportsCard';
 
-type ExportsProps = {
+type AttendanceExportsProps = {
   names: string[];
   range: [Date | null, Date | null];
 };
 
-interface ExportsFormProps {
+interface AttendanceExportsFormProps {
   allServices: Promise<Pick<Service, 'name' | 'service_id'>[]>;
 }
 
-export function ExportsForm({ allServices }: ExportsFormProps) {
+export function AttendanceExportsForm({ allServices }: AttendanceExportsFormProps) {
   const [enabledDateSelection, setEnabledDateSelection] = useState(false);
   const [loading, setLoading] = useState(false);
   const services = use(allServices);
@@ -35,7 +35,7 @@ export function ExportsForm({ allServices }: ExportsFormProps) {
     [services],
   );
 
-  const form = useForm<ExportsProps>({
+  const form = useForm<AttendanceExportsProps>({
     initialValues: {
       names: [],
       range: [null, null],
@@ -70,7 +70,7 @@ export function ExportsForm({ allServices }: ExportsFormProps) {
     },
   });
 
-  const handleSubmit = async (values: ExportsProps) => {
+  const handleSubmit = async (values: AttendanceExportsProps) => {
     const transformedValues = {
       id: values.names.map((name) => serviceData[name]),
       start_date: values.range[0]?.toISOString(),
@@ -125,17 +125,7 @@ export function ExportsForm({ allServices }: ExportsFormProps) {
         return;
     }
 
-    const responseData = response.data as ArrayBuffer;
-    const blob = new Blob([responseData], { type: response.headers['content-type'] });
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = response.headers['content-disposition'].split('=')[1];
-    a.click();
-    a.remove();
-
-    URL.revokeObjectURL(url);
+    downloadFile(response.data as ArrayBuffer, response.headers as DownloadFileHeaders);
 
     notifications.show({
       title: 'Success',
@@ -145,33 +135,35 @@ export function ExportsForm({ allServices }: ExportsFormProps) {
   };
 
   return (
-    <form onSubmit={form.onSubmit(handleSubmit)} className='exports-form'>
-      <TagsInput
-        label='Services'
-        placeholder='Select services to export'
-        data={Object.keys(serviceData)}
-        {...form.getInputProps('names')}
-      />
-
-      <Checkbox
-        label='Select date range'
-        checked={enabledDateSelection}
-        onChange={() => {
-          form.setValues({ range: [null, null] });
-          setEnabledDateSelection(!enabledDateSelection);
-        }}
-      />
-      {enabledDateSelection && (
-        <DatePickerInput
-          type='range'
-          placeholder='Choose a date range...'
-          {...form.getInputProps('range')}
+    <ExportsCard>
+      <form onSubmit={form.onSubmit(handleSubmit)} className='exports-form'>
+        <TagsInput
+          label='Services'
+          placeholder='Select services to export'
+          data={Object.keys(serviceData)}
+          {...form.getInputProps('names')}
         />
-      )}
 
-      <Button type='submit' variant='outline' color='green' loading={loading}>
-        Export Data
-      </Button>
-    </form>
+        <Checkbox
+          label='Select date range'
+          checked={enabledDateSelection}
+          onChange={() => {
+            form.setValues({ range: [null, null] });
+            setEnabledDateSelection(!enabledDateSelection);
+          }}
+        />
+        {enabledDateSelection && (
+          <DatePickerInput
+            type='range'
+            placeholder='Choose a date range...'
+            {...form.getInputProps('range')}
+          />
+        )}
+
+        <Button type='submit' variant='outline' color='green' loading={loading}>
+          Export Data
+        </Button>
+      </form>
+    </ExportsCard>
   );
 }

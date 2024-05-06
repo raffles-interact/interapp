@@ -2,12 +2,13 @@ export const dynamic = 'force-dynamic'; // nextjs needs this to build properly
 
 import APIClient from '@api/api_client';
 import { useMemo } from 'react';
-import { Title, Text } from '@mantine/core';
+import { Title, Text, Group } from '@mantine/core';
 
 import { type Service } from '@/app/services/types';
 import { AxiosInstance } from 'axios';
 import './styles.css';
-import { ExportsForm } from './ExportsForm/ExportsForm';
+import { AttendanceExportsForm } from './AttendanceExportsForm/AttendanceExportsForm';
+import { ServiceHoursExportsForm } from './ServiceHoursExportsForm/ServiceHoursExportsForm';
 import { ClientError } from '@utils/.';
 
 const fetchServices = async (apiClient: AxiosInstance) => {
@@ -35,7 +36,10 @@ export default function Exports() {
     <div className='exports-page'>
       <Title order={1}>Exports</Title>
       <Text>Export data as an Excel sheet here.</Text>
-      <ExportsForm allServices={services} />
+      <Group justify='center'>
+        <AttendanceExportsForm allServices={services} />
+        <ServiceHoursExportsForm />
+      </Group>
     </div>
   );
 }
