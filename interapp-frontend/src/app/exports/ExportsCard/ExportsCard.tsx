@@ -27,37 +27,37 @@ export const generateErrorFromResponse = (response: AxiosResponse) => {
     case 200:
       break;
     case 400:
-      return ({
+      return {
         title: 'Error',
         message: parseServerError(response.data),
         color: 'red',
-      });
+      };
     case 401:
-      return ({
+      return {
         title: 'Error',
         message: 'Unauthorized',
         color: 'red',
-      });
+      };
     case 403:
-      return ({
+      return {
         title: 'Error',
         message: 'Forbidden',
         color: 'red',
-      });
+      };
     case 404:
-      return ({
+      return {
         title: 'Error',
         message: 'Sessions between the selected dates are not found',
         color: 'red',
-      });
+      };
     default:
-      return ({
+      return {
         title: 'Error',
         message: 'Unknown error',
         color: 'red',
-      });
+      };
   }
-}
+};
 
 interface ExportsCardProps {
   children: ReactNode;
