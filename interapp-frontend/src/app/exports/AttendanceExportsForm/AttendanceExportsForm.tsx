@@ -6,8 +6,7 @@ import { notifications } from '@mantine/notifications';
 import { APIClient } from '@api/api_client';
 import { Service } from '@/app/services/types';
 import { use, useMemo, useState } from 'react';
-import { parseServerError } from '@utils/.';
-import { ExportsCard, downloadFile, type DownloadFileHeaders } from '../ExportsCard/ExportsCard';
+import { ExportsCard, downloadFile, generateErrorFromResponse, type DownloadFileHeaders } from '../ExportsCard/ExportsCard';
 
 type AttendanceExportsProps = {
   names: string[];
@@ -18,7 +17,7 @@ interface AttendanceExportsFormProps {
   allServices: Promise<Pick<Service, 'name' | 'service_id'>[]>;
 }
 
-export function AttendanceExportsForm({ allServices }: AttendanceExportsFormProps) {
+export function AttendanceExportsForm({ allServices }: Readonly<AttendanceExportsFormProps>) {
   const [enabledDateSelection, setEnabledDateSelection] = useState(false);
   const [loading, setLoading] = useState(false);
   const services = use(allServices);
@@ -85,44 +84,10 @@ export function AttendanceExportsForm({ allServices }: AttendanceExportsFormProp
     });
     setLoading(false);
 
-    switch (response.status) {
-      case 200:
-        break;
-      case 400:
-        notifications.show({
-          title: 'Error',
-          message: parseServerError(response.data),
-          color: 'red',
-        });
-        return;
-      case 401:
-        notifications.show({
-          title: 'Error',
-          message: 'Unauthorized',
-          color: 'red',
-        });
-        return;
-      case 403:
-        notifications.show({
-          title: 'Error',
-          message: 'Forbidden',
-          color: 'red',
-        });
-        return;
-      case 404:
-        notifications.show({
-          title: 'Error',
-          message: 'Sessions between the selected dates are not found',
-          color: 'red',
-        });
-        return;
-      default:
-        notifications.show({
-          title: 'Error',
-          message: 'Unknown error',
-          color: 'red',
-        });
-        return;
+    const error = generateErrorFromResponse(response);
+    if (error) {
+      notifications.show(error);
+      return;
     }
 
     downloadFile(response.data as ArrayBuffer, response.headers as DownloadFileHeaders);

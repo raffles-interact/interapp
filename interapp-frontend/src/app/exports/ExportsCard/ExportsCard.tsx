@@ -1,5 +1,6 @@
 import { Card, Stack, Title, Text } from '@mantine/core';
-import { AxiosResponseHeaders } from 'axios';
+import { AxiosResponseHeaders, AxiosResponse } from 'axios';
+import { parseServerError } from '@utils/parseServerError';
 import { type ReactNode } from 'react';
 import './styles.css';
 
@@ -21,13 +22,50 @@ export function downloadFile(data: ArrayBuffer, headers: DownloadFileHeaders) {
   URL.revokeObjectURL(url);
 }
 
+export const generateErrorFromResponse = (response: AxiosResponse) => {
+  switch (response.status) {
+    case 200:
+      break;
+    case 400:
+      return ({
+        title: 'Error',
+        message: parseServerError(response.data),
+        color: 'red',
+      });
+    case 401:
+      return ({
+        title: 'Error',
+        message: 'Unauthorized',
+        color: 'red',
+      });
+    case 403:
+      return ({
+        title: 'Error',
+        message: 'Forbidden',
+        color: 'red',
+      });
+    case 404:
+      return ({
+        title: 'Error',
+        message: 'Sessions between the selected dates are not found',
+        color: 'red',
+      });
+    default:
+      return ({
+        title: 'Error',
+        message: 'Unknown error',
+        color: 'red',
+      });
+  }
+}
+
 interface ExportsCardProps {
   children: ReactNode;
   title: string;
   description: string;
 }
 
-export function ExportsCard({ children, title, description }: ExportsCardProps) {
+export function ExportsCard({ children, title, description }: Readonly<ExportsCardProps>) {
   return (
     <Card shadow='sm' padding='lg' radius='md' withBorder className='exports-card'>
       <Stack gap='sm'>
