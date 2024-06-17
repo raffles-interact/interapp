@@ -1,9 +1,10 @@
 import { AttendanceStatus } from '@db/entities';
+import { type WorkSheet } from 'node-xlsx';
 
 export interface ExportsModelImpl {
   queryExports(conds: unknown): Promise<unknown[]>;
-  formatXLSX(conds: unknown): Promise<unknown>;
-  packXLSX(ids: number[], start_date?: string, end_date?: string): Promise<Buffer>;
+  formatXLSX(conds: unknown): Promise<WorkSheet>;
+  packXLSX(...params: unknown[]): Promise<Buffer>;
 }
 
 // class decorator that asserts that a class implements an interface statically
@@ -48,3 +49,19 @@ export type AttendanceQueryExportsConditions = {
       end_date?: never;
     }
 );
+
+export type ServiceHoursExportResult = {
+  username: string;
+  user_id: number;
+  service_hours: number;
+};
+
+export type ServiceHoursExportsXLSX = [
+  ['user_id', 'username', 'service_hours'],
+  ...[number, string, number][],
+];
+
+export type ServiceHoursQueryExportsConditions = {
+  type: 'user_id' | 'username' | 'service_hours';
+  order: 'ASC' | 'DESC';
+};

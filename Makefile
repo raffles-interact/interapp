@@ -54,3 +54,7 @@ run:
 	$(DC_CMD) up -d
 down:
 	$(DC_CMD) -v down
+
+# push docker images to the registry
+push:
+	docker compose -f docker-compose.prod.yml push
