@@ -30,9 +30,7 @@ Obtain both files (containing secret keys and the like) ``interapp-backend/.env.
 2. Install packages in both the ``interapp-backend`` and ``interapp-frontend`` directories (do not install in the root directory). Note that these 2 directories act as different project folders and are only unified during the build process with docker.
 
 3. Set up the dev server with ``make build && make run``. Go onto the website and create an account with any username and id you want. Note down this username.
-4. Run ``docker exec -it interapp-postgres sh`` (you should see ‘/ #’ pop up) to enter into a interactive shell after the containers are up. Run 
-``username=your_username_that_you_signed_up_with PGPASSWORD=postgres psql -U postgres -d interapp -c "INSERT INTO \"user_permission\" (\'username\', \'permission_id\', \'userUsername\') VALUES (\'$username\', 6, \'$username\')"``  to give yourself admin permissions. Exit the interactive shell.
-
+4. Run ``docker exec -it interapp-postgres sh`` (you should see ‘/ #’ pop up) to enter into a interactive shell after the containers are up. Run `PGPASSWORD=postgres psql -U postgres -d interapp` and then run the query `INSERT INTO "user_permission" ('username', 'permission_id', 'userUsername') VALUES ('<username>', 6, '<username>')` to give yourself admin permissions. Exit the interactive shell afterwards.
 
 ### Running
 
