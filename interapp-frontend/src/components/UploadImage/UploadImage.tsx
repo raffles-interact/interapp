@@ -92,6 +92,8 @@ const UploadImage = ({ onChange, defaultImageURL, className, accept }: UploadIma
           onKeyDown={(e) => {
             if (e.key === 'F1') inputRef.current?.click();
           }}
+          role='button'
+          tabIndex={0}
         >
           <Text>Upload an image</Text>
         </div>
