@@ -6,7 +6,7 @@ COPY . .
 RUN bun install --production --frozen-lockfile && \
 
     # install curl, lsb-release and gnupg
-    apt-get update && apt-get install -y curl lsb-release gnupg && apt-get clean && \
+    apt-get update && apt-get install -y curl gnupg lsb-release && apt-get clean && \
 
     # add postgresql repository
     curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - && \
