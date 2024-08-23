@@ -177,6 +177,7 @@ const NavbarNotifications = () => {
           if (e.key === 'F1') setOpened(!opened);
         }}
         role='button'
+        tabIndex={0}
       >
         {notificationsCount > 0 ? (
           <Indicator color='blue'>
