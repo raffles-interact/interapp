@@ -34,7 +34,7 @@ export function validateRequiredFields<T extends z.ZodType<ReqBody | ReqQuery>>(
 export async function verifyJWT(req: Request, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (!authHeader?.startsWith('Bearer ')) {
     throw new HTTPError(
       'Missing JWT',
       'You must provide a JWT token in the Authorization header',
