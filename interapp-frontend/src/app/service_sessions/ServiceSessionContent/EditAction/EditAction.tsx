@@ -112,8 +112,8 @@ async function updateServiceHours(
 
         // if the user was previously not attended and is now attended, add the hours
         if (oldValue !== 'Attended' && value === 'Attended') offset += formValues.service_hours;
-      } else {
-        if (value === 'Attended') offset += formValues.service_hours;
+      } else if (value === 'Attended') {
+        offset += formValues.service_hours;
       }
 
       return [key, offset];

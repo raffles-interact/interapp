@@ -92,7 +92,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       const constructedSearchParams = Object.entries(Object.fromEntries(params))
         .map(([key, value]) => `${key}=${value}`)
         .join('&');
-      const fullPath = `${pathname}${constructedSearchParams ? `?${constructedSearchParams}` : ''}`;
+      
+      const constructedSearchParamsParsed = constructedSearchParams ? `?${constructedSearchParams}` : '';
+      const fullPath = `${pathname}${constructedSearchParamsParsed}`;
       router.push(`/auth/login?redirectTo=${encodeURIComponent(fullPath)}`);
 
       return;

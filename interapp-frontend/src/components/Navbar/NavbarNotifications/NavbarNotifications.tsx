@@ -167,7 +167,7 @@ const NavbarNotifications = () => {
     return unreadAnnouncements + activeSessions + verified;
   }, [userNotifications]);
 
-  if (!user || !user.permissions.includes(Permissions.CLUB_MEMBER)) return <div></div>;
+  if (!user?.permissions.includes(Permissions.CLUB_MEMBER)) return <div></div>;
   return (
     <>
       <div
