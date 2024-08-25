@@ -1,0 +1,3 @@
+.exports-card {
+  width: clamp(450px, 48%, 600px);
+}

@@ -37,6 +37,7 @@ services:
 
   scheduler:
     container_name: interapp-scheduler
+    image: sebassnoob/interapp-scheduler:latest
     restart: on-failure
     build:
       context: ./interapp-backend
@@ -81,6 +82,7 @@ services:
 
   backend:
     container_name: interapp-backend
+    image: sebassnoob/interapp-backend:latest
     restart: always
     build:
       context: ./interapp-backend
@@ -101,6 +103,7 @@ services:
 
   frontend:
     container_name: interapp-frontend
+    image: sebassnoob/interapp-frontend:latest
     build:
       context: ./interapp-frontend
       dockerfile: prod.Dockerfile
@@ -118,6 +121,7 @@ services:
   
   nginx:
     container_name: interapp-nginx
+    image: sebassnoob/interapp-nginx:latest
     build:
       context: ./nginx
       dockerfile: prod.Dockerfile

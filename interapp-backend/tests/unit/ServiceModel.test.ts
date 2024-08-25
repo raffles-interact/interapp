@@ -15,6 +15,21 @@ const suite = testSuites[SUITE_NAME];
 const signUpUser = async (id: number, name: string) =>
   await AuthModel.signUp(id, name, 'sfsajhjkh@fdjfas', 'pass');
 
+const createSession = async (id: number) => {
+  const now = new Date();
+  const inOneHour = new Date();
+  inOneHour.setHours(now.getHours() + 1);
+  const sessionData = {
+    service_id: 1,
+    start_time: now.toISOString(),
+    end_time: inOneHour.toISOString(),
+    ad_hoc_enabled: true,
+    service_hours: 1,
+  };
+  const sessionId = await ServiceModel.createServiceSession(sessionData);
+  expect(sessionId).toBe(id);
+};
+
 suite.createService = [
   {
     name: 'should create a service',
@@ -501,20 +516,6 @@ suite.createServiceSession = [
       expect(id).toBe(1);
       // create service sessions
 
-      const createSession = async (id: number) => {
-        const now = new Date();
-        const inOneHour = new Date();
-        inOneHour.setHours(now.getHours() + 1);
-        const sessionData = {
-          service_id: 1,
-          start_time: now.toISOString(),
-          end_time: inOneHour.toISOString(),
-          ad_hoc_enabled: true,
-          service_hours: 1,
-        };
-        const sessionId = await ServiceModel.createServiceSession(sessionData);
-        expect(sessionId).toBe(id);
-      };
       for (let i = 1; i <= 10; i++) {
         await createSession(i);
       }
@@ -890,21 +891,6 @@ suite.createServiceSessionUser = [
       const serviceId = await ServiceModel.createService(serviceData);
       expect(serviceId).toBe(1);
 
-      const createSession = async (id: number) => {
-        const now = new Date();
-        const inOneHour = new Date();
-        inOneHour.setHours(now.getHours() + 1);
-        const sessionData = {
-          service_id: 1,
-          start_time: now.toISOString(),
-          end_time: inOneHour.toISOString(),
-          ad_hoc_enabled: true,
-          service_hours: 1,
-        };
-        const sessionId = await ServiceModel.createServiceSession(sessionData);
-        expect(sessionId).toBe(id);
-      };
-
       for (let i = 1; i <= 10; i++) {
         await createSession(i);
       }
@@ -971,21 +957,6 @@ suite.createServiceSessionUsers = [
       };
       const serviceId = await ServiceModel.createService(serviceData);
       expect(serviceId).toBe(1);
-
-      const createSession = async (id: number) => {
-        const now = new Date();
-        const inOneHour = new Date();
-        inOneHour.setHours(now.getHours() + 1);
-        const sessionData = {
-          service_id: 1,
-          start_time: now.toISOString(),
-          end_time: inOneHour.toISOString(),
-          ad_hoc_enabled: true,
-          service_hours: 1,
-        };
-        const sessionId = await ServiceModel.createServiceSession(sessionData);
-        expect(sessionId).toBe(id);
-      };
 
       for (let i = 1; i <= 10; i++) {
         await createSession(i);
@@ -1331,21 +1302,8 @@ suite.getAllServiceSessions = [
       };
       const id = await ServiceModel.createService(serviceData);
       expect(id).toBe(1);
+
       // create service sessions
-      const createSession = async (id: number) => {
-        const now = new Date();
-        const inOneHour = new Date();
-        inOneHour.setHours(now.getHours() + 1);
-        const sessionData = {
-          service_id: 1,
-          start_time: now.toISOString(),
-          end_time: inOneHour.toISOString(),
-          ad_hoc_enabled: true,
-          service_hours: 1,
-        };
-        const sessionId = await ServiceModel.createServiceSession(sessionData);
-        expect(sessionId).toBe(id);
-      };
       for (let i = 1; i <= 10; i++) {
         await createSession(i);
       }

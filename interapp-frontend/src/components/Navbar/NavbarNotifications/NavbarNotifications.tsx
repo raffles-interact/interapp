@@ -167,7 +167,7 @@ const NavbarNotifications = () => {
     return unreadAnnouncements + activeSessions + verified;
   }, [userNotifications]);
 
-  if (!user || !user.permissions.includes(Permissions.CLUB_MEMBER)) return <div></div>;
+  if (!user?.permissions.includes(Permissions.CLUB_MEMBER)) return <div></div>;
   return (
     <>
       <div
@@ -177,6 +177,7 @@ const NavbarNotifications = () => {
           if (e.key === 'F1') setOpened(!opened);
         }}
         role='button'
+        tabIndex={0}
       >
         {notificationsCount > 0 ? (
           <Indicator color='blue'>

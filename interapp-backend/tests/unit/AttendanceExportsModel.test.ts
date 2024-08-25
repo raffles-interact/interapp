@@ -243,6 +243,4 @@ suite.packXLSX = [
   },
 ];
 
-console.log(suite);
-
 runSuite(SUITE_NAME, suite);
