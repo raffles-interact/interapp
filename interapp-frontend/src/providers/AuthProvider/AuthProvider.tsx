@@ -10,7 +10,7 @@ import {
 } from './types';
 import APIClient from '@api/api_client';
 import { useRouter, usePathname, useSearchParams } from 'next/navigation';
-import { routePermissions, noLoginRequiredRoutes, allRoutes } from '@/app/route_permissions';
+import { routePermissions, noLoginRequiredRoutes, allRoutes } from '@/app/routePermissions';
 import { notifications } from '@mantine/notifications';
 import { remapAssetUrl, wildcardMatcher } from '@utils/.';
 

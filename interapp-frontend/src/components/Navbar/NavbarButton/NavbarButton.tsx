@@ -17,7 +17,7 @@ import {
 } from '@tabler/icons-react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { User } from '@providers/AuthProvider/types';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { Menu } from '@mantine/core';
 import { notifications } from '@mantine/notifications';
 import { useRouter } from 'next/navigation';

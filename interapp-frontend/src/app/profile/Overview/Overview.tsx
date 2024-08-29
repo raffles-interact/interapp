@@ -2,7 +2,7 @@
 import APIClient from '@api/api_client';
 import { useState, useEffect } from 'react';
 import { User, validateUserType } from '@providers/AuthProvider/types';
-import { Permissions } from '../../route_permissions';
+import { Permissions } from '../../routePermissions';
 import { ClientError, remapAssetUrl } from '@utils/.';
 import { Text, Title, Group, Stack, Badge, ActionIcon, Paper, Button } from '@mantine/core';
 import './styles.css';

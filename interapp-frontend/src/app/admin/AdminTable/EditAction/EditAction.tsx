@@ -8,7 +8,7 @@ import { memo, useState } from 'react';
 import PermissionsInput from '../PermissionsInput/PermissionsInput';
 import APIClient from '@api/api_client';
 import './styles.css';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 
 function EditAction({ user, refreshData }: Readonly<{ user: User; refreshData: () => void }>) {
   const apiClient = new APIClient().instance;

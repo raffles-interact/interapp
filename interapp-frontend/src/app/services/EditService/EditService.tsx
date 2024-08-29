@@ -14,7 +14,7 @@ import { useState, useContext, memo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import UploadImage, { convertToBase64, allowedFormats } from '@components/UploadImage/UploadImage';
 import { IconPencil } from '@tabler/icons-react';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import './styles.css';
 import { notifications } from '@mantine/notifications';

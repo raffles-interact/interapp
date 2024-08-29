@@ -8,7 +8,7 @@ import ServiceSessionUserInput from '../ServiceSessionUserInput/ServiceSessionUs
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 import { memo, useContext, useEffect, useState } from 'react';
 import APIClient from '@api/api_client';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
 import { ClientError, getAllUsernames, parseServerError } from '@utils/.';
 import { ServiceSessionUser } from '../../types';

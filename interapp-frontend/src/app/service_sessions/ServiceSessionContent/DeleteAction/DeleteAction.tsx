@@ -6,7 +6,7 @@ import { notifications } from '@mantine/notifications';
 import APIClient from '@api/api_client';
 import CRUDModal from '@components/CRUDModal/CRUDModal';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { IconTrash } from '@tabler/icons-react';
 
 interface DeleteActionProps {

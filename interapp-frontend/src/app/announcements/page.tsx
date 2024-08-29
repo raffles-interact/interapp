@@ -11,7 +11,7 @@ import { useDebouncedState } from '@mantine/hooks';
 import { useRouter } from 'next/navigation';
 import './styles.css';
 import { IconPlus } from '@tabler/icons-react';
-import { Permissions } from '../route_permissions';
+import { Permissions } from '../routePermissions';
 
 const handleFetch = async (page: number) => {
   const apiClient = new APIClient().instance;

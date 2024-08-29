@@ -13,7 +13,7 @@ import AnnouncementAttachment from '@components/AnnouncementAttachment/Announcem
 import { useRouter } from 'next/navigation';
 import './styles.css';
 import { notifications } from '@mantine/notifications';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import PageSkeleton from '@components/PageSkeleton/PageSkeleton';
 
 const handleFetch = async (id: number) => {

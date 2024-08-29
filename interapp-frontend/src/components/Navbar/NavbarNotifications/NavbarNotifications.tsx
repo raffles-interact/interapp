@@ -14,7 +14,7 @@ import APIClient from '@api/api_client';
 import { useRouter } from 'next/navigation';
 import { notifications } from '@mantine/notifications';
 import './styles.css';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { ClientError } from '@/utils';
 
 const NavbarNotifications = () => {

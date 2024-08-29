@@ -1,7 +1,7 @@
 'use client';
 import { useContext, useMemo, useState, useEffect } from 'react';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 
 import LatestAnnouncement from '@/app/_homepage/LatestAnnouncement/LatestAnnouncement';
 import AttendanceList, {

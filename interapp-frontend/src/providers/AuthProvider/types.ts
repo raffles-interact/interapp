@@ -1,5 +1,5 @@
 import { ReactNode } from 'react';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 
 export interface AuthContextType {
   user: User | null;

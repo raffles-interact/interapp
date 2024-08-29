@@ -1,6 +1,6 @@
 'use client';
 import { PillsInput, Pill, Combobox, CheckIcon, Group, useCombobox } from '@mantine/core';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { ReactNode, useEffect, useState } from 'react';
 
 export const permissionsMap: Record<Permissions, string> = {

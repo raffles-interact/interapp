@@ -9,7 +9,7 @@ import { Modal, Button, Text, TagsInput } from '@mantine/core';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
 
 import './styles.css';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { ClientError } from '@/utils';
 
 const handleGetUsers = async (service_id: number) => {

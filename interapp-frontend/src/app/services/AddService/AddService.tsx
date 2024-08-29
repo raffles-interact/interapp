@@ -21,7 +21,7 @@ import CRUDModal from '@components/CRUDModal/CRUDModal';
 import SearchableSelect from '@components/SearchableSelect/SearchableSelect';
 import UploadImage, { convertToBase64, allowedFormats } from '@components/UploadImage/UploadImage';
 import './styles.css';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { getAllUsernames, parseServerError } from '@utils/.';
 import { useRouter } from 'next/navigation';
 import { CreateServiceWithUsers } from '../types';

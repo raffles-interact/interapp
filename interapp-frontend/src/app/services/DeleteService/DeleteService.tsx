@@ -7,7 +7,7 @@ import { memo, useState, useContext } from 'react';
 import APIClient from '@api/api_client';
 import { useRouter } from 'next/navigation';
 import { AuthContext } from '@providers/AuthProvider/AuthProvider';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { notifications } from '@mantine/notifications';
 import './styles.css';
 

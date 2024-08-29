@@ -3,7 +3,7 @@ import { Table, Pill, TextInput } from '@mantine/core';
 import APIClient from '@api/api_client';
 import { memo, useEffect, useState, useMemo } from 'react';
 import { User } from '@providers/AuthProvider/types';
-import { Permissions } from '@/app/route_permissions';
+import { Permissions } from '@/app/routePermissions';
 import { permissionsMap } from './PermissionsInput/PermissionsInput';
 import EditAction from './EditAction/EditAction';
 import DeleteAction from './DeleteAction/DeleteAction';
