@@ -14,7 +14,11 @@ import CRUDModal from '@components/CRUDModal/CRUDModal';
 import './styles.css';
 import { ServiceSessionUser } from '../../types';
 import { getAllUsernames, parseServerError } from '@utils/.';
-import { updateServiceSessionUsers, updateServiceSession, updateServiceHours } from './EditActionUpdaters';
+import {
+  updateServiceSessionUsers,
+  updateServiceSession,
+  updateServiceHours,
+} from './EditActionUpdaters';
 
 const calculateInterval = (start: Date, end: Date) => {
   const diff = end.getTime() - start.getTime();
@@ -146,7 +150,7 @@ function EditAction({
     setLoading(false);
     close();
   };
-  
+
   // if any user is ad_hoc, disable ad_hoc_enabled as a selectable option because it's already enabled for >1 user
   useEffect(() => {
     const hasAdHocUser = form.values.attendees.some((user) => user.ad_hoc);
