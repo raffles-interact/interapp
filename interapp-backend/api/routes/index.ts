@@ -46,8 +46,6 @@ import {
   announcementRouter,
   exportsRouter,
 } from './endpoints';
-
-import 'express-async-errors';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { handleError, generateRateLimit } from './middleware';
