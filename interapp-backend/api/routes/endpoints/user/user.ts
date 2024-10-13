@@ -21,7 +21,7 @@ import { Permissions } from '@utils/permissions';
 const userRouter = Router();
 
 userRouter.get('/', validateRequiredFields(OptionalUsername), verifyJWT, async (req, res) => {
-  const query: z.infer<typeof OptionalUsername> = req.query;
+  const query: z.infer<typeof OptionalUsername> = res.locals.query;
   const username = query.username;
 
   if (username !== undefined) {
@@ -153,7 +153,7 @@ userRouter.get(
   validateRequiredFields(OptionalUsername),
   verifyJWT,
   async (req, res) => {
-    const query: z.infer<typeof OptionalUsername> = req.query;
+    const query: z.infer<typeof OptionalUsername> = res.locals.query;
     const username = query.username;
     const permissions = await UserModel.getPermissions(username);
     res.status(200).send(permissions);
@@ -165,7 +165,7 @@ userRouter.get(
   verifyJWT,
   validateRequiredFields(RequiredUsername),
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof RequiredUsername>;
+    const query = res.locals.query as unknown as z.infer<typeof RequiredUsername>;
     const services = await UserModel.getAllServicesByUser(query.username as string);
     res.status(200).send(services);
   },

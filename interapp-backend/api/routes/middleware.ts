@@ -23,7 +23,7 @@ export function validateRequiredFields<T extends z.ZodType<ReqBody | ReqQuery>>(
       );
     }
     if (req.method === 'GET') {
-      req.query = validationResult.data as ReqQuery;
+      res.locals.query = validationResult.data as ReqQuery;
     } else {
       req.body = validationResult.data as ReqBody;
     }

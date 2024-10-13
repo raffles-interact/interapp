@@ -41,7 +41,7 @@ serviceRouter.post(
 );
 
 serviceRouter.get('/', validateRequiredFields(ServiceIdFields), async (req, res) => {
-  const query = req.query as unknown as z.infer<typeof ServiceIdFields>;
+  const query = res.locals.query as unknown as z.infer<typeof ServiceIdFields>;
 
   const service = await ServiceModel.getService(Number(query.service_id));
   res.status(200).send(service);
@@ -85,7 +85,7 @@ serviceRouter.get(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof ServiceIdFields>;
+    const query = res.locals.query as unknown as z.infer<typeof ServiceIdFields>;
     const users = await UserModel.getAllUsersByService(Number(query.service_id));
 
     res.status(200).send(users);
@@ -107,7 +107,7 @@ serviceRouter.post(
 );
 
 serviceRouter.get('/session', validateRequiredFields(ServiceSessionIdFields), async (req, res) => {
-  const query = req.query as unknown as z.infer<typeof ServiceSessionIdFields>;
+  const query = res.locals.query as unknown as z.infer<typeof ServiceSessionIdFields>;
   const session = await ServiceModel.getServiceSession(Number(query.service_session_id));
   res.status(200).send(session);
 });
@@ -141,7 +141,7 @@ serviceRouter.get(
   '/session/all',
   validateRequiredFields(AllServiceSessionsFields),
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof AllServiceSessionsFields>;
+    const query = res.locals.query as unknown as z.infer<typeof AllServiceSessionsFields>;
     let sessions;
     if (query.service_id) {
       sessions = await ServiceModel.getAllServiceSessions(
@@ -192,7 +192,7 @@ serviceRouter.get(
   '/session_user',
   validateRequiredFields(FindServiceSessionUserFields),
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof FindServiceSessionUserFields>;
+    const query = res.locals.query as unknown as z.infer<typeof FindServiceSessionUserFields>;
 
     const session_user = await ServiceModel.getServiceSessionUser(
       Number(query.service_session_id),
@@ -207,14 +207,14 @@ serviceRouter.get(
   '/session_user_bulk',
   validateRequiredFields(ServiceSessionUserBulkFields),
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof ServiceSessionUserBulkFields>;
+    const query = res.locals.query as unknown as z.infer<typeof ServiceSessionUserBulkFields>;
 
     if (Object.prototype.hasOwnProperty.call(query, 'username')) {
-      const session_users = await UserModel.getAllServiceSessionsByUser(String(req.query.username));
+      const session_users = await UserModel.getAllServiceSessionsByUser(String(res.locals.query.username));
       res.status(200).send(session_users);
     } else if (Object.prototype.hasOwnProperty.call(query, 'service_session_id')) {
       const session_users = await ServiceModel.getServiceSessionUsers(
-        Number(req.query.service_session_id),
+        Number(res.locals.query.service_session_id),
       );
       res.status(200).send(session_users);
     } else
