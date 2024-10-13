@@ -210,7 +210,9 @@ serviceRouter.get(
     const query = res.locals.query as unknown as z.infer<typeof ServiceSessionUserBulkFields>;
 
     if (Object.prototype.hasOwnProperty.call(query, 'username')) {
-      const session_users = await UserModel.getAllServiceSessionsByUser(String(res.locals.query.username));
+      const session_users = await UserModel.getAllServiceSessionsByUser(
+        String(res.locals.query.username),
+      );
       res.status(200).send(session_users);
     } else if (Object.prototype.hasOwnProperty.call(query, 'service_session_id')) {
       const session_users = await ServiceModel.getServiceSessionUsers(
