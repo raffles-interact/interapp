@@ -39,7 +39,6 @@ if (missing.length > 0) {
 
 import express from 'express';
 import {
-  helloRouter,
   authRouter,
   userRouter,
   serviceRouter,
@@ -70,7 +69,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 const routes = {
-  '/api/hello': helloRouter,
   '/api/auth': authRouter,
   '/api/user': userRouter,
   '/api/service': serviceRouter,
