@@ -30,6 +30,9 @@ export class APIClient {
       baseURL: this.isReactServerComponent
         ? `http://${process.env.NEXT_PUBLIC_BACKEND_HOST}:${process.env.NEXT_PUBLIC_BACKEND_PORT}/api`
         : process.env.NEXT_PUBLIC_AXIOS_BASE_URL,
+      paramsSerializer: {
+        indexes: null,
+      }
     });
     this.instance.interceptors.request.use((req) => {
       if (
