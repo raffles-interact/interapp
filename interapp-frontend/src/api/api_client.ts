@@ -32,7 +32,7 @@ export class APIClient {
         : process.env.NEXT_PUBLIC_AXIOS_BASE_URL,
       paramsSerializer: {
         indexes: null,
-      }
+      },
     });
     this.instance.interceptors.request.use((req) => {
       if (
