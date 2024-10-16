@@ -24,7 +24,7 @@
     "@types/bun": "^1.0.8",
     "@types/cookie-parser": "^1.4.6",
     "@types/cors": "^2.8.16",
-    "@types/express": "^5.0.0",
+    "@types/express": ">=5.0.0",
     "@types/express-rate-limit": "^6.0.0",
     "@types/multer": "^1.4.11",
     "@types/node-cron": "^3.0.11",
