@@ -1,4 +1,3 @@
-
 .PHONY:
 .ONESHELL:
 
@@ -30,11 +29,15 @@ export APP_VERSION
 # we need to down the container and rebuild the container
 ifeq ($(version), prod)
     ifeq ($(real), true)
-    BUILD_COMMANDS = $(DC_CMD) -v down ;\
+    BUILD_COMMANDS = sudo chmod -R 755 . ;\
+                     sudo chown -R $(whoami):$(whoami) . ;\
+                     $(DC_CMD) -v down ;\
                      docker system prune -f ;\
                      $(DC_CMD) build --no-cache
     else
-    BUILD_COMMANDS = trap "find . -iname .env.*.bak -exec sh -c 'mv $$0 $${0%.bak}' {} \;" SIGINT ;\
+    BUILD_COMMANDS = sudo chmod -R 755 . ;\
+                     sudo chown -R $(whoami):$(whoami) . ;\
+                     trap "find . -iname .env.*.bak -exec sh -c 'mv $$0 $${0%.bak}' {} \;" SIGINT ;\
                      $(DC_CMD) -v down ;\
                      find . -iname .env.* -exec cp {} {}.bak \; ;\
                      find . -iname .env.* ! -iname "*.bak" -exec sed -i -e 's/13.229.79.214/localhost/g' {} \; ;\
@@ -42,7 +45,9 @@ ifeq ($(version), prod)
                      find . -iname .env.*.bak -exec sh -c 'mv $$0 $${0%.bak}' {} \;
     endif
 else
-    BUILD_COMMANDS = $(DC_CMD) -v down ;\
+    BUILD_COMMANDS = sudo chmod -R 755 . ;\
+                     sudo chown -R $(whoami):$(whoami) . ;\
+                     $(DC_CMD) -v down ;\
                      $(DC_CMD) build
 endif
 

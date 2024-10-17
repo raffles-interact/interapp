@@ -25,7 +25,7 @@ announcementRouter.post(
   async (req, res) => {
     const files = req.files as Express.Multer.File[] | undefined;
 
-    const body: z.infer<typeof CreateAnnouncementFields> = req.body;
+    const body: z.infer<typeof CreateAnnouncementFields> = res.locals.body;
     const announcement_id = await AnnouncementModel.createAnnouncement({
       ...body,
       attachments: files,
@@ -41,7 +41,7 @@ announcementRouter.get(
   validateRequiredFields(AnnouncementIdFields),
   verifyJWT,
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof AnnouncementIdFields>;
+    const query: z.infer<typeof AnnouncementIdFields> = res.locals.query;
     const announcement = await AnnouncementModel.getAnnouncement(Number(query.announcement_id));
     res.status(200).json(announcement);
   },
@@ -52,7 +52,7 @@ announcementRouter.get(
   validateRequiredFields(PaginationFields),
   verifyJWT,
   async (req, res) => {
-    const query = req.query as unknown as z.infer<typeof PaginationFields>;
+    const query: z.infer<typeof PaginationFields> = res.locals.query;
     const announcements = await AnnouncementModel.getAnnouncements(
       Number(query.page),
       Number(query.page_size),
@@ -68,7 +68,7 @@ announcementRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const body: z.infer<typeof UpdateAnnouncementFields> = req.body;
+    const body: z.infer<typeof UpdateAnnouncementFields> = res.locals.body;
     const files = req.files as Express.Multer.File[] | undefined;
 
     const updated = await AnnouncementModel.updateAnnouncement({ ...body, attachments: files });
@@ -82,7 +82,7 @@ announcementRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const body: z.infer<typeof AnnouncementIdFields> = req.body;
+    const body: z.infer<typeof AnnouncementIdFields> = res.locals.body;
     await AnnouncementModel.deleteAnnouncement(Number(body.announcement_id));
     res.status(204).send();
   },
@@ -94,7 +94,7 @@ announcementRouter.get(
   verifyJWT,
   async (req, res) => {
     const completions = await AnnouncementModel.getAnnouncementCompletions(
-      Number(req.query.announcement_id),
+      Number(res.locals.query.announcement_id),
     );
 
     res.status(200).send(completions);
@@ -106,7 +106,7 @@ announcementRouter.patch(
   validateRequiredFields(AnnouncementCompletionFields),
   verifyJWT,
   async (req, res) => {
-    const body: z.infer<typeof AnnouncementCompletionFields> = req.body;
+    const body: z.infer<typeof AnnouncementCompletionFields> = res.locals.body;
     await AnnouncementModel.updateAnnouncementCompletion(
       body.announcement_id,
       req.headers.username as string,
