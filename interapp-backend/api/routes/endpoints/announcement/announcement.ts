@@ -41,7 +41,7 @@ announcementRouter.get(
   validateRequiredFields(AnnouncementIdFields),
   verifyJWT,
   async (req, res) => {
-    const query = res.locals.query as unknown as z.infer<typeof AnnouncementIdFields>;
+    const query:z.infer<typeof AnnouncementIdFields> = res.locals.query;
     const announcement = await AnnouncementModel.getAnnouncement(Number(query.announcement_id));
     res.status(200).json(announcement);
   },
@@ -52,7 +52,7 @@ announcementRouter.get(
   validateRequiredFields(PaginationFields),
   verifyJWT,
   async (req, res) => {
-    const query = res.locals.query as unknown as z.infer<typeof PaginationFields>;
+    const query: z.infer<typeof PaginationFields> = res.locals.query;
     const announcements = await AnnouncementModel.getAnnouncements(
       Number(query.page),
       Number(query.page_size),

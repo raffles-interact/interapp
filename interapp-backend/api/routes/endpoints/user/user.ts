@@ -165,7 +165,7 @@ userRouter.get(
   verifyJWT,
   validateRequiredFields(RequiredUsername),
   async (req, res) => {
-    const query = res.locals.query as unknown as z.infer<typeof RequiredUsername>;
+    const query: z.infer<typeof RequiredUsername> = res.locals.query;
     const services = await UserModel.getAllServicesByUser(query.username as string);
     res.status(200).send(services);
   },
