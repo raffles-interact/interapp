@@ -41,7 +41,7 @@ announcementRouter.get(
   validateRequiredFields(AnnouncementIdFields),
   verifyJWT,
   async (req, res) => {
-    const query:z.infer<typeof AnnouncementIdFields> = res.locals.query;
+    const query: z.infer<typeof AnnouncementIdFields> = res.locals.query;
     const announcement = await AnnouncementModel.getAnnouncement(Number(query.announcement_id));
     res.status(200).json(announcement);
   },

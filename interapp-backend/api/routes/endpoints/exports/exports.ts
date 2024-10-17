@@ -35,7 +35,7 @@ exportsRouter.get(
   verifyJWT,
   verifyRequiredPermission(Permissions.ATTENDANCE_MANAGER),
   async (req, res) => {
-    const query:z.infer<typeof ServiceHoursExportsFields> = res.locals.query;
+    const query: z.infer<typeof ServiceHoursExportsFields> = res.locals.query;
 
     const exports = await ServiceHoursExportsModel.packXLSX(query.type, query.order);
 
