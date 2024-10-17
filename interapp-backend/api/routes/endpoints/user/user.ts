@@ -59,7 +59,7 @@ userRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
-    const body: z.infer<typeof RequiredUsername> = req.body;
+    const body: z.infer<typeof RequiredUsername> = res.locals.body;
     await UserModel.deleteUser(body.username as string);
     res.status(204).send();
   },
@@ -70,7 +70,7 @@ userRouter.patch(
   validateRequiredFields(ChangePasswordFields),
   verifyJWT,
   async (req, res) => {
-    const body: z.infer<typeof ChangePasswordFields> = req.body;
+    const body: z.infer<typeof ChangePasswordFields> = res.locals.body;
     await UserModel.changePassword(
       req.headers.username as string,
       body.old_password,
@@ -84,14 +84,14 @@ userRouter.post(
   '/password/reset_email',
   validateRequiredFields(RequiredUsername),
   async (req, res) => {
-    const body: z.infer<typeof RequiredUsername> = req.body;
+    const body: z.infer<typeof RequiredUsername> = res.locals.body;
     await UserModel.sendResetPasswordEmail(body.username);
     res.status(204).send();
   },
 );
 
 userRouter.patch('/password/reset', validateRequiredFields(TokenFields), async (req, res) => {
-  const body: z.infer<typeof TokenFields> = req.body;
+  const body: z.infer<typeof TokenFields> = res.locals.body;
   const newPw = await UserModel.resetPassword(body.token);
   res.clearCookie('refresh', { path: '/api/auth/refresh' });
   res.status(200).send({
@@ -104,7 +104,7 @@ userRouter.patch(
   validateRequiredFields(ChangeEmailFields),
   verifyJWT,
   async (req, res) => {
-    const body: z.infer<typeof ChangeEmailFields> = req.body;
+    const body: z.infer<typeof ChangeEmailFields> = res.locals.body;
 
     if (body.username) {
       // we are changing someone else's email
@@ -119,7 +119,7 @@ userRouter.patch(
     }
     const username = body.username ?? (req.headers.username as string);
 
-    await UserModel.changeEmail(username, req.body.new_email);
+    await UserModel.changeEmail(username, res.locals.body.new_email);
     res.status(204).send();
   },
 );
@@ -130,7 +130,7 @@ userRouter.post('/verify_email', verifyJWT, async (req, res) => {
 });
 
 userRouter.patch('/verify', validateRequiredFields(TokenFields), verifyJWT, async (req, res) => {
-  const body: z.infer<typeof TokenFields> = req.body;
+  const body: z.infer<typeof TokenFields> = res.locals.body;
   await UserModel.verifyEmail(body.token);
   res.status(204).send();
 });
@@ -141,7 +141,7 @@ userRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.ADMIN),
   async (req, res) => {
-    const body: z.infer<typeof PermissionsFields> = req.body;
+    const body: z.infer<typeof PermissionsFields> = res.locals.body;
 
     await UserModel.updatePermissions(body.username, body.permissions);
     res.status(204).send();
@@ -177,7 +177,7 @@ userRouter.post(
   verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(ServiceIdFieldsNumeric),
   async (req, res) => {
-    const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
+    const body: z.infer<typeof ServiceIdFieldsNumeric> = res.locals.body;
     await UserModel.addServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
@@ -189,7 +189,7 @@ userRouter.delete(
   verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(ServiceIdFieldsNumeric),
   async (req, res) => {
-    const body: z.infer<typeof ServiceIdFieldsNumeric> = req.body;
+    const body: z.infer<typeof ServiceIdFieldsNumeric> = res.locals.body;
     await UserModel.removeServiceUser(body.service_id, body.username);
     res.status(204).send();
   },
@@ -201,7 +201,7 @@ userRouter.patch(
   verifyRequiredPermission(Permissions.EXCO),
   validateRequiredFields(UpdateUserServicesFields),
   async (req, res) => {
-    const body: z.infer<typeof UpdateUserServicesFields> = req.body;
+    const body: z.infer<typeof UpdateUserServicesFields> = res.locals.body;
 
     await UserModel.updateServiceUserBulk(body.service_id, body.data);
     res.status(204).send();
@@ -213,7 +213,7 @@ userRouter.patch(
   verifyJWT,
   validateRequiredFields(ServiceHoursFields),
   async (req, res) => {
-    const body: z.infer<typeof ServiceHoursFields> = req.body;
+    const body: z.infer<typeof ServiceHoursFields> = res.locals.body;
     if (body.username) {
       // we are changing someone else's service hours
       const perms = await UserModel.checkPermissions(req.headers.username as string);
@@ -240,7 +240,7 @@ userRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof ServiceHoursBulkFields> = req.body;
+    const body: z.infer<typeof ServiceHoursBulkFields> = res.locals.body;
     await UserModel.updateServiceHoursBulk(body);
     res.status(204).send();
   },
@@ -251,7 +251,7 @@ userRouter.patch(
   verifyJWT,
   validateRequiredFields(ProfilePictureFields),
   async (req, res) => {
-    const body: z.infer<typeof ProfilePictureFields> = req.body;
+    const body: z.infer<typeof ProfilePictureFields> = res.locals.body;
     const presigned = await UserModel.updateProfilePicture(
       req.headers.username as string,
       body.profile_picture,

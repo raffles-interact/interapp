@@ -31,7 +31,7 @@ serviceRouter.post(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const body: z.infer<typeof CreateServiceFields> = req.body;
+    const body: z.infer<typeof CreateServiceFields> = res.locals.body;
 
     const service_id = await ServiceModel.createService(body);
     res.status(200).send({
@@ -53,7 +53,7 @@ serviceRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const body: z.infer<typeof UpdateServiceFields> = req.body;
+    const body: z.infer<typeof UpdateServiceFields> = res.locals.body;
 
     const service = await ServiceModel.getService(body.service_id);
     const updated = await ServiceModel.updateService({ ...service, ...body });
@@ -67,7 +67,7 @@ serviceRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const body: z.infer<typeof ServiceIdFields> = req.body;
+    const body: z.infer<typeof ServiceIdFields> = res.locals.body;
     await ServiceModel.deleteService(body.service_id);
     res.status(204).send();
   },
@@ -98,7 +98,7 @@ serviceRouter.post(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof CreateServiceSessionFields> = req.body;
+    const body: z.infer<typeof CreateServiceSessionFields> = res.locals.body;
     const id = await ServiceModel.createServiceSession(body);
     res.status(200).send({
       service_session_id: id,
@@ -118,7 +118,7 @@ serviceRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof UpdateServiceSessionFields> = req.body;
+    const body: z.infer<typeof UpdateServiceSessionFields> = res.locals.body;
     const session = await ServiceModel.getServiceSession(body.service_session_id);
     const updated = await ServiceModel.updateServiceSession({ ...session, ...body });
     res.status(200).send(updated);
@@ -131,7 +131,7 @@ serviceRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof ServiceSessionIdFields> = req.body;
+    const body: z.infer<typeof ServiceSessionIdFields> = res.locals.body;
     await ServiceModel.deleteServiceSession(body.service_session_id);
     res.status(204).send();
   },
@@ -165,7 +165,7 @@ serviceRouter.post(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof CreateServiceSessionUserFields> = req.body;
+    const body: z.infer<typeof CreateServiceSessionUserFields> = res.locals.body;
 
     await ServiceModel.createServiceSessionUser(body);
     res.status(201).send();
@@ -178,7 +178,7 @@ serviceRouter.post(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof CreateBulkServiceSessionUserFields> = req.body;
+    const body: z.infer<typeof CreateBulkServiceSessionUserFields> = res.locals.body;
 
     const parsed = body.users.map((user) => {
       return { ...user, service_session_id: body.service_session_id };
@@ -230,7 +230,7 @@ serviceRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof UpdateServiceSessionUserFields> = req.body;
+    const body: z.infer<typeof UpdateServiceSessionUserFields> = res.locals.body;
 
     const session_user = await ServiceModel.getServiceSessionUser(
       Number(body.service_session_id),
@@ -247,7 +247,7 @@ serviceRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.CLUB_MEMBER),
   async (req, res) => {
-    const body: z.infer<typeof ServiceSessionUserIdFields> = req.body;
+    const body: z.infer<typeof ServiceSessionUserIdFields> = res.locals.body;
     const session_user = await ServiceModel.getServiceSessionUser(
       Number(body.service_session_id),
       String(body.username),
@@ -266,7 +266,7 @@ serviceRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof ServiceSessionUserIdFields> = req.body;
+    const body: z.infer<typeof ServiceSessionUserIdFields> = res.locals.body;
     await ServiceModel.deleteServiceSessionUser(
       Number(body.service_session_id),
       String(body.username),
@@ -281,7 +281,7 @@ serviceRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.SERVICE_IC, Permissions.MENTORSHIP_IC),
   async (req, res) => {
-    const body: z.infer<typeof DeleteBulkServiceSessionUserFields> = req.body;
+    const body: z.infer<typeof DeleteBulkServiceSessionUserFields> = res.locals.body;
     await ServiceModel.deleteServiceSessionUsers(Number(body.service_session_id), body.usernames);
     res.status(204).send();
   },
@@ -307,7 +307,7 @@ serviceRouter.post(
   validateRequiredFields(VerifyAttendanceFields),
   verifyJWT,
   async (req, res) => {
-    const body: z.infer<typeof VerifyAttendanceFields> = req.body;
+    const body: z.infer<typeof VerifyAttendanceFields> = res.locals.body;
     const meta = await ServiceModel.verifyAttendance(body.hash, req.headers.username as string);
     res.status(200).send(meta);
   },

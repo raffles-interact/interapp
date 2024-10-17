@@ -25,7 +25,7 @@ announcementRouter.post(
   async (req, res) => {
     const files = req.files as Express.Multer.File[] | undefined;
 
-    const body: z.infer<typeof CreateAnnouncementFields> = req.body;
+    const body: z.infer<typeof CreateAnnouncementFields> = res.locals.body;
     const announcement_id = await AnnouncementModel.createAnnouncement({
       ...body,
       attachments: files,
@@ -68,7 +68,7 @@ announcementRouter.patch(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const body: z.infer<typeof UpdateAnnouncementFields> = req.body;
+    const body: z.infer<typeof UpdateAnnouncementFields> = res.locals.body;
     const files = req.files as Express.Multer.File[] | undefined;
 
     const updated = await AnnouncementModel.updateAnnouncement({ ...body, attachments: files });
@@ -82,7 +82,7 @@ announcementRouter.delete(
   verifyJWT,
   verifyRequiredPermission(Permissions.EXCO),
   async (req, res) => {
-    const body: z.infer<typeof AnnouncementIdFields> = req.body;
+    const body: z.infer<typeof AnnouncementIdFields> = res.locals.body;
     await AnnouncementModel.deleteAnnouncement(Number(body.announcement_id));
     res.status(204).send();
   },
@@ -106,7 +106,7 @@ announcementRouter.patch(
   validateRequiredFields(AnnouncementCompletionFields),
   verifyJWT,
   async (req, res) => {
-    const body: z.infer<typeof AnnouncementCompletionFields> = req.body;
+    const body: z.infer<typeof AnnouncementCompletionFields> = res.locals.body;
     await AnnouncementModel.updateAnnouncementCompletion(
       body.announcement_id,
       req.headers.username as string,

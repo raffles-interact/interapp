@@ -7,14 +7,14 @@ import { z } from 'zod';
 const authRouter = Router();
 
 authRouter.post('/signup', validateRequiredFields(SignupFields), async (req, res) => {
-  const body: z.infer<typeof SignupFields> = req.body;
+  const body: z.infer<typeof SignupFields> = res.locals.body;
 
   await AuthModel.signUp(body.user_id, body.username, body.email, body.password);
   res.status(201).send();
 });
 
 authRouter.post('/signin', validateRequiredFields(SigninFields), async (req, res) => {
-  const body: z.infer<typeof SigninFields> = req.body;
+  const body: z.infer<typeof SigninFields> = res.locals.body;
   const { token, refresh, user, expire } = await AuthModel.signIn(body.username, body.password);
   res.cookie('refresh', refresh, {
     httpOnly: true,
