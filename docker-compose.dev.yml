@@ -23,6 +23,8 @@ services:
         reservations:
           cpus: '0.5'
           memory: 2G
+    environment:
+      PGDATA: /var/lib/pg_data
   
   redis:
     container_name: interapp-redis

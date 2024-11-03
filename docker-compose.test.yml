@@ -8,6 +8,8 @@ services:
     command: postgres -p 2345
     env_file:
       - ./interapp-backend/tests/config/.env.docker
+    environment:
+      PGDATA: /var/lib/pg_data
 
     networks:
       - interapp-network
