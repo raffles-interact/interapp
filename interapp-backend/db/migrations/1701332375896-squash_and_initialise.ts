@@ -11,7 +11,7 @@ export class SquashAndInitialise1701332375896 implements MigrationInterface {
       `CREATE TABLE "user_permission" ("username" character varying NOT NULL, "permission_id" integer NOT NULL, "userUsername" character varying, CONSTRAINT "PK_8e08d51f763ac375937a5b5faea" PRIMARY KEY ("username", "permission_id"))`,
     );
     await queryRunner.query(
-      `CREATE TYPE "public"."service_session_user_attended_enum" AS ENUM('Attended', 'Absent', 'Valid Reason')`,
+      `CREATE TYPE "public"."service_session_user_attended_enum" AS ENUM('Attended', 'Absent', 'Valid Reason', 'Late')`,
     );
     await queryRunner.query(
       `CREATE TABLE "service_session_user" ("service_session_id" integer NOT NULL, "username" character varying NOT NULL, "ad_hoc" boolean NOT NULL, "attended" "public"."service_session_user_attended_enum" NOT NULL, "is_ic" boolean NOT NULL, "serviceSessionServiceSessionId" integer, "userUsername" character varying, CONSTRAINT "PK_0a02c2eeffde68aace483ed73f4" PRIMARY KEY ("service_session_id", "username"))`,

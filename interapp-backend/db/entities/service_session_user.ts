@@ -6,6 +6,7 @@ export enum AttendanceStatus {
   Attended = 'Attended',
   Absent = 'Absent',
   ValidReason = 'Valid Reason',
+  Late = 'Late',
 }
 
 @Entity()

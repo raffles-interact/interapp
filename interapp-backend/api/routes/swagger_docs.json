@@ -2186,7 +2186,7 @@
           },
           "attended": {
             "type": "string",
-            "enum": ["Attended", "Absent", "Valid Reason"]
+            "enum": ["Attended", "Absent", "Valid Reason", "Late"]
           },
           "is_ic": {
             "type": "boolean",
