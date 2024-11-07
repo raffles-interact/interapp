@@ -1801,7 +1801,7 @@
                         },
                         "attended": {
                           "type": "string",
-                          "enum": ["Attended", "Absent", "Valid Reason"],
+                          "enum": ["Attended", "Absent", "Valid Reason", "Late"],
                           "example": "Absent"
                         },
                         "is_ic": {
