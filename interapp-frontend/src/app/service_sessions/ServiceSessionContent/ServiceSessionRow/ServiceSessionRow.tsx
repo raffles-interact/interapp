@@ -52,6 +52,7 @@ const ServiceSessionRow = ({
                   Absent: 'red',
                   Attended: 'green',
                   'Valid Reason': 'yellow',
+                  Late: 'orange',
                 }[user.attended]
               }
               key={user.username}

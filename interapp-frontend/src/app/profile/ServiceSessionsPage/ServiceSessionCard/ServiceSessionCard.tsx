@@ -10,11 +10,11 @@ interface ServiceSessionCardProps {
   service_session_id: number;
 
   ad_hoc: boolean;
-  attended: 'Absent' | 'Attended' | 'Valid Reason';
+  attended: 'Absent' | 'Attended' | 'Valid Reason' | 'Late';
   is_ic: boolean;
 }
 
-const generateAttendedBadge = (attended: 'Absent' | 'Attended' | 'Valid Reason') => {
+const generateAttendedBadge = (attended: 'Absent' | 'Attended' | 'Valid Reason' | 'Late') => {
   switch (attended) {
     case 'Absent':
       return <Badge color='red'>Absent</Badge>;
@@ -22,6 +22,8 @@ const generateAttendedBadge = (attended: 'Absent' | 'Attended' | 'Valid Reason')
       return <Badge color='green'>Attended</Badge>;
     case 'Valid Reason':
       return <Badge color='yellow'>Valid Reason</Badge>;
+    case 'Late':
+      return <Badge color='orange'>Late</Badge>;
   }
 };
 

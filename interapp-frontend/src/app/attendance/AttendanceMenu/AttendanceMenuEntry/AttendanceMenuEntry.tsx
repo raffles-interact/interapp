@@ -56,7 +56,7 @@ export const fetchAttendanceDetails = async (service_session_id: number) => {
     service_session_id: number;
     username: string;
     ad_hoc: boolean;
-    attended: 'Absent' | 'Attended' | 'Valid Reason';
+    attended: 'Absent' | 'Attended' | 'Valid Reason' | 'Late';
     is_ic: boolean;
   }[] = res2.data;
 
@@ -127,6 +127,7 @@ const AttendanceMenuEntry = ({ service_session_id }: AttendanceMenuEntryProps) =
                       Attended: 'green',
                       Absent: 'red',
                       'Valid Reason': 'yellow',
+                      Late: 'orange',
                     }[user.attended]
                   }
                   variant='light'

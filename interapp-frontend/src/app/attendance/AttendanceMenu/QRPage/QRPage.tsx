@@ -34,7 +34,7 @@ const refreshAttendance = async (id: number) => {
     service_session_id: number;
     username: string;
     ad_hoc: boolean;
-    attended: 'Absent' | 'Attended' | 'Valid Reason';
+    attended: 'Absent' | 'Attended' | 'Valid Reason' | 'Late';
     is_ic: boolean;
   }[] = res.data;
 
@@ -139,6 +139,7 @@ const QRPage = ({ id, hash }: QRPageProps) => {
                       Attended: 'green',
                       Absent: 'red',
                       'Valid Reason': 'yellow',
+                      Late: 'orange',
                     }[user.attended]
                   }
                   key={user.username}

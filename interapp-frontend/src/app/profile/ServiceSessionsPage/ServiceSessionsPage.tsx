@@ -26,7 +26,7 @@ const fetchUserServiceSessions = async (username: string) => {
     service_session_id: number;
     username: string;
     ad_hoc: boolean;
-    attended: 'Absent' | 'Attended' | 'Valid Reason';
+    attended: 'Absent' | 'Attended' | 'Valid Reason' | 'Late';
     is_ic: boolean;
   }[] = response.data;
 

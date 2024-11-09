@@ -10,7 +10,7 @@ export type FetchAttendanceResponse = {
   service_session_id: number;
   username: string;
   ad_hoc: boolean;
-  attended: 'Absent' | 'Attended' | 'Valid Reason';
+  attended: 'Absent' | 'Attended' | 'Valid Reason' | 'Late';
   is_ic: boolean;
 }[];
 
@@ -18,6 +18,7 @@ const AttendanceBadge = ({ attended }: Pick<FetchAttendanceResponse[0], 'attende
   let color = 'gray';
   if (attended === 'Attended') color = 'green';
   else if (attended === 'Valid Reason') color = 'yellow';
+  else if (attended === 'Late') color = 'orange';
   else if (attended === 'Absent') color = 'red';
   return <Badge color={color}>{attended}</Badge>;
 };

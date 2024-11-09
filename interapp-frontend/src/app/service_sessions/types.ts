@@ -11,10 +11,10 @@ export interface ServiceSession {
   service_hours: number;
 }
 
-export const AttendanceStatus = ['Absent', 'Attended', 'Valid Reason'];
+export const AttendanceStatus = ['Absent', 'Attended', 'Valid Reason', 'Late'];
 export interface ServiceSessionUser {
   ad_hoc: boolean;
-  attended: 'Absent' | 'Attended' | 'Valid Reason';
+  attended: 'Absent' | 'Attended' | 'Valid Reason' | 'Late';
   is_ic: boolean;
   service_session_id: number | null;
   username: string;
