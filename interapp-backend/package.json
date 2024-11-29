@@ -43,7 +43,7 @@
   "dependencies": {
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
-    "express": ">=5.0.0",
+    "express": "^5.0.0",
     "express-rate-limit": "^7.4.1",
     "jose": "^5.1.1",
     "minio": "^7.1.3",
